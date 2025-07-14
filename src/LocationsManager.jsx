@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
+import { useCRUD } from './hooks/useCRUD'
 
-// Datos de ejemplo para lugares
-const exampleLocations = [
+// Datos de ejemplo para lugares (movidos a constante)
+const EXAMPLE_LOCATIONS = [
   {
     id: 1,
     name: "Taberna del Dragón Dorado",
@@ -25,57 +26,21 @@ const exampleLocations = [
 ]
 
 function LocationsManager({ campaign }) {
-  const [locations, setLocations] = useState(exampleLocations)
-  const [showForm, setShowForm] = useState(false)
-  const [editingLocation, setEditingLocation] = useState(null)
-  const [selectedLocation, setSelectedLocation] = useState(null)
-
-  // Crear nuevo lugar
-  const handleCreateLocation = (locationData) => {
-    const newLocation = {
-      ...locationData,
-      id: Date.now(),
-      createdAt: new Date().toISOString().split('T')[0]
-    }
-    setLocations(prev => [...prev, newLocation])
-    setShowForm(false)
-    alert(`¡Lugar "${newLocation.name}" creado exitosamente! 🎉`)
-  }
-
-  // Editar lugar existente
-  const handleEditLocation = (locationData) => {
-    setLocations(prev => prev.map(loc => 
-      loc.id === editingLocation.id 
-        ? { ...locationData, id: editingLocation.id, createdAt: editingLocation.createdAt }
-        : loc
-    ))
-    setEditingLocation(null)
-    setShowForm(false)
-    alert(`¡Lugar "${locationData.name}" actualizado! ✨`)
-  }
-
-  // Eliminar lugar
-  const handleDeleteLocation = (locationId, locationName) => {
-    if (window.confirm(`¿Estás seguro de que quieres eliminar "${locationName}"?`)) {
-      setLocations(prev => prev.filter(loc => loc.id !== locationId))
-      if (selectedLocation?.id === locationId) {
-        setSelectedLocation(null)
-      }
-      alert(`Lugar "${locationName}" eliminado`)
-    }
-  }
-
-  // Abrir formulario para editar
-  const openEditForm = (location) => {
-    setEditingLocation(location)
-    setShowForm(true)
-  }
-
-  // Abrir formulario para crear
-  const openCreateForm = () => {
-    setEditingLocation(null)
-    setShowForm(true)
-  }
+  // ✨ Todo el estado y lógica CRUD en una línea
+  const {
+    items: locations,
+    showForm,
+    editingItem,
+    selectedItem: selectedLocation,
+    isEmpty,
+    handleSave,
+    handleDelete,
+    selectItem: selectLocation,
+    openCreateForm,
+    openEditForm,
+    closeForm,
+    closeDetails
+  } = useCRUD(EXAMPLE_LOCATIONS, 'Lugar')
 
   return (
     <div className="fade-in">
@@ -102,10 +67,7 @@ function LocationsManager({ campaign }) {
             Los lugares dan vida a tu mundo de {campaign.name}
           </p>
         </div>
-        <button
-          onClick={openCreateForm}
-          className="btn-primary"
-        >
+        <button onClick={openCreateForm} className="btn-primary">
           ➕ Añadir Lugar
         </button>
       </div>
@@ -120,14 +82,14 @@ function LocationsManager({ campaign }) {
         
         {/* Lista de lugares */}
         <div>
-          {locations.length === 0 ? (
+          {isEmpty ? (
             <EmptyState onAddFirst={openCreateForm} />
           ) : (
             <LocationsList 
               locations={locations}
               onEdit={openEditForm}
-              onDelete={handleDeleteLocation}
-              onSelect={setSelectedLocation}
+              onDelete={(id, name) => handleDelete(id, name)}
+              onSelect={selectLocation}
               selectedId={selectedLocation?.id}
             />
           )}
@@ -137,9 +99,9 @@ function LocationsManager({ campaign }) {
         {selectedLocation && (
           <LocationDetails 
             location={selectedLocation}
-            onClose={() => setSelectedLocation(null)}
+            onClose={closeDetails}
             onEdit={() => openEditForm(selectedLocation)}
-            onDelete={() => handleDeleteLocation(selectedLocation.id, selectedLocation.name)}
+            onDelete={() => handleDelete(selectedLocation.id, selectedLocation.name)}
           />
         )}
       </div>
@@ -147,17 +109,17 @@ function LocationsManager({ campaign }) {
       {/* Formulario modal */}
       {showForm && (
         <LocationForm
-          location={editingLocation}
-          onSave={editingLocation ? handleEditLocation : handleCreateLocation}
-          onClose={() => {
-            setShowForm(false)
-            setEditingLocation(null)
-          }}
+          location={editingItem}
+          onSave={handleSave}
+          onClose={closeForm}
         />
       )}
     </div>
   )
 }
+
+// Los componentes EmptyState, LocationsList, LocationCard, LocationDetails, LocationForm 
+// permanecen exactamente igual - solo cambió el componente principal
 
 // Componente de estado vacío
 function EmptyState({ onAddFirst }) {
@@ -180,10 +142,7 @@ function EmptyState({ onAddFirst }) {
 // Lista de lugares
 function LocationsList({ locations, onEdit, onDelete, onSelect, selectedId }) {
   return (
-    <div style={{
-      display: 'grid',
-      gap: '1rem'
-    }}>
+    <div style={{ display: 'grid', gap: '1rem' }}>
       {locations.map(location => (
         <LocationCard
           key={location.id}
