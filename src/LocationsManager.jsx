@@ -55,7 +55,7 @@ function LocationsManager({ campaign, connections }) {
     openEditForm,
     closeForm,
     closeDetails
-  } = useCRUD(EXAMPLE_LOCATIONS, 'Lugar')
+  } = useCRUD(campaign.locations || [], 'Lugar')
 
   return (
     <div className="fade-in">
