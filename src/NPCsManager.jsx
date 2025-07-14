@@ -1,16 +1,17 @@
 import React, { useState } from 'react'
+import { useCRUD } from './hooks/useCRUD'
 
 // Datos de ejemplo para NPCs
-const exampleNPCs = [
+const EXAMPLE_NPCS = [
   {
     id: 1,
     name: "Eldara la Sabia",
     role: "Bibliotecaria",
-    location: "Gran Biblioteca de Eldoria",
-    description: "Una anciana elfa con vastos conocimientos arcanos. Sus ojos brillan con la sabiduría de milenios.",
+    location: "Gran Biblioteca de la Ciudad",
+    description: "Una elfa anciana con cabello plateado y ojos que brillan con sabiduría acumulada durante siglos.",
     attitude: "Amistoso",
-    notes: "Puede proporcionar información sobre artefactos antiguos. Le gustan los acertijos.",
-    icon: "🧙‍♀️",
+    icon: "📚",
+    notes: "Conoce secretos antiguos y está dispuesta a ayudar a cambio de conocimiento raro.",
     createdAt: "2024-01-15"
   },
   {
@@ -18,77 +19,41 @@ const exampleNPCs = [
     name: "Capitán Thorgrim",
     role: "Guardia de la Ciudad",
     location: "Cuartel de la Guardia",
-    description: "Un enano veterano con cicatrices de batalla. Estricto pero justo, protege la ciudad con fiereza.",
+    description: "Un enano robusto con armadura brillante y una barba trenzada con medallas de honor.",
     attitude: "Neutral",
-    notes: "Puede dar misiones relacionadas con la seguridad. No confía fácilmente en extraños.",
     icon: "⚔️",
+    notes: "Estricto pero justo. Respeta a quienes demuestran honor y valor.",
     createdAt: "2024-01-16"
   },
   {
     id: 3,
     name: "Sombra Roja",
     role: "Asesino",
-    location: "Distrito de los Ladrones",
-    description: "Una figura misteriosa que trabaja desde las sombras. Su verdadera identidad es desconocida.",
+    location: "Barrios bajos",
+    description: "Una figura encapuchada que aparece y desaparece entre las sombras. Sus ojos rojos son lo único visible.",
     attitude: "Hostil",
-    notes: "Líder de la organización criminal local. Peligroso pero puede ser útil si se negocia bien.",
     icon: "🗡️",
+    notes: "Trabaja para el gremio de ladrones. Mortal pero puede ser sobornado con oro suficiente.",
     createdAt: "2024-01-17"
   }
 ]
 
 function NPCsManager({ campaign }) {
-  const [npcs, setNPCs] = useState(exampleNPCs)
-  const [showForm, setShowForm] = useState(false)
-  const [editingNPC, setEditingNPC] = useState(null)
-  const [selectedNPC, setSelectedNPC] = useState(null)
-
-  // Crear nuevo NPC
-  const handleCreateNPC = (npcData) => {
-    const newNPC = {
-      ...npcData,
-      id: Date.now(),
-      createdAt: new Date().toISOString().split('T')[0]
-    }
-    setNPCs(prev => [...prev, newNPC])
-    setShowForm(false)
-    alert(`¡NPC "${newNPC.name}" creado exitosamente! 🎉`)
-  }
-
-  // Editar NPC existente
-  const handleEditNPC = (npcData) => {
-    setNPCs(prev => prev.map(npc => 
-      npc.id === editingNPC.id 
-        ? { ...npcData, id: editingNPC.id, createdAt: editingNPC.createdAt }
-        : npc
-    ))
-    setEditingNPC(null)
-    setShowForm(false)
-    alert(`¡NPC "${npcData.name}" actualizado! ✨`)
-  }
-
-  // Eliminar NPC
-  const handleDeleteNPC = (npcId, npcName) => {
-    if (window.confirm(`¿Estás seguro de que quieres eliminar "${npcName}"?`)) {
-      setNPCs(prev => prev.filter(npc => npc.id !== npcId))
-      if (selectedNPC?.id === npcId) {
-        setSelectedNPC(null)
-      }
-      alert(`NPC "${npcName}" eliminado`)
-    }
-  }
-
-  // Abrir formulario para editar
-  const openEditForm = (npc) => {
-    setEditingNPC(npc)
-    setShowForm(true)
-  }
-
-  // Abrir formulario para crear
-  const openCreateForm = () => {
-    setEditingNPC(null)
-    setShowForm(true)
-  }
+  // ✨ Todo el estado y lógica CRUD en una línea
+  const {
+    items: npcs,
+    showForm,
+    editingItem,
+    selectedItem: selectedNPC,
+    isEmpty,
+    handleSave,
+    handleDelete,
+    selectItem: selectNPC,
+    openCreateForm,
+    openEditForm,
+    closeForm,
+    closeDetails
+  } = useCRUD(EXAMPLE_NPCS, 'NPC')
 
   return (
     <div className="fade-in">
@@ -112,13 +77,10 @@ function NPCsManager({ campaign }) {
             🧙 NPCs
           </h2>
           <p style={{ color: 'var(--text-muted)', margin: '0.5rem 0 0 0' }}>
-            Crea personajes memorables para {campaign.name}
+            Los personajes que dan vida al mundo de {campaign.name}
           </p>
         </div>
-        <button
-          onClick={openCreateForm}
-          className="btn-primary"
-        >
+        <button onClick={openCreateForm} className="btn-primary">
           ➕ Añadir NPC
         </button>
       </div>
@@ -133,14 +95,14 @@ function NPCsManager({ campaign }) {
         
         {/* Lista de NPCs */}
         <div>
-          {npcs.length === 0 ? (
+          {isEmpty ? (
             <EmptyState onAddFirst={openCreateForm} />
           ) : (
             <NPCsList 
               npcs={npcs}
               onEdit={openEditForm}
-              onDelete={handleDeleteNPC}
-              onSelect={setSelectedNPC}
+              onDelete={(id, name) => handleDelete(id, name)}
+              onSelect={selectNPC}
               selectedId={selectedNPC?.id}
             />
           )}
@@ -150,9 +112,9 @@ function NPCsManager({ campaign }) {
         {selectedNPC && (
           <NPCDetails 
             npc={selectedNPC}
-            onClose={() => setSelectedNPC(null)}
+            onClose={closeDetails}
             onEdit={() => openEditForm(selectedNPC)}
-            onDelete={() => handleDeleteNPC(selectedNPC.id, selectedNPC.name)}
+            onDelete={() => handleDelete(selectedNPC.id, selectedNPC.name)}
           />
         )}
       </div>
@@ -160,12 +122,9 @@ function NPCsManager({ campaign }) {
       {/* Formulario modal */}
       {showForm && (
         <NPCForm
-          npc={editingNPC}
-          onSave={editingNPC ? handleEditNPC : handleCreateNPC}
-          onClose={() => {
-            setShowForm(false)
-            setEditingNPC(null)
-          }}
+          npc={editingItem}
+          onSave={handleSave}
+          onClose={closeForm}
         />
       )}
     </div>
@@ -181,7 +140,7 @@ function EmptyState({ onAddFirst }) {
         No hay NPCs creados
       </h3>
       <p style={{ color: 'var(--text-disabled)', marginBottom: '2rem' }}>
-        Los NPCs dan vida a tu mundo. Crea comerciantes, guardias, villanos y aliados.
+        Los NPCs dan vida a tu mundo. Crea comerciantes, guardias, sabios y más.
       </p>
       <button onClick={onAddFirst} className="btn-primary">
         🧙 Crear el primer NPC
@@ -193,10 +152,7 @@ function EmptyState({ onAddFirst }) {
 // Lista de NPCs
 function NPCsList({ npcs, onEdit, onDelete, onSelect, selectedId }) {
   return (
-    <div style={{
-      display: 'grid',
-      gap: '1rem'
-    }}>
+    <div style={{ display: 'grid', gap: '1rem' }}>
       {npcs.map(npc => (
         <NPCCard
           key={npc.id}
@@ -215,7 +171,7 @@ function NPCsList({ npcs, onEdit, onDelete, onSelect, selectedId }) {
 function NPCCard({ npc, onEdit, onDelete, onSelect, isSelected }) {
   const attitudeColors = {
     'Amistoso': '#10b981',
-    'Neutral': '#f59e0b', 
+    'Neutral': '#f59e0b',
     'Hostil': '#ef4444'
   }
 
@@ -327,15 +283,13 @@ function NPCCard({ npc, onEdit, onDelete, onSelect, isSelected }) {
           {npc.description}
         </p>
 
-        <div style={{ 
-          color: 'var(--text-muted)', 
-          fontSize: '0.9rem',
-          marginBottom: '0.5rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem'
-        }}>
-          📍 {npc.location}
+        <div style={{ marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ fontSize: '0.8rem' }}>📍</span>
+            <span style={{ color: '#3b82f6', fontSize: '0.85rem' }}>
+              {npc.location}
+            </span>
+          </div>
         </div>
 
         <div style={{ 
@@ -353,7 +307,7 @@ function NPCCard({ npc, onEdit, onDelete, onSelect, isSelected }) {
 function NPCDetails({ npc, onClose, onEdit, onDelete }) {
   const attitudeColors = {
     'Amistoso': '#10b981',
-    'Neutral': '#f59e0b', 
+    'Neutral': '#f59e0b',
     'Hostil': '#ef4444'
   }
 
@@ -388,6 +342,18 @@ function NPCDetails({ npc, onClose, onEdit, onDelete }) {
             <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>
               {npc.role}
             </p>
+            <span style={{
+              background: `${attitudeColors[npc.attitude]}20`,
+              color: attitudeColors[npc.attitude],
+              padding: '0.25rem 0.75rem',
+              borderRadius: '12px',
+              fontSize: '0.8rem',
+              fontWeight: '600',
+              display: 'inline-block',
+              marginTop: '0.5rem'
+            }}>
+              {npc.attitude}
+            </span>
           </div>
         </div>
         <button
@@ -406,7 +372,26 @@ function NPCDetails({ npc, onClose, onEdit, onDelete }) {
         </button>
       </div>
 
-      {/* Contenido */}
+      {/* Ubicación */}
+      <div style={{ marginBottom: '2rem' }}>
+        <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Ubicación habitual</h4>
+        <div style={{
+          background: 'rgba(59, 130, 246, 0.1)',
+          border: '1px solid rgba(59, 130, 246, 0.2)',
+          borderRadius: '10px',
+          padding: '1rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem'
+        }}>
+          <span style={{ fontSize: '1.5rem' }}>📍</span>
+          <span style={{ color: '#3b82f6', fontWeight: '500' }}>
+            {npc.location}
+          </span>
+        </div>
+      </div>
+
+      {/* Descripción */}
       <div style={{ marginBottom: '2rem' }}>
         <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Descripción</h4>
         <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
@@ -414,33 +399,20 @@ function NPCDetails({ npc, onClose, onEdit, onDelete }) {
         </p>
       </div>
 
-      <div style={{ marginBottom: '2rem' }}>
-        <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Ubicación</h4>
-        <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-          📍 {npc.location}
-        </p>
-      </div>
-
-      <div style={{ marginBottom: '2rem' }}>
-        <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Actitud</h4>
-        <span style={{
-          background: `${attitudeColors[npc.attitude]}20`,
-          color: attitudeColors[npc.attitude],
-          padding: '0.25rem 0.75rem',
-          borderRadius: '12px',
-          fontSize: '0.9rem',
-          fontWeight: '600'
-        }}>
-          {npc.attitude}
-        </span>
-      </div>
-
+      {/* Notas */}
       {npc.notes && (
         <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Notas</h4>
-          <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-            {npc.notes}
-          </p>
+          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Notas de interpretación</h4>
+          <div style={{
+            background: 'rgba(139, 92, 246, 0.1)',
+            border: '1px solid rgba(139, 92, 246, 0.2)',
+            borderRadius: '10px',
+            padding: '1rem'
+          }}>
+            <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+              {npc.notes}
+            </p>
+          </div>
         </div>
       )}
 
@@ -480,8 +452,8 @@ function NPCForm({ npc, onSave, onClose }) {
     location: npc?.location || '',
     description: npc?.description || '',
     attitude: npc?.attitude || 'Neutral',
-    notes: npc?.notes || '',
-    icon: npc?.icon || '👤'
+    icon: npc?.icon || '👤',
+    notes: npc?.notes || ''
   })
 
   const [errors, setErrors] = useState({})
@@ -516,7 +488,7 @@ function NPCForm({ npc, onSave, onClose }) {
   }
 
   // Lista de emojis para NPCs
-  const npcIcons = ['👤', '🧙', '🧙‍♀️', '🧙‍♂️', '⚔️', '🛡️', '🏹', '👑', '💂', '🕵️', '🥷', '👨‍⚕️', '👩‍⚕️', '👨‍🍳', '👩‍🍳', '👨‍🌾', '👩‍🌾', '👮', '👮‍♀️', '👮‍♂️', '🧝', '🧝‍♀️', '🧝‍♂️', '🧛', '🧚', '🧞', '🧟', '👹', '👺', '😈', '🤴', '👸']
+  const npcIcons = ['👤', '🧙', '🧙‍♀️', '🧙‍♂️', '🤴', '👸', '🧝', '🧝‍♀️', '🧝‍♂️', '🧛', '🧛‍♀️', '🧛‍♂️', '🧚', '🧚‍♀️', '🧚‍♂️', '👷', '👷‍♀️', '👷‍♂️', '💂', '💂‍♀️', '💂‍♂️', '🕵️', '🕵️‍♀️', '🕵️‍♂️', '👨‍⚕️', '👩‍⚕️', '👨‍🌾', '👩‍🌾', '👨‍🍳', '👩‍🍳', '👨‍🏫', '👩‍🏫', '👨‍⚖️', '👩‍⚖️', '🧔', '👲', '👳', '👳‍♀️', '👳‍♂️', '🧕', '👮', '👮‍♀️', '👮‍♂️', '👴', '👵', '🧓']
 
   return (
     <div style={{
@@ -538,7 +510,7 @@ function NPCForm({ npc, onSave, onClose }) {
         border: '1px solid var(--glass-border)',
         borderRadius: '20px',
         padding: '2rem',
-        maxWidth: '600px',
+        maxWidth: '700px',
         width: '100%',
         maxHeight: '90vh',
         overflow: 'auto'
@@ -591,76 +563,103 @@ function NPCForm({ npc, onSave, onClose }) {
             </div>
           </div>
 
-          {/* Nombre */}
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', color: 'var(--primary-light)', fontWeight: '600', marginBottom: '0.5rem' }}>
-              Nombre del NPC *
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Ej: Eldara la Sabia"
-              style={{
-                width: '100%',
-                background: 'rgba(31, 41, 55, 0.5)',
-                border: `1px solid ${errors.name ? '#ef4444' : 'rgba(139, 92, 246, 0.2)'}`,
-                borderRadius: '10px',
-                padding: '0.75rem',
-                color: 'white',
-                fontSize: '1rem'
-              }}
-              autoFocus
-            />
-            {errors.name && <p style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.5rem' }}>{errors.name}</p>}
+          {/* Nombre y Rol */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div>
+              <label style={{ display: 'block', color: 'var(--primary-light)', fontWeight: '600', marginBottom: '0.5rem' }}>
+                Nombre del NPC *
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Ej: Eldara la Sabia"
+                style={{
+                  width: '100%',
+                  background: 'rgba(31, 41, 55, 0.5)',
+                  border: `1px solid ${errors.name ? '#ef4444' : 'rgba(139, 92, 246, 0.2)'}`,
+                  borderRadius: '10px',
+                  padding: '0.75rem',
+                  color: 'white',
+                  fontSize: '1rem'
+                }}
+                autoFocus
+              />
+              {errors.name && <p style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.5rem' }}>{errors.name}</p>}
+            </div>
+
+            <div>
+              <label style={{ display: 'block', color: 'var(--primary-light)', fontWeight: '600', marginBottom: '0.5rem' }}>
+                Rol o profesión *
+              </label>
+              <input
+                type="text"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                placeholder="Ej: Comerciante, Guardia, Noble"
+                style={{
+                  width: '100%',
+                  background: 'rgba(31, 41, 55, 0.5)',
+                  border: `1px solid ${errors.role ? '#ef4444' : 'rgba(139, 92, 246, 0.2)'}`,
+                  borderRadius: '10px',
+                  padding: '0.75rem',
+                  color: 'white',
+                  fontSize: '1rem'
+                }}
+              />
+              {errors.role && <p style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.5rem' }}>{errors.role}</p>}
+            </div>
           </div>
 
-          {/* Rol */}
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', color: 'var(--primary-light)', fontWeight: '600', marginBottom: '0.5rem' }}>
-              Rol o profesión *
-            </label>
-            <input
-              type="text"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              placeholder="Ej: Comerciante, Guardia, Noble, Sabio"
-              style={{
-                width: '100%',
-                background: 'rgba(31, 41, 55, 0.5)',
-                border: `1px solid ${errors.role ? '#ef4444' : 'rgba(139, 92, 246, 0.2)'}`,
-                borderRadius: '10px',
-                padding: '0.75rem',
-                color: 'white',
-                fontSize: '1rem'
-              }}
-            />
-            {errors.role && <p style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.5rem' }}>{errors.role}</p>}
-          </div>
+          {/* Ubicación y Actitud */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div>
+              <label style={{ display: 'block', color: 'var(--primary-light)', fontWeight: '600', marginBottom: '0.5rem' }}>
+                Ubicación habitual
+              </label>
+              <input
+                type="text"
+                name="location"
+                value={formData.location}
+                onChange={handleChange}
+                placeholder="Ej: Mercado central"
+                style={{
+                  width: '100%',
+                  background: 'rgba(31, 41, 55, 0.5)',
+                  border: '1px solid rgba(139, 92, 246, 0.2)',
+                  borderRadius: '10px',
+                  padding: '0.75rem',
+                  color: 'white',
+                  fontSize: '1rem'
+                }}
+              />
+            </div>
 
-          {/* Ubicación */}
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', color: 'var(--primary-light)', fontWeight: '600', marginBottom: '0.5rem' }}>
-              Ubicación habitual
-            </label>
-            <input
-              type="text"
-              name="location"
-              value={formData.location}
-              onChange={handleChange}
-              placeholder="Ej: Mercado central, Torre del mago"
-              style={{
-                width: '100%',
-                background: 'rgba(31, 41, 55, 0.5)',
-                border: '1px solid rgba(139, 92, 246, 0.2)',
-                borderRadius: '10px',
-                padding: '0.75rem',
-                color: 'white',
-                fontSize: '1rem'
-              }}
-            />
+            <div>
+              <label style={{ display: 'block', color: 'var(--primary-light)', fontWeight: '600', marginBottom: '0.5rem' }}>
+                Actitud hacia jugadores
+              </label>
+              <select
+                name="attitude"
+                value={formData.attitude}
+                onChange={handleChange}
+                style={{
+                  width: '100%',
+                  background: 'rgba(31, 41, 55, 0.5)',
+                  border: '1px solid rgba(139, 92, 246, 0.2)',
+                  borderRadius: '10px',
+                  padding: '0.75rem',
+                  color: 'white',
+                  fontSize: '1rem'
+                }}
+              >
+                <option value="Amistoso">Amistoso</option>
+                <option value="Neutral">Neutral</option>
+                <option value="Hostil">Hostil</option>
+              </select>
+            </div>
           </div>
 
           {/* Descripción */}
@@ -672,7 +671,7 @@ function NPCForm({ npc, onSave, onClose }) {
               name="description"
               value={formData.description}
               onChange={handleChange}
-              placeholder="Apariencia, personalidad, peculiaridades..."
+              placeholder="Apariencia física y primeras impresiones..."
               rows={3}
               style={{
                 width: '100%',
@@ -689,42 +688,17 @@ function NPCForm({ npc, onSave, onClose }) {
             {errors.description && <p style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.5rem' }}>{errors.description}</p>}
           </div>
 
-          {/* Actitud */}
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', color: 'var(--primary-light)', fontWeight: '600', marginBottom: '0.5rem' }}>
-              Actitud hacia los jugadores
-            </label>
-            <select
-              name="attitude"
-              value={formData.attitude}
-              onChange={handleChange}
-              style={{
-                width: '100%',
-                background: 'rgba(31, 41, 55, 0.5)',
-                border: '1px solid rgba(139, 92, 246, 0.2)',
-                borderRadius: '10px',
-                padding: '0.75rem',
-                color: 'white',
-                fontSize: '1rem'
-              }}
-            >
-              <option value="Amistoso">Actitud Amistosa</option>
-              <option value="Neutral">Actitud Neutral</option>
-              <option value="Hostil">Actitud Hostil</option>
-            </select>
-          </div>
-
           {/* Notas */}
           <div style={{ marginBottom: '2rem' }}>
             <label style={{ display: 'block', color: 'var(--primary-light)', fontWeight: '600', marginBottom: '0.5rem' }}>
-              Notas adicionales
+              Notas de interpretación
             </label>
             <textarea
               name="notes"
               value={formData.notes}
               onChange={handleChange}
-              placeholder="Información adicional, secretos, motivaciones..."
-              rows={3}
+              placeholder="Personalidad, motivaciones, secretos, cómo interpretar a este NPC..."
+              rows={4}
               style={{
                 width: '100%',
                 background: 'rgba(31, 41, 55, 0.5)',
