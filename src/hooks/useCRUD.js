@@ -3,6 +3,7 @@ import { useState } from 'react'
 /**
  * Hook personalizado para manejar operaciones CRUD de manera uniforme
  * Elimina código duplicado entre todos los gestores
+ * ✅ ACTUALIZADO con protección para linkedItems
  */
 export function useCRUD(initialData = [], itemName = 'elemento') {
   // Estados principales
@@ -11,13 +12,32 @@ export function useCRUD(initialData = [], itemName = 'elemento') {
   const [editingItem, setEditingItem] = useState(null)
   const [selectedItem, setSelectedItem] = useState(null)
 
+  // ✅ Función para inicializar linkedItems si no existe
+  const ensureLinkedItems = (item) => {
+    if (!item.linkedItems || typeof item.linkedItems !== 'object') {
+      return {
+        ...item,
+        linkedItems: {
+          locations: [],
+          players: [],
+          npcs: [],
+          quests: [],
+          objects: [],
+          notes: []
+        }
+      }
+    }
+    return item
+  }
+
   // Crear nuevo elemento
   const handleCreate = (itemData) => {
-    const newItem = {
+    const newItem = ensureLinkedItems({
       ...itemData,
       id: Date.now(),
       createdAt: new Date().toISOString().split('T')[0]
-    }
+    })
+    
     setItems(prev => [...prev, newItem])
     setShowForm(false)
     alert(`¡${itemName} "${newItem.name || newItem.title}" creado exitosamente! 🎉`)
@@ -26,11 +46,11 @@ export function useCRUD(initialData = [], itemName = 'elemento') {
 
   // Editar elemento existente
   const handleEdit = (itemData) => {
-    const updatedItem = {
+    const updatedItem = ensureLinkedItems({
       ...itemData,
       id: editingItem.id,
       createdAt: editingItem.createdAt
-    }
+    })
     
     setItems(prev => prev.map(item => 
       item.id === editingItem.id ? updatedItem : item
@@ -65,7 +85,7 @@ export function useCRUD(initialData = [], itemName = 'elemento') {
 
   // Abrir formulario para editar
   const openEditForm = (item) => {
-    setEditingItem(item)
+    setEditingItem(ensureLinkedItems(item))
     setShowForm(true)
   }
 
@@ -83,7 +103,7 @@ export function useCRUD(initialData = [], itemName = 'elemento') {
 
   // Seleccionar elemento (para panel de detalles)
   const selectItem = (item) => {
-    setSelectedItem(item)
+    setSelectedItem(ensureLinkedItems(item))
   }
 
   // Cerrar panel de detalles

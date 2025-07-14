@@ -5,6 +5,8 @@ import QuestsManager from './QuestsManager'
 import ObjectsManager from './ObjectsManager'
 import PlayersManager from './PlayersManager'
 import NotesManager from './NotesManager'
+import ConnectionModal from './components/ConnectionModal'
+import { useConnections } from './hooks/useConnections'
 
 // Configuración de las pestañas
 const tabs = [
@@ -19,6 +21,18 @@ const tabs = [
 
 function CampaignManager({ campaign, onBackToSelector }) {
   const [activeTab, setActiveTab] = useState('dashboard')
+  
+  // ✨ Simulamos una función de actualización de campaña
+  // En el futuro esto vendrá del localStorage o contexto global
+  const [currentCampaign, setCurrentCampaign] = useState(campaign)
+  
+  const updateCampaign = (updates) => {
+    console.log('Actualizando campaña:', updates)
+    setCurrentCampaign(prev => ({ ...prev, ...updates }))
+  }
+
+  // 🔗 Hook de conexiones
+  const connections = useConnections(currentCampaign, updateCampaign)
 
   return (
     <div className="gradient-bg">
@@ -64,10 +78,10 @@ function CampaignManager({ campaign, onBackToSelector }) {
               backgroundClip: 'text',
               margin: 0
             }}>
-              {campaign.name}
+              {currentCampaign.name}
             </h1>
             <p style={{ color: 'var(--text-muted)', margin: 0 }}>
-              {campaign.description || 'Tu mundo de aventuras te espera'}
+              {currentCampaign.description || 'Tu mundo de aventuras te espera'}
             </p>
           </div>
 
@@ -137,29 +151,48 @@ function CampaignManager({ campaign, onBackToSelector }) {
         padding: '2rem',
         minHeight: 'calc(100vh - 100px)'
       }}>
-        <TabContent activeTab={activeTab} campaign={campaign} onTabChange={setActiveTab} />
+        <TabContent 
+          activeTab={activeTab} 
+          campaign={currentCampaign} 
+          onTabChange={setActiveTab}
+          connections={connections}
+        />
       </div>
+
+      {/* Modal de conexiones */}
+      {connections.showConnectionModal && connections.connectionSource && (
+        <ConnectionModal
+          sourceItem={connections.connectionSource.item}
+          sourceType={connections.connectionSource.type}
+          campaign={currentCampaign}
+          onConnect={connections.createConnection}
+          onRemove={connections.removeConnection}
+          onClose={connections.closeConnectionModal}
+          getLinkedItems={connections.getLinkedItems}
+          getAvailableItems={connections.getAvailableItems}
+        />
+      )}
     </div>
   )
 }
 
 // Componente para el contenido de cada pestaña
-function TabContent({ activeTab, campaign, onTabChange }) {
+function TabContent({ activeTab, campaign, onTabChange, connections }) {
   switch (activeTab) {
     case 'dashboard':
       return <Dashboard campaign={campaign} onTabChange={onTabChange} />
     case 'locations':
-      return <LocationsManager campaign={campaign} />
+      return <LocationsManager campaign={campaign} connections={connections} />
     case 'players':
-      return <PlayersManager campaign={campaign} />
+      return <PlayersManager campaign={campaign} connections={connections} />
     case 'npcs':
-      return <NPCsManager campaign={campaign} />
+      return <NPCsManager campaign={campaign} connections={connections} />
     case 'objects':
-      return <ObjectsManager campaign={campaign} />  // ← Cambiado aquí
+      return <ObjectsManager campaign={campaign} connections={connections} />
     case 'quests':
-      return <QuestsManager campaign={campaign} />
+      return <QuestsManager campaign={campaign} connections={connections} />
     case 'notes':
-      return <NotesManager campaign={campaign} />
+      return <NotesManager campaign={campaign} connections={connections} />
     default:
       return <Dashboard campaign={campaign} onTabChange={onTabChange} />
   }
@@ -167,6 +200,11 @@ function TabContent({ activeTab, campaign, onTabChange }) {
 
 // Dashboard principal
 function Dashboard({ campaign, onTabChange }) {
+  // Simulamos contadores (en el futuro vendrán de la campaña real)
+  const getCount = (type) => {
+    return campaign[type]?.length || 0
+  }
+
   return (
     <div className="fade-in">
       {/* Estadísticas principales */}
@@ -178,42 +216,42 @@ function Dashboard({ campaign, onTabChange }) {
       }}>
         <StatCard 
           title="Lugares" 
-          value={campaign.locations} 
+          value={getCount('locations')} 
           icon="📍" 
           color="#3b82f6"
           onClick={() => onTabChange('locations')}
         />
         <StatCard 
           title="Jugadores" 
-          value={campaign.players} 
+          value={getCount('players')} 
           icon="👥" 
           color="#10b981"
           onClick={() => onTabChange('players')}
         />
         <StatCard 
           title="NPCs" 
-          value={campaign.npcs} 
+          value={getCount('npcs')} 
           icon="🧙" 
           color="#8b5cf6"
           onClick={() => onTabChange('npcs')}
         />
         <StatCard 
           title="Objetos" 
-          value={campaign.objects} 
+          value={getCount('objects')} 
           icon="📦" 
           color="#06b6d4"
           onClick={() => onTabChange('objects')}
         />
         <StatCard 
           title="Misiones" 
-          value={campaign.quests} 
+          value={getCount('quests')} 
           icon="📜" 
           color="#f59e0b"
           onClick={() => onTabChange('quests')}
         />
         <StatCard 
           title="Notas" 
-          value={campaign.notes} 
+          value={getCount('notes')} 
           icon="📝" 
           color="#3b82f6"
           onClick={() => onTabChange('notes')}
@@ -240,130 +278,65 @@ function Dashboard({ campaign, onTabChange }) {
         <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
           Bienvenido a tu mundo de aventuras. Desde aquí puedes gestionar todos los elementos de tu campaña.
         </p>
-        
+
+        {/* Estadísticas de conexiones */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '1rem'
+          background: 'rgba(139, 92, 246, 0.1)',
+          border: '1px solid rgba(139, 92, 246, 0.2)',
+          borderRadius: '12px',
+          padding: '1.5rem',
+          marginTop: '1.5rem'
         }}>
-          <QuickAction 
-            title="Añadir Lugar"
-            description="Crea nuevos lugares para explorar"
-            icon="📍"
-            color="#3b82f6"
-            onClick={() => onTabChange('locations')}
-          />
-          <QuickAction 
-            title="Crear NPC"
-            description="Añade personajes memorables"
-            icon="🧙"
-            color="#8b5cf6"
-            onClick={() => onTabChange('npcs')}
-          />
-          <QuickAction 
-            title="Nueva Misión"
-            description="Diseña aventuras épicas"
-            icon="📜"
-            color="#f59e0b"
-            onClick={() => onTabChange('quests')}
-          />
+          <h3 style={{ 
+            color: '#8b5cf6', 
+            fontSize: '1.2rem', 
+            marginBottom: '1rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}>
+            🔗 Sistema de Conexiones Activado
+          </h3>
+          <p style={{ color: 'var(--text-muted)', lineHeight: '1.6' }}>
+            Ahora puedes conectar elementos entre sí: relaciona NPCs con lugares, 
+            misiones con objetos, jugadores con aventuras y mucho más. 
+            Las conexiones aparecen en los paneles de detalle de cada elemento.
+          </p>
         </div>
       </div>
     </div>
   )
 }
 
-// Componente para estadísticas
+// Componente de tarjeta de estadística
 function StatCard({ title, value, icon, color, onClick }) {
   return (
-    <div style={{
-      background: 'var(--glass-bg)',
-      border: '1px solid var(--glass-border)',
-      borderRadius: '16px',
-      padding: '1.5rem',
-      textAlign: 'center',
-      transition: 'all 0.2s ease',
-      cursor: 'pointer'
-    }}
-    className="campaign-card"
-    onClick={onClick}
-    >
-      <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{icon}</div>
-      <div style={{ 
-        fontSize: '2.5rem', 
-        fontWeight: '700', 
-        color: color,
-        margin: '0.5rem 0'
-      }}>
-        {value}
-      </div>
-      <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-        {title}
-      </div>
-    </div>
-  )
-}
-
-// Componente para acciones rápidas
-function QuickAction({ title, description, icon, color, onClick }) {
-  return (
-    <div 
-      style={{
-        background: 'rgba(255, 255, 255, 0.05)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        borderRadius: '12px',
-        padding: '1rem',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease'
-      }}
-      className="campaign-card"
+    <div
       onClick={onClick}
-    >
-      <div style={{ 
-        fontSize: '1.5rem', 
-        color: color,
-        marginBottom: '0.5rem' 
-      }}>
-        {icon}
-      </div>
-      <h4 style={{ color: 'white', marginBottom: '0.25rem' }}>{title}</h4>
-      <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-        {description}
-      </p>
-    </div>
-  )
-}
-
-// Placeholder para las otras pestañas
-function TabPlaceholder({ title, campaign, type }) {
-  return (
-    <div className="fade-in" style={{ textAlign: 'center', padding: '4rem 1rem' }}>
-      <div style={{ fontSize: '5rem', marginBottom: '1rem' }}>
-        {title.split(' ')[0]}
-      </div>
-      <h2 style={{ color: 'white', fontSize: '2rem', marginBottom: '1rem' }}>
-        {title}
-      </h2>
-      <p style={{ color: 'var(--text-muted)', fontSize: '1.2rem', marginBottom: '2rem' }}>
-        Gestión de {title.toLowerCase()} para "{campaign.name}"
-      </p>
-      <div style={{
+      style={{
         background: 'var(--glass-bg)',
         border: '1px solid var(--glass-border)',
         borderRadius: '16px',
         padding: '2rem',
-        maxWidth: '600px',
-        margin: '0 auto'
-      }}>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-          Actualmente tienes <strong style={{ color: 'white' }}>{campaign[type]}</strong> {title.toLowerCase()} en esta campaña.
-        </p>
-        <button 
-          className="btn-primary"
-          onClick={() => alert(`Gestión de ${title} - próximamente en el siguiente paso`)}
-        >
-          ➕ Añadir {title.split(' ')[1] || title.split(' ')[0]}
-        </button>
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+        textAlign: 'center'
+      }}
+      onMouseEnter={(e) => {
+        e.target.style.transform = 'translateY(-4px)'
+        e.target.style.boxShadow = `0 8px 25px ${color}30`
+      }}
+      onMouseLeave={(e) => {
+        e.target.style.transform = 'translateY(0)'
+        e.target.style.boxShadow = 'none'
+      }}
+    >
+      <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>{icon}</div>
+      <div style={{ fontSize: '3rem', fontWeight: 'bold', color, marginBottom: '0.5rem' }}>
+        {value}
+      </div>
+      <div style={{ color: 'var(--text-muted)', fontSize: '1.1rem', fontWeight: '500' }}>
+        {title}
       </div>
     </div>
   )
