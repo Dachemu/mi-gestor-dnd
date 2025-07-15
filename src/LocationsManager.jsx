@@ -2,46 +2,10 @@ import React, { useState } from 'react'
 import { useCRUD } from './hooks/useCRUD'
 import ConnectionsDisplay from './components/ConnectionsDisplay'
 
-// Datos de ejemplo para lugares (SIN IDs hardcodeados)
-const EXAMPLE_LOCATIONS = [
-  {
-    id: 1,
-    name: "Taberna del Dragón Dorado",
-    type: "Comercio",
-    description: "Una acogedora taberna en el centro de la ciudad donde aventureros se reúnen para compartir historias.",
-    inhabitants: "Innkeeper Gareth y varios clientes habituales",
-    importance: "Media",
-    icon: "🍺",
-    linkedItems: {
-      npcs: [],
-      players: [],
-      quests: [],
-      objects: [],
-      notes: []
-    },
-    createdAt: "2024-01-15"
-  },
-  {
-    id: 2,
-    name: "Torre del Mago Oscuro",
-    type: "Mazmorra",
-    description: "Una torre misteriosa envuelta en niebla perpetua. Se dice que guarda secretos arcanos.",
-    inhabitants: "El Mago Malachar y sus servidores",
-    importance: "Alta",
-    icon: "🗼",
-    linkedItems: {
-      npcs: [],
-      players: [],
-      quests: [],
-      objects: [],
-      notes: []
-    },
-    createdAt: "2024-01-16"
-  }
-]
+// 🎯 SIN DATOS DE EJEMPLO - usa directamente los datos de la campaña
 
 function LocationsManager({ campaign, connections }) {
-  // ✨ Todo el estado y lógica CRUD en una línea
+  // ✨ Hook CRUD para manejar todos los estados - USA DATOS DE LA CAMPAÑA
   const {
     items: locations,
     showForm,
@@ -103,7 +67,7 @@ function LocationsManager({ campaign, connections }) {
             <LocationsList 
               locations={locations}
               onEdit={openEditForm}
-              onDelete={(id, name) => handleDelete(id, name)}
+              onDelete={handleDelete}
               onSelect={selectLocation}
               selectedId={selectedLocation?.id}
               connections={connections}
@@ -145,7 +109,7 @@ function EmptyState({ onAddFirst }) {
         No hay lugares creados
       </h3>
       <p style={{ color: 'var(--text-disabled)', marginBottom: '2rem' }}>
-        Los lugares dan vida a tu mundo. Crea tavernas, mazmorras, ciudades y más.
+        Los lugares dan vida a tu mundo. Crea ciudades, mazmorras, bosques y territorios épicos.
       </p>
       <button onClick={onAddFirst} className="btn-primary">
         📍 Crear el primer lugar
@@ -177,9 +141,18 @@ function LocationsList({ locations, onEdit, onDelete, onSelect, selectedId, conn
 function LocationCard({ location, onEdit, onDelete, onSelect, isSelected, connectionCount }) {
   const importanceColors = {
     'Baja': '#6b7280',
-    'Media': '#f59e0b', 
-    'Alta': '#ef4444',
-    'Crítica': '#8b5cf6'
+    'Media': '#f59e0b',
+    'Alta': '#ef4444'
+  }
+
+  const typeColors = {
+    'Ciudad': '#3b82f6',
+    'Mazmorra': '#8b5cf6',
+    'Naturaleza': '#10b981',
+    'Comercio': '#f59e0b',
+    'Fortaleza': '#ef4444',
+    'Templo': '#06b6d4',
+    'Otro': '#9ca3af'
   }
 
   return (
@@ -195,49 +168,42 @@ function LocationCard({ location, onEdit, onDelete, onSelect, isSelected, connec
         borderRadius: '16px',
         padding: '1.5rem',
         cursor: 'pointer',
-        transition: 'all 0.3s ease'
-      }}
-      onMouseEnter={(e) => {
-        if (!isSelected) {
-          e.target.style.background = 'rgba(139, 92, 246, 0.05)'
-          e.target.style.transform = 'translateY(-2px)'
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!isSelected) {
-          e.target.style.background = 'var(--glass-bg)'
-          e.target.style.transform = 'translateY(0)'
-        }
+        transition: 'all 0.3s ease',
+        position: 'relative'
       }}
     >
-      {/* Header con acciones */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
+      {/* Header */}
+      <div style={{ 
+        display: 'flex', 
         alignItems: 'flex-start',
+        justifyContent: 'space-between',
         marginBottom: '1rem'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
-          <span style={{ fontSize: '2.5rem' }}>{location.icon}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <span style={{ fontSize: '2rem' }}>{location.icon}</span>
           <div>
             <h3 style={{ 
               color: 'white', 
-              fontSize: '1.3rem', 
+              fontSize: '1.2rem', 
               fontWeight: 'bold',
               margin: 0
             }}>
               {location.name}
             </h3>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem' }}>
               <span style={{
-                color: 'var(--text-muted)',
-                fontSize: '0.9rem'
+                background: `${typeColors[location.type] || '#9ca3af'}20`,
+                color: typeColors[location.type] || '#9ca3af',
+                padding: '0.125rem 0.5rem',
+                borderRadius: '12px',
+                fontSize: '0.75rem',
+                fontWeight: '600'
               }}>
                 {location.type}
               </span>
               <span style={{
-                background: `${importanceColors[location.importance]}20`,
-                color: importanceColors[location.importance],
+                background: `${importanceColors[location.importance] || '#6b7280'}20`,
+                color: importanceColors[location.importance] || '#6b7280',
                 padding: '0.125rem 0.5rem',
                 borderRadius: '12px',
                 fontSize: '0.75rem',
@@ -245,69 +211,30 @@ function LocationCard({ location, onEdit, onDelete, onSelect, isSelected, connec
               }}>
                 {location.importance}
               </span>
-              {/* Indicador de conexiones */}
-              {connectionCount > 0 && (
-                <span style={{
-                  background: 'rgba(139, 92, 246, 0.2)',
-                  color: '#8b5cf6',
-                  padding: '0.125rem 0.5rem',
-                  borderRadius: '12px',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.25rem'
-                }}>
-                  🔗 {connectionCount}
-                </span>
-              )}
             </div>
           </div>
         </div>
 
-        {/* Botones de acción */}
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onEdit(location)
-            }}
-            style={{
-              background: 'rgba(139, 92, 246, 0.2)',
-              border: '1px solid rgba(139, 92, 246, 0.3)',
-              borderRadius: '6px',
-              color: '#8b5cf6',
-              padding: '0.25rem 0.5rem',
-              cursor: 'pointer',
-              fontSize: '0.8rem'
-            }}
-          >
-            ✏️
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onDelete(location.id, location.name)
-            }}
-            style={{
-              background: 'rgba(239, 68, 68, 0.2)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              borderRadius: '6px',
-              color: '#ef4444',
-              padding: '0.25rem 0.5rem',
-              cursor: 'pointer',
-              fontSize: '0.8rem'
-            }}
-          >
-            🗑️
-          </button>
-        </div>
+        {/* Conexiones */}
+        {connectionCount > 0 && (
+          <div style={{
+            background: 'rgba(139, 92, 246, 0.2)',
+            color: '#a78bfa',
+            padding: '0.25rem 0.5rem',
+            borderRadius: '12px',
+            fontSize: '0.75rem',
+            fontWeight: '600'
+          }}>
+            🔗 {connectionCount}
+          </div>
+        )}
       </div>
 
+      {/* Descripción */}
       <p style={{ 
         color: 'var(--text-secondary)', 
-        lineHeight: '1.5',
         marginBottom: '1rem',
+        lineHeight: '1.5',
         display: '-webkit-box',
         WebkitLineClamp: 2,
         WebkitBoxOrient: 'vertical',
@@ -316,11 +243,60 @@ function LocationCard({ location, onEdit, onDelete, onSelect, isSelected, connec
         {location.description}
       </p>
 
+      {/* Habitantes */}
+      {location.inhabitants && (
+        <p style={{ 
+          color: 'var(--text-muted)', 
+          fontSize: '0.9rem',
+          marginBottom: '1rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem'
+        }}>
+          👥 {location.inhabitants}
+        </p>
+      )}
+
+      {/* Acciones */}
       <div style={{ 
-        fontSize: '0.8rem', 
-        color: 'var(--text-disabled)'
+        display: 'flex', 
+        gap: '0.5rem',
+        justifyContent: 'flex-end'
       }}>
-        Creado: {new Date(location.createdAt).toLocaleDateString()}
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onEdit(location)
+          }}
+          style={{
+            background: 'rgba(139, 92, 246, 0.2)',
+            border: '1px solid rgba(139, 92, 246, 0.3)',
+            borderRadius: '6px',
+            color: '#a78bfa',
+            padding: '0.25rem 0.5rem',
+            cursor: 'pointer',
+            fontSize: '0.8rem'
+          }}
+        >
+          ✏️
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onDelete(location.id, location.name)
+          }}
+          style={{
+            background: 'rgba(239, 68, 68, 0.2)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '6px',
+            color: '#ef4444',
+            padding: '0.25rem 0.5rem',
+            cursor: 'pointer',
+            fontSize: '0.8rem'
+          }}
+        >
+          🗑️
+        </button>
       </div>
     </div>
   )
@@ -339,19 +315,17 @@ function LocationDetails({ location, onClose, onEdit, onDelete, connections, cam
       padding: '2rem',
       height: 'fit-content',
       position: 'sticky',
-      top: '2rem',
-      maxHeight: 'calc(100vh - 4rem)',
-      overflowY: 'auto'
+      top: '2rem'
     }}>
       {/* Header */}
-      <div style={{
-        display: 'flex',
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center',
         justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: '1.5rem'
+        marginBottom: '2rem'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ fontSize: '3rem' }}>{location.icon}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <span style={{ fontSize: '2.5rem' }}>{location.icon}</span>
           <div>
             <h3 style={{ 
               color: 'white', 
@@ -362,54 +336,53 @@ function LocationDetails({ location, onClose, onEdit, onDelete, connections, cam
               {location.name}
             </h3>
             <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>
-              {location.type}
+              {location.type} - {location.importance} importancia
             </p>
           </div>
         </div>
         <button
           onClick={onClose}
           style={{
-            background: 'rgba(107, 114, 128, 0.2)',
-            border: '1px solid rgba(107, 114, 128, 0.3)',
-            borderRadius: '6px',
-            color: '#9ca3af',
-            padding: '0.25rem 0.5rem',
+            background: 'none',
+            border: 'none',
+            color: 'var(--text-muted)',
             cursor: 'pointer',
-            fontSize: '0.8rem'
+            fontSize: '1.5rem'
           }}
         >
           ✕
         </button>
       </div>
 
-      {/* Contenido */}
-      <div style={{ marginBottom: '2rem' }}>
-        <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Descripción</h4>
-        <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-          {location.description}
-        </p>
-      </div>
+      {/* Descripción */}
+      {location.description && (
+        <div style={{ marginBottom: '2rem' }}>
+          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Descripción</h4>
+          <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+            {location.description}
+          </p>
+        </div>
+      )}
 
-      <div style={{ marginBottom: '2rem' }}>
-        <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Habitantes</h4>
-        <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-          {location.inhabitants}
-        </p>
-      </div>
+      {/* Habitantes */}
+      {location.inhabitants && (
+        <div style={{ marginBottom: '2rem' }}>
+          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Habitantes</h4>
+          <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+            👥 {location.inhabitants}
+          </p>
+        </div>
+      )}
 
-      <div style={{ marginBottom: '2rem' }}>
-        <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Importancia</h4>
-        <span style={{
-          background: 'rgba(139, 92, 246, 0.2)',
-          color: '#a78bfa',
-          padding: '0.25rem 0.75rem',
-          borderRadius: '12px',
-          fontSize: '0.9rem',
-          fontWeight: '600'
-        }}>
-          {location.importance}
-        </span>
-      </div>
+      {/* Notas */}
+      {location.notes && (
+        <div style={{ marginBottom: '2rem' }}>
+          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Notas</h4>
+          <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+            {location.notes}
+          </p>
+        </div>
+      )}
 
       {/* 🔗 SISTEMA DE CONEXIONES */}
       {connections && (
@@ -456,53 +429,90 @@ function LocationDetails({ location, onClose, onEdit, onDelete, connections, cam
 function LocationForm({ location, onSave, onClose }) {
   const [formData, setFormData] = useState({
     name: location?.name || '',
-    type: location?.type || '',
+    type: location?.type || 'Ciudad',
     description: location?.description || '',
     inhabitants: location?.inhabitants || '',
     importance: location?.importance || 'Media',
-    icon: location?.icon || '🏛️',
-    linkedItems: location?.linkedItems || {
-      npcs: [],
-      players: [],
-      quests: [],
-      objects: [],
-      notes: []
-    }
+    notes: location?.notes || '',
+    icon: location?.icon || '🏰'
   })
 
   const [errors, setErrors] = useState({})
 
+  // Opciones para selects
+  const typeOptions = [
+    'Ciudad', 'Mazmorra', 'Naturaleza', 'Comercio', 
+    'Fortaleza', 'Templo', 'Otro'
+  ]
+  
+  const importanceOptions = ['Baja', 'Media', 'Alta']
+
+  // Manejar cambios en los inputs
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+    
+    // Limpiar error cuando el usuario empiece a escribir
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }))
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }))
     }
   }
 
+  // Validar formulario
   const validateForm = () => {
     const newErrors = {}
+    
     if (!formData.name.trim()) {
       newErrors.name = 'El nombre es obligatorio'
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = 'El nombre debe tener al menos 2 caracteres'
     }
-    if (!formData.type.trim()) {
-      newErrors.type = 'El tipo es obligatorio'
-    }
+    
     if (!formData.description.trim()) {
       newErrors.description = 'La descripción es obligatoria'
+    } else if (formData.description.trim().length < 10) {
+      newErrors.description = 'La descripción debe tener al menos 10 caracteres'
     }
+    
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
+  // Manejar envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!validateForm()) return
-    onSave(formData)
-  }
+    
+    if (!validateForm()) {
+      return
+    }
 
-  // Lista de emojis para lugares
-  const locationIcons = ['🏛️', '🏰', '🏯', '🗼', '⛪', '🏚️', '🏠', '🏪', '🏨', '🏦', '🏭', '⛺', '🏕️', '🍺', '⚔️', '🗡️', '💎', '📚', '🔥', '❄️']
+    // Crear objeto de lugar
+    const locationData = {
+      id: location?.id || Date.now() + Math.random(),
+      ...formData,
+      name: formData.name.trim(),
+      description: formData.description.trim(),
+      inhabitants: formData.inhabitants.trim(),
+      notes: formData.notes.trim(),
+      linkedItems: location?.linkedItems || {
+        npcs: [],
+        players: [],
+        quests: [],
+        objects: [],
+        notes: []
+      },
+      createdAt: location?.createdAt || new Date().toISOString().split('T')[0],
+      lastModified: new Date().toISOString().split('T')[0]
+    }
+
+    onSave(locationData)
+  }
 
   return (
     <div style={{
@@ -527,223 +537,149 @@ function LocationForm({ location, onSave, onClose }) {
         maxWidth: '600px',
         width: '100%',
         maxHeight: '90vh',
-        overflow: 'auto'
+        overflowY: 'auto'
       }}>
-        <div style={{
+        <h3 style={{ 
+          color: 'white', 
+          fontSize: '1.5rem',
+          marginBottom: '2rem',
           display: 'flex',
-          justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '2rem'
+          gap: '0.5rem'
         }}>
-          <h3 style={{ fontSize: '1.8rem', fontWeight: 'bold', color: 'white', margin: 0 }}>
-            {location ? '✏️ Editar Lugar' : '📍 Nuevo Lugar'}
-          </h3>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'rgba(107, 114, 128, 0.2)',
-              border: '1px solid rgba(107, 114, 128, 0.3)',
-              borderRadius: '6px',
-              color: '#9ca3af',
-              padding: '0.5rem',
-              cursor: 'pointer',
-              fontSize: '1.2rem'
-            }}
-          >
-            ✕
-          </button>
-        </div>
+          📍 {location ? 'Editar Lugar' : 'Nuevo Lugar'}
+        </h3>
 
         <form onSubmit={handleSubmit}>
-          {/* Nombre */}
-          <div style={{ marginBottom: '2rem' }}>
-            <label style={{ display: 'block', color: 'var(--primary-light)', fontWeight: '600', marginBottom: '0.5rem' }}>
-              Nombre del lugar *
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Ej: Taberna del Dragón Dorado"
-              style={{
-                width: '100%',
-                background: 'rgba(31, 41, 55, 0.5)',
-                border: errors.name ? '1px solid #ef4444' : '1px solid rgba(139, 92, 246, 0.2)',
-                borderRadius: '10px',
-                padding: '0.75rem',
-                color: 'white',
-                fontSize: '1rem'
-              }}
-            />
-            {errors.name && <span style={{ color: '#ef4444', fontSize: '0.8rem' }}>{errors.name}</span>}
-          </div>
-
-          {/* Tipo */}
-          <div style={{ marginBottom: '2rem' }}>
-            <label style={{ display: 'block', color: 'var(--primary-light)', fontWeight: '600', marginBottom: '0.5rem' }}>
-              Tipo de lugar *
-            </label>
-            <input
-              type="text"
-              name="type"
-              value={formData.type}
-              onChange={handleChange}
-              placeholder="Ej: Comercio, Mazmorra, Ciudad, etc."
-              style={{
-                width: '100%',
-                background: 'rgba(31, 41, 55, 0.5)',
-                border: errors.type ? '1px solid #ef4444' : '1px solid rgba(139, 92, 246, 0.2)',
-                borderRadius: '10px',
-                padding: '0.75rem',
-                color: 'white',
-                fontSize: '1rem'
-              }}
-            />
-            {errors.type && <span style={{ color: '#ef4444', fontSize: '0.8rem' }}>{errors.type}</span>}
-          </div>
-
-          {/* Descripción */}
-          <div style={{ marginBottom: '2rem' }}>
-            <label style={{ display: 'block', color: 'var(--primary-light)', fontWeight: '600', marginBottom: '0.5rem' }}>
-              Descripción *
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Describe el lugar, su ambiente, características especiales..."
-              rows={3}
-              style={{
-                width: '100%',
-                background: 'rgba(31, 41, 55, 0.5)',
-                border: errors.description ? '1px solid #ef4444' : '1px solid rgba(139, 92, 246, 0.2)',
-                borderRadius: '10px',
-                padding: '0.75rem',
-                color: 'white',
-                fontSize: '1rem',
-                resize: 'vertical',
-                fontFamily: 'inherit'
-              }}
-            />
-            {errors.description && <span style={{ color: '#ef4444', fontSize: '0.8rem' }}>{errors.description}</span>}
-          </div>
-
-          {/* Habitantes */}
-          <div style={{ marginBottom: '2rem' }}>
-            <label style={{ display: 'block', color: 'var(--primary-light)', fontWeight: '600', marginBottom: '0.5rem' }}>
-              Habitantes
-            </label>
-            <input
-              type="text"
-              name="inhabitants"
-              value={formData.inhabitants}
-              onChange={handleChange}
-              placeholder="¿Quién vive o frecuenta este lugar?"
-              style={{
-                width: '100%',
-                background: 'rgba(31, 41, 55, 0.5)',
-                border: '1px solid rgba(139, 92, 246, 0.2)',
-                borderRadius: '10px',
-                padding: '0.75rem',
-                color: 'white',
-                fontSize: '1rem'
-              }}
-            />
-          </div>
-
-          {/* Selector de icono */}
-          <div style={{ marginBottom: '2rem' }}>
-            <label style={{ display: 'block', color: 'var(--primary-light)', fontWeight: '600', marginBottom: '0.5rem' }}>
-              Icono
-            </label>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(40px, 1fr))',
-              gap: '0.5rem',
-              marginBottom: '1rem'
-            }}>
-              {locationIcons.map(icon => (
-                <button
-                  key={icon}
-                  type="button"
-                  onClick={() => setFormData(prev => ({ ...prev, icon }))}
-                  style={{
-                    background: formData.icon === icon 
-                      ? 'rgba(139, 92, 246, 0.3)' 
-                      : 'rgba(31, 41, 55, 0.5)',
-                    border: `1px solid ${formData.icon === icon 
-                      ? 'rgba(139, 92, 246, 0.5)' 
-                      : 'rgba(139, 92, 246, 0.2)'}`,
-                    borderRadius: '8px',
-                    padding: '0.5rem',
-                    cursor: 'pointer',
-                    fontSize: '1.2rem',
-                    aspectRatio: '1'
-                  }}
-                >
-                  {icon}
-                </button>
-              ))}
+          <div style={{ display: 'grid', gap: '1.5rem' }}>
+            {/* Nombre */}
+            <div>
+              <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+                Nombre del lugar *
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Ej: Taberna del Dragón Dorado"
+                className="input-field"
+                style={{
+                  border: errors.name ? '1px solid #ef4444' : undefined
+                }}
+              />
+              {errors.name && (
+                <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
+                  {errors.name}
+                </p>
+              )}
             </div>
-            <input
-              type="text"
-              name="icon"
-              value={formData.icon}
-              onChange={handleChange}
-              placeholder="O escribe tu propio emoji"
-              style={{
-                width: '100%',
-                background: 'rgba(31, 41, 55, 0.5)',
-                border: '1px solid rgba(139, 92, 246, 0.2)',
-                borderRadius: '10px',
-                padding: '0.75rem',
-                color: 'white',
-                fontSize: '1rem'
-              }}
-            />
-          </div>
 
-          {/* Importancia */}
-          <div style={{ marginBottom: '2rem' }}>
-            <label style={{ display: 'block', color: 'var(--primary-light)', fontWeight: '600', marginBottom: '0.5rem' }}>
-              Importancia
-            </label>
-            <select
-              name="importance"
-              value={formData.importance}
-              onChange={handleChange}
-              style={{
-                width: '100%',
-                background: 'rgba(31, 41, 55, 0.5)',
-                border: '1px solid rgba(139, 92, 246, 0.2)',
-                borderRadius: '10px',
-                padding: '0.75rem',
-                color: 'white',
-                fontSize: '1rem'
-              }}
-            >
-              <option value="Baja">Importancia Baja</option>
-              <option value="Media">Importancia Media</option>
-              <option value="Alta">Importancia Alta</option>
-              <option value="Crítica">Importancia Crítica</option>
-            </select>
+            {/* Tipo e Importancia */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div>
+                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+                  Tipo
+                </label>
+                <select
+                  name="type"
+                  value={formData.type}
+                  onChange={handleChange}
+                  className="input-field"
+                >
+                  {typeOptions.map(type => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+                  Importancia
+                </label>
+                <select
+                  name="importance"
+                  value={formData.importance}
+                  onChange={handleChange}
+                  className="input-field"
+                >
+                  {importanceOptions.map(importance => (
+                    <option key={importance} value={importance}>
+                      {importance}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Descripción */}
+            <div>
+              <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+                Descripción *
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Describe el lugar, su atmósfera, características distintivas..."
+                className="input-field"
+                style={{ 
+                  minHeight: '100px', 
+                  resize: 'vertical',
+                  border: errors.description ? '1px solid #ef4444' : undefined
+                }}
+              />
+              {errors.description && (
+                <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
+                  {errors.description}
+                </p>
+              )}
+            </div>
+
+            {/* Habitantes */}
+            <div>
+              <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+                Habitantes
+              </label>
+              <input
+                type="text"
+                name="inhabitants"
+                value={formData.inhabitants}
+                onChange={handleChange}
+                placeholder="¿Quién vive o frecuenta este lugar?"
+                className="input-field"
+              />
+            </div>
+
+            {/* Notas */}
+            <div>
+              <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+                Notas del DM
+              </label>
+              <textarea
+                name="notes"
+                value={formData.notes}
+                onChange={handleChange}
+                placeholder="Secretos, hooks para aventuras, detalles importantes..."
+                className="input-field"
+                style={{ minHeight: '80px', resize: 'vertical' }}
+              />
+            </div>
           </div>
 
           {/* Botones */}
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+          <div style={{ 
+            display: 'flex', 
+            gap: '1rem', 
+            marginTop: '2rem',
+            justifyContent: 'flex-end'
+          }}>
             <button
               type="button"
               onClick={onClose}
-              style={{
-                background: 'transparent',
-                color: 'var(--text-secondary)',
-                padding: '0.75rem 1.5rem',
-                borderRadius: '10px',
-                fontWeight: '500',
-                border: '1px solid rgba(139, 92, 246, 0.3)',
-                cursor: 'pointer'
-              }}
+              className="btn-secondary"
             >
               Cancelar
             </button>
@@ -751,7 +687,7 @@ function LocationForm({ location, onSave, onClose }) {
               type="submit"
               className="btn-primary"
             >
-              {location ? '💾 Actualizar' : '📍 Crear Lugar'}
+              {location ? '💾 Guardar Cambios' : '➕ Crear Lugar'}
             </button>
           </div>
         </form>
