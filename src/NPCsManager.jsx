@@ -92,9 +92,6 @@ function NPCsManager({ campaign, connections, selectedItemForNavigation, updateC
         items={npcs}
         itemType="npcs"
         onSelectItem={selectNPC}
-        onEditItem={openEditForm}
-        onDeleteItem={handleDelete}
-        onOpenConnections={connections?.openConnectionModal}
         getConnectionCount={connections?.getConnectionCount}
         emptyMessage="No hay NPCs aún. ¡Añade el primer personaje de tu campaña!"
         emptyIcon="🧙"

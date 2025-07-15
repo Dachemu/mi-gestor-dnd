@@ -13,7 +13,7 @@ function Modal({
   size = 'medium',
   showCloseButton = true 
 }) {
-  // Cerrar con tecla Escape
+  // Cerrar con tecla Escape y manejar scrolls
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape' && isOpen) {
@@ -23,13 +23,40 @@ function Modal({
     
     if (isOpen) {
       document.addEventListener('keydown', handleEscape)
-      // Prevenir scroll del body cuando el modal está abierto
+      
+      // Prevenir scroll del body Y de la campaña cuando el modal está abierto
       document.body.style.overflow = 'hidden'
+      document.body.style.paddingRight = '0px' // Evitar salto por scrollbar
+      
+      // También prevenir scroll en el container principal
+      const campaignContent = document.querySelector('.campaign-content')
+      const campaignManager = document.querySelector('.campaign-manager')
+      
+      if (campaignContent) {
+        campaignContent.style.overflow = 'hidden'
+        campaignContent.style.height = '100vh'
+      }
+      if (campaignManager) {
+        campaignManager.style.overflow = 'hidden'
+      }
     }
     
     return () => {
       document.removeEventListener('keydown', handleEscape)
-      document.body.style.overflow = 'auto'
+      document.body.style.overflow = ''
+      document.body.style.paddingRight = ''
+      
+      // Restaurar scroll en containers
+      const campaignContent = document.querySelector('.campaign-content')
+      const campaignManager = document.querySelector('.campaign-manager')
+      
+      if (campaignContent) {
+        campaignContent.style.overflow = ''
+        campaignContent.style.height = ''
+      }
+      if (campaignManager) {
+        campaignManager.style.overflow = ''
+      }
     }
   }, [isOpen, onClose])
 
@@ -51,15 +78,16 @@ function Modal({
         position: 'fixed',
         top: 0,
         left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        backdropFilter: 'blur(4px)',
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        backdropFilter: 'blur(6px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 1000,
         padding: '2rem',
+        overflowY: 'auto',
         animation: 'fadeIn 0.2s ease-out'
       }}
       onClick={onClose}
@@ -133,10 +161,15 @@ function Modal({
         {/* Contenido del modal */}
         <div style={{
           padding: '2rem',
+          paddingBottom: '3rem', // Extra padding para asegurar que los botones sean visibles
           overflowY: 'auto',
-          flex: 1
+          flex: 1,
+          maxHeight: '100%'
         }}>
           {children}
+          
+          {/* Espaciador invisible para asegurar scroll completo */}
+          <div style={{ height: '2rem', visibility: 'hidden' }} />
         </div>
       </div>
 

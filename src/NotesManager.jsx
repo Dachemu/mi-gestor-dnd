@@ -174,9 +174,6 @@ function NotesManager({ campaign, connections, selectedItemForNavigation, update
           items={filteredNotes}
           itemType="notes"
           onSelectItem={selectNote}
-          onEditItem={openEditForm}
-          onDeleteItem={handleDelete}
-          onOpenConnections={connections?.openConnectionModal}
           getConnectionCount={connections?.getConnectionCount}
           emptyMessage="No hay notas aún. ¡Añade la primera nota de tu campaña!"
           emptyIcon="📝"

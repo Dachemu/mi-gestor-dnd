@@ -92,9 +92,6 @@ function PlayersManager({ campaign, connections, selectedItemForNavigation, upda
         items={players}
         itemType="players"
         onSelectItem={selectPlayer}
-        onEditItem={openEditForm}
-        onDeleteItem={handleDelete}
-        onOpenConnections={connections?.openConnectionModal}
         getConnectionCount={connections?.getConnectionCount}
         emptyMessage="No hay jugadores aún. ¡Añade el primer héroe de tu campaña!"
         emptyIcon="👥"

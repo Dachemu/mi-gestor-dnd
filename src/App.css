@@ -255,11 +255,12 @@ textarea.input-field {
 .clean-nav-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1rem;
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: 2rem;
+  gap: 1rem;
   align-items: center;
+  overflow: hidden;
 }
 
 /* Sección izquierda */
@@ -350,6 +351,9 @@ textarea.input-field {
   display: flex;
   align-items: center;
   gap: 1rem;
+  justify-content: flex-end;
+  min-width: 0;
+  flex-shrink: 1;
 }
 
 /* ====================================
@@ -357,8 +361,11 @@ textarea.input-field {
    ==================================== */
 .search-container {
   position: relative;
-  width: 350px;
+  width: 100%;
+  max-width: 300px;
+  min-width: 200px;
   z-index: 6000;
+  flex-shrink: 1;
 }
 
 .search-input-wrapper {

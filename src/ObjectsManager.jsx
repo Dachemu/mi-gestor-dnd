@@ -92,9 +92,6 @@ function ObjectsManager({ campaign, connections, selectedItemForNavigation, upda
         items={objects}
         itemType="objects"
         onSelectItem={selectObject}
-        onEditItem={openEditForm}
-        onDeleteItem={handleDelete}
-        onOpenConnections={connections?.openConnectionModal}
         getConnectionCount={connections?.getConnectionCount}
         emptyMessage="No hay objetos aún. ¡Añade el primer tesoro de tu campaña!"
         emptyIcon="📦"

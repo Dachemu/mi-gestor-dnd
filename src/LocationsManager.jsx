@@ -92,9 +92,6 @@ function LocationsManager({ campaign, connections, selectedItemForNavigation, up
         items={locations}
         itemType="locations"
         onSelectItem={selectLocation}
-        onEditItem={openEditForm}
-        onDeleteItem={handleDelete}
-        onOpenConnections={connections?.openConnectionModal}
         getConnectionCount={connections?.getConnectionCount}
         emptyMessage="No hay lugares aún. ¡Añade el primer escenario de tu campaña!"
         emptyIcon="📍"

@@ -92,9 +92,6 @@ function QuestsManager({ campaign, connections, selectedItemForNavigation, updat
         items={quests}
         itemType="quests"
         onSelectItem={selectQuest}
-        onEditItem={openEditForm}
-        onDeleteItem={handleDelete}
-        onOpenConnections={connections?.openConnectionModal}
         getConnectionCount={connections?.getConnectionCount}
         emptyMessage="No hay misiones aún. ¡Crea la primera aventura de tu campaña!"
         emptyIcon="📜"

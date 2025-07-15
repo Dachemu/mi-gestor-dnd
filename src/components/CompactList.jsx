@@ -5,13 +5,29 @@ import { Eye, Edit, Trash2, Link2 } from 'lucide-react'
  * Componente para mostrar listas de elementos en formato compacto tipo cards
  * Elimina el scroll excesivo y mejora la experiencia visual
  */
+
+// Helper para crear botones con estilo consistente
+const createActionButton = (color, hoverColor, shadowColor) => ({
+  background: `linear-gradient(135deg, var(--accent-${color}), ${hoverColor})`,
+  border: 'none',
+  color: 'white',
+  padding: '0.75rem',
+  borderRadius: '10px',
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  flex: 1,
+  boxShadow: `0 4px 12px rgba(${shadowColor}, 0.3)`,
+  position: 'relative',
+  overflow: 'hidden'
+})
+
 function CompactList({ 
   items = [], 
   itemType, 
   onSelectItem, 
-  onEditItem, 
-  onDeleteItem, 
-  onOpenConnections,
   getConnectionCount,
   emptyMessage = "No hay elementos aún",
   emptyIcon = "📝"
@@ -41,9 +57,10 @@ function CompactList({
   return (
     <div style={{
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-      gap: '1.5rem',
-      padding: '1rem 0'
+      gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 380px), 1fr))',
+      gap: 'clamp(1rem, 2.5vw, 2rem)',
+      padding: 'clamp(0.5rem, 2vw, 1.5rem) 0',
+      justifyContent: 'center'
     }}>
       {items.map(item => {
         const connectionCount = getConnectionCount ? getConnectionCount(item) : 0
@@ -52,29 +69,56 @@ function CompactList({
           <div
             key={item.id}
             style={{
-              backgroundColor: 'var(--bg-secondary)',
-              border: '1px solid var(--border-color)',
-              borderRadius: '12px',
-              padding: '1.5rem',
-              transition: 'all 0.2s ease',
+              background: 'linear-gradient(135deg, var(--bg-secondary) 0%, rgba(26, 26, 46, 0.8) 100%)',
+              border: '1px solid rgba(139, 92, 246, 0.2)',
+              borderRadius: '16px',
+              padding: '1.75rem',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               cursor: 'pointer',
               position: 'relative',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05)',
+              backdropFilter: 'blur(10px)'
             }}
             className="compact-card"
             onClick={() => onSelectItem(item)}
           >
+            {/* Gradiente decorativo superior */}
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '4px',
+              background: 'linear-gradient(90deg, #8b5cf6, #3b82f6, #10b981, #f59e0b)',
+              borderRadius: '16px 16px 0 0'
+            }} />
+            
+            {/* Icono del elemento */}
+            <div style={{
+              fontSize: '2.5rem',
+              marginBottom: '1rem',
+              textAlign: 'center',
+              filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))'
+            }}>
+              {item.icon || '📝'}
+            </div>
+            
             {/* Nombre/Título */}
             <h3 style={{
               fontSize: '1.2rem',
-              fontWeight: '600',
-              color: 'white',
-              margin: '0 0 0.75rem 0',
+              fontWeight: '700',
+              background: 'linear-gradient(135deg, #ffffff 0%, #e5e7eb 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              margin: '0 0 1rem 0',
               lineHeight: '1.3',
               display: '-webkit-box',
               WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              textAlign: 'center'
             }}>
               {item.name || item.title}
             </h3>
@@ -89,12 +133,14 @@ function CompactList({
               {/* Tipo específico por item */}
               {item.type && (
                 <span style={{
-                  backgroundColor: 'var(--accent-blue)',
+                  background: 'linear-gradient(135deg, var(--accent-blue), #2563eb)',
                   color: 'white',
-                  padding: '0.25rem 0.75rem',
-                  borderRadius: '12px',
+                  padding: '0.375rem 0.875rem',
+                  borderRadius: '20px',
                   fontSize: '0.75rem',
-                  fontWeight: '500'
+                  fontWeight: '600',
+                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+                  boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)'
                 }}>
                   {item.type}
                 </span>
@@ -102,12 +148,14 @@ function CompactList({
               
               {item.class && (
                 <span style={{
-                  backgroundColor: 'var(--accent-green)',
+                  background: 'linear-gradient(135deg, var(--accent-green), #059669)',
                   color: 'white',
-                  padding: '0.25rem 0.75rem',
-                  borderRadius: '12px',
+                  padding: '0.375rem 0.875rem',
+                  borderRadius: '20px',
                   fontSize: '0.75rem',
-                  fontWeight: '500'
+                  fontWeight: '600',
+                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+                  boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)'
                 }}>
                   {item.class}
                 </span>
@@ -115,12 +163,14 @@ function CompactList({
               
               {item.role && (
                 <span style={{
-                  backgroundColor: 'var(--accent-purple)',
+                  background: 'linear-gradient(135deg, var(--accent-purple), #7c3aed)',
                   color: 'white',
-                  padding: '0.25rem 0.75rem',
-                  borderRadius: '12px',
+                  padding: '0.375rem 0.875rem',
+                  borderRadius: '20px',
                   fontSize: '0.75rem',
-                  fontWeight: '500'
+                  fontWeight: '600',
+                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+                  boxShadow: '0 2px 8px rgba(139, 92, 246, 0.3)'
                 }}>
                   {item.role}
                 </span>
@@ -128,14 +178,18 @@ function CompactList({
               
               {item.status && (
                 <span style={{
-                  backgroundColor: item.status === 'Completada' ? 'var(--accent-green)' : 
-                               item.status === 'En progreso' ? 'var(--accent-orange)' : 
-                               'var(--accent-gray)',
+                  background: item.status === 'Completada' ? 'linear-gradient(135deg, var(--accent-green), #059669)' : 
+                           item.status === 'En progreso' ? 'linear-gradient(135deg, var(--accent-orange), #d97706)' : 
+                           'linear-gradient(135deg, var(--accent-gray), #4b5563)',
                   color: 'white',
-                  padding: '0.25rem 0.75rem',
-                  borderRadius: '12px',
+                  padding: '0.375rem 0.875rem',
+                  borderRadius: '20px',
                   fontSize: '0.75rem',
-                  fontWeight: '500'
+                  fontWeight: '600',
+                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+                  boxShadow: item.status === 'Completada' ? '0 2px 8px rgba(16, 185, 129, 0.3)' : 
+                           item.status === 'En progreso' ? '0 2px 8px rgba(245, 158, 11, 0.3)' : 
+                           '0 2px 8px rgba(107, 114, 128, 0.3)'
                 }}>
                   {item.status}
                 </span>
@@ -173,104 +227,18 @@ function CompactList({
               </div>
             )}
 
-            {/* Botones de acción */}
+            {/* Indicador de click */}
             <div style={{
+              marginTop: 'auto',
+              paddingTop: '1rem',
               display: 'flex',
-              gap: '0.75rem',
-              marginTop: 'auto'
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--text-muted)',
+              fontSize: '0.85rem',
+              opacity: 0.7
             }}>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onSelectItem(item)
-                }}
-                style={{
-                  background: 'var(--accent-blue)',
-                  border: 'none',
-                  color: 'white',
-                  padding: '0.5rem',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s ease',
-                  flex: 1
-                }}
-                className="action-button"
-              >
-                <Eye size={16} />
-              </button>
-              
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onEditItem(item)
-                }}
-                style={{
-                  background: 'var(--accent-orange)',
-                  border: 'none',
-                  color: 'white',
-                  padding: '0.5rem',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s ease',
-                  flex: 1
-                }}
-                className="action-button"
-              >
-                <Edit size={16} />
-              </button>
-              
-              {onOpenConnections && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onOpenConnections(item, itemType)
-                  }}
-                  style={{
-                    background: 'var(--accent-purple)',
-                    border: 'none',
-                    color: 'white',
-                    padding: '0.5rem',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'all 0.2s ease',
-                    flex: 1
-                  }}
-                  className="action-button"
-                >
-                  <Link2 size={16} />
-                </button>
-              )}
-              
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onDeleteItem(item.id, item.name || item.title)
-                }}
-                style={{
-                  background: 'var(--accent-red)',
-                  border: 'none',
-                  color: 'white',
-                  padding: '0.5rem',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s ease'
-                }}
-                className="action-button"
-              >
-                <Trash2 size={16} />
-              </button>
+              Clic para abrir
             </div>
           </div>
         )
@@ -278,14 +246,55 @@ function CompactList({
 
       <style jsx>{`
         .compact-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-          border-color: var(--accent-blue);
+          transform: translateY(-4px);
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(139, 92, 246, 0.5);
+          border-color: rgba(139, 92, 246, 0.6);
         }
         
         .action-button:hover {
-          transform: scale(1.05);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          transform: translateY(-2px);
+          filter: brightness(1.1);
+        }
+        
+        .compact-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, rgba(139, 92, 246, 0.03), rgba(59, 130, 246, 0.03));
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          border-radius: 16px;
+        }
+        
+        .compact-card:hover::before {
+          opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+          .compact-card {
+            padding: 1.25rem !important;
+          }
+          
+          .action-button {
+            padding: 0.625rem !important;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .compact-card {
+            padding: 1rem !important;
+          }
+          
+          .compact-card h3 {
+            font-size: 1.1rem !important;
+          }
+          
+          .action-button {
+            padding: 0.5rem !important;
+          }
         }
       `}</style>
     </div>
