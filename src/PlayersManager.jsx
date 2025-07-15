@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { useCRUD } from './hooks/useCRUD'
+import { useCRUD } from './hooks/useCRUD.jsx'
 import ConnectionsDisplay from './components/ConnectionsDisplay'
+import Modal from './components/Modal'
+import CompactList from './components/CompactList'
 
 function PlayersManager({ campaign, connections, selectedItemForNavigation, updateCampaign }) {
   // ✨ Hook CRUD usando datos de la campaña
@@ -25,9 +27,9 @@ function PlayersManager({ campaign, connections, selectedItemForNavigation, upda
     const savedItem = handleSaveInternal(itemData)
     if (savedItem && updateCampaign) {
       updateCampaign({
-        npcs: editingItem 
-          ? campaign.npcs.map(npc => npc.id === savedItem.id ? savedItem : npc)
-          : [...campaign.npcs, savedItem]
+        players: editingItem 
+          ? campaign.players.map(player => player.id === savedItem.id ? savedItem : player)
+          : [...(campaign.players || []), savedItem]
       })
     }
   }
@@ -37,7 +39,7 @@ function PlayersManager({ campaign, connections, selectedItemForNavigation, upda
     handleDeleteInternal(id, name)
     if (updateCampaign) {
       updateCampaign({
-        npcs: campaign.npcs.filter(npc => npc.id !== id)
+        players: (campaign.players || []).filter(player => player.id !== id)
       })
     }
   }
@@ -85,38 +87,40 @@ function PlayersManager({ campaign, connections, selectedItemForNavigation, upda
         </button>
       </div>
 
-      {/* Vista principal */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: selectedPlayer ? '1fr 400px' : '1fr',
-        gap: '2rem',
-        transition: 'all 0.3s ease'
-      }}>
-        
-        {/* Lista de jugadores */}
-        <div>
-          {isEmpty ? (
-            <EmptyState onAddFirst={openCreateForm} />
-          ) : (
-            <div style={{
-              display: 'grid',
-              gap: '1rem'
-            }}>
-              {players.map(player => (
-                <PlayerCard
-                  key={player.id}
-                  player={player}
-                  isSelected={selectedPlayer?.id === player.id}
-                  onClick={() => selectPlayer(player)}
-                  onEdit={() => openEditForm(player)}
-                  onDelete={() => handleDelete(player.id, player.name)}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+      {/* Lista compacta de jugadores */}
+      <CompactList
+        items={players}
+        itemType="players"
+        onSelectItem={selectPlayer}
+        onEditItem={openEditForm}
+        onDeleteItem={handleDelete}
+        onOpenConnections={connections?.openConnectionModal}
+        getConnectionCount={connections?.getConnectionCount}
+        emptyMessage="No hay jugadores aún. ¡Añade el primer héroe de tu campaña!"
+        emptyIcon="👥"
+      />
 
-        {/* Panel de detalles */}
+      {/* Modal de formulario */}
+      <Modal
+        isOpen={showForm}
+        onClose={closeForm}
+        title={editingItem ? 'Editar Jugador' : 'Nuevo Jugador'}
+        size="large"
+      >
+        <PlayerForm
+          player={editingItem}
+          onSave={handleSave}
+          onClose={closeForm}
+        />
+      </Modal>
+
+      {/* Modal de detalles */}
+      <Modal
+        isOpen={!!selectedPlayer}
+        onClose={closeDetails}
+        title={selectedPlayer?.name}
+        size="large"
+      >
         {selectedPlayer && (
           <PlayerDetails
             player={selectedPlayer}
@@ -127,207 +131,7 @@ function PlayersManager({ campaign, connections, selectedItemForNavigation, upda
             campaign={campaign}
           />
         )}
-      </div>
-
-      {/* Modal de formulario */}
-      {showForm && (
-        <PlayerForm
-          player={editingItem}
-          onSave={handleSave}
-          onClose={closeForm}
-        />
-      )}
-    </div>
-  )
-}
-
-// Estado vacío
-function EmptyState({ onAddFirst }) {
-  return (
-    <div style={{
-      textAlign: 'center',
-      padding: '4rem 2rem',
-      color: 'var(--text-muted)'
-    }}>
-      <div style={{ fontSize: '4rem', marginBottom: '1rem', opacity: 0.5 }}>
-        👥
-      </div>
-      <h3 style={{ color: 'white', marginBottom: '1rem' }}>
-        No hay jugadores registrados aún
-      </h3>
-      <p style={{ marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem' }}>
-        Los jugadores son los protagonistas de tu historia. Añade información 
-        sobre sus personajes, clases, trasfondos y evolución en la campaña.
-      </p>
-      <button onClick={onAddFirst} className="btn-primary">
-        👥 Añadir Primer Jugador
-      </button>
-    </div>
-  )
-}
-
-// Tarjeta de jugador
-function PlayerCard({ player, isSelected, onClick, onEdit, onDelete }) {
-  const getLevelColor = (level) => {
-    if (!level) return '#6b7280'
-    const levelNum = parseInt(level)
-    if (levelNum >= 15) return '#ff6b35' // Legendario
-    if (levelNum >= 10) return '#8b5cf6' // Épico
-    if (levelNum >= 5) return '#3b82f6'  // Veterano
-    return '#10b981' // Novato
-  }
-
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        background: isSelected 
-          ? 'rgba(139, 92, 246, 0.2)' 
-          : 'rgba(31, 41, 55, 0.5)',
-        border: isSelected 
-          ? '1px solid rgba(139, 92, 246, 0.5)' 
-          : '1px solid rgba(139, 92, 246, 0.1)',
-        borderRadius: '12px',
-        padding: '1.5rem',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '1rem'
-      }}
-    >
-      {/* Avatar */}
-      <div style={{
-        fontSize: '2rem',
-        flexShrink: 0,
-        width: '50px',
-        height: '50px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'rgba(16, 185, 129, 0.2)',
-        borderRadius: '10px'
-      }}>
-        {player.avatar || '⚔️'}
-      </div>
-
-      {/* Información principal */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <h4 style={{ 
-          color: 'white', 
-          margin: '0 0 0.25rem 0',
-          fontSize: '1.1rem',
-          fontWeight: '600'
-        }}>
-          {player.name}
-        </h4>
-        
-        {/* Clase y raza */}
-        <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
-          {player.class && (
-            <p style={{ 
-              color: 'var(--text-muted)', 
-              margin: 0,
-              fontSize: '0.9rem'
-            }}>
-              🎭 {player.class}
-            </p>
-          )}
-          
-          {player.race && (
-            <p style={{ 
-              color: '#6b7280', 
-              margin: 0,
-              fontSize: '0.9rem'
-            }}>
-              🧬 {player.race}
-            </p>
-          )}
-        </div>
-
-        {/* Nivel */}
-        {player.level && (
-          <span style={{
-            display: 'inline-block',
-            marginBottom: '0.5rem',
-            padding: '0.25rem 0.5rem',
-            background: `${getLevelColor(player.level)}20`,
-            color: getLevelColor(player.level),
-            borderRadius: '6px',
-            fontSize: '0.75rem',
-            fontWeight: '600'
-          }}>
-            ⭐ Nivel {player.level}
-          </span>
-        )}
-
-        {/* Player real */}
-        {player.playerName && (
-          <p style={{ 
-            color: '#6b7280', 
-            margin: '0.25rem 0 0 0',
-            fontSize: '0.8rem'
-          }}>
-            🎮 Jugado por: {player.playerName}
-          </p>
-        )}
-
-        {/* Trasfondo */}
-        {player.background && (
-          <p style={{ 
-            color: 'var(--text-muted)', 
-            margin: '0.25rem 0 0 0',
-            fontSize: '0.85rem',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap'
-          }}>
-            📜 {player.background}
-          </p>
-        )}
-      </div>
-
-      {/* Acciones */}
-      <div style={{ 
-        display: 'flex', 
-        gap: '0.5rem',
-        marginLeft: 'auto'
-      }}>
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            onEdit()
-          }}
-          style={{
-            background: 'rgba(139, 92, 246, 0.2)',
-            border: '1px solid rgba(139, 92, 246, 0.3)',
-            borderRadius: '6px',
-            color: '#a78bfa',
-            padding: '0.25rem 0.5rem',
-            cursor: 'pointer',
-            fontSize: '0.8rem'
-          }}
-        >
-          ✏️
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            onDelete()
-          }}
-          style={{
-            background: 'rgba(239, 68, 68, 0.2)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: '6px',
-            color: '#ef4444',
-            padding: '0.25rem 0.5rem',
-            cursor: 'pointer',
-            fontSize: '0.8rem'
-          }}
-        >
-          🗑️
-        </button>
-      </div>
+      </Modal>
     </div>
   )
 }
@@ -347,24 +151,10 @@ function PlayerDetails({ player, onClose, onEdit, onDelete, connections, campaig
   }
 
   return (
-    <div style={{
-      background: 'var(--glass-bg)',
-      border: '1px solid var(--glass-border)',
-      borderRadius: '16px',
-      padding: '2rem',
-      position: 'sticky',
-      top: '2rem',
-      maxHeight: 'calc(100vh - 4rem)',
-      overflowY: 'auto'
-    }}>
-      {/* Header */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'flex-start',
-        marginBottom: '2rem'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+    <div>
+      {/* Información básica */}
+      <div style={{ marginBottom: '2rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
           <div style={{ fontSize: '3rem' }}>
             {player.avatar || '⚔️'}
           </div>
@@ -393,23 +183,7 @@ function PlayerDetails({ player, onClose, onEdit, onDelete, connections, campaig
             )}
           </div>
         </div>
-        <button
-          onClick={onClose}
-          style={{
-            background: 'rgba(239, 68, 68, 0.2)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: '8px',
-            color: '#ef4444',
-            padding: '0.5rem',
-            cursor: 'pointer'
-          }}
-        >
-          ✕
-        </button>
-      </div>
 
-      {/* Información básica */}
-      <div style={{ marginBottom: '2rem' }}>
         {player.playerName && (
           <div style={{ marginBottom: '1rem' }}>
             <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Jugador real</h4>
@@ -601,274 +375,239 @@ function PlayerForm({ player, onSave, onClose }) {
   }
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      background: 'rgba(0, 0, 0, 0.8)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      backdropFilter: 'blur(10px)'
-    }}>
+    <form onSubmit={handleSubmit}>
       <div style={{
-        background: 'var(--glass-bg)',
-        border: '1px solid var(--glass-border)',
-        borderRadius: '20px',
-        padding: '2rem',
-        width: '90%',
-        maxWidth: '700px',
-        maxHeight: '90vh',
-        overflowY: 'auto'
+        display: 'grid',
+        gap: '1.5rem',
+        marginBottom: '2rem'
       }}>
-        <h2 style={{ 
-          color: 'white', 
-          marginBottom: '2rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem'
-        }}>
-          {player ? '✏️ Editar Jugador' : '👥 Nuevo Jugador'}
-        </h2>
-
-        <form onSubmit={handleSubmit}>
-          <div style={{
-            display: 'grid',
-            gap: '1.5rem',
-            marginBottom: '2rem'
-          }}>
-            {/* Nombre del personaje y jugador real */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <div>
-                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                  Nombre del personaje *
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Ej: Aragorn"
-                  className="input-field"
-                  style={{
-                    borderColor: errors.name ? '#ef4444' : undefined
-                  }}
-                />
-                {errors.name && (
-                  <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
-                    {errors.name}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                  Jugador real
-                </label>
-                <input
-                  type="text"
-                  name="playerName"
-                  value={formData.playerName}
-                  onChange={handleChange}
-                  placeholder="Nombre del jugador"
-                  className="input-field"
-                />
-              </div>
-            </div>
-
-            {/* Clase, raza y nivel */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 80px', gap: '1rem' }}>
-              <div>
-                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                  Clase *
-                </label>
-                <select
-                  name="class"
-                  value={formData.class}
-                  onChange={handleChange}
-                  className="input-field"
-                  style={{
-                    borderColor: errors.class ? '#ef4444' : undefined
-                  }}
-                >
-                  <option value="">Seleccionar</option>
-                  {classOptions.map(cls => (
-                    <option key={cls} value={cls}>
-                      {cls}
-                    </option>
-                  ))}
-                </select>
-                {errors.class && (
-                  <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
-                    {errors.class}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                  Raza *
-                </label>
-                <select
-                  name="race"
-                  value={formData.race}
-                  onChange={handleChange}
-                  className="input-field"
-                  style={{
-                    borderColor: errors.race ? '#ef4444' : undefined
-                  }}
-                >
-                  <option value="">Seleccionar</option>
-                  {raceOptions.map(race => (
-                    <option key={race} value={race}>
-                      {race}
-                    </option>
-                  ))}
-                </select>
-                {errors.race && (
-                  <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
-                    {errors.race}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                  Nivel
-                </label>
-                <input
-                  type="number"
-                  name="level"
-                  value={formData.level}
-                  onChange={handleChange}
-                  min="1"
-                  max="20"
-                  className="input-field"
-                />
-              </div>
-            </div>
-
-            {/* Trasfondo */}
-            <div>
-              <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                Trasfondo
-              </label>
-              <input
-                type="text"
-                name="background"
-                value={formData.background}
-                onChange={handleChange}
-                placeholder="Ej: Noble, Forajido, Ermitaño..."
-                className="input-field"
-              />
-            </div>
-
-            {/* Descripción */}
-            <div>
-              <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                Descripción del personaje
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Apariencia, personalidad, historia personal..."
-                className="input-field"
-                style={{ minHeight: '100px', resize: 'vertical' }}
-              />
-            </div>
-
-            {/* Estadísticas básicas */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
-              <div>
-                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                  Puntos de vida
-                </label>
-                <input
-                  type="number"
-                  name="hitPoints"
-                  value={formData.hitPoints}
-                  onChange={handleChange}
-                  placeholder="HP"
-                  className="input-field"
-                  min="1"
-                />
-              </div>
-
-              <div>
-                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                  Clase de armadura
-                </label>
-                <input
-                  type="number"
-                  name="armorClass"
-                  value={formData.armorClass}
-                  onChange={handleChange}
-                  placeholder="CA"
-                  className="input-field"
-                  min="1"
-                />
-              </div>
-
-              <div>
-                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                  Velocidad (pies)
-                </label>
-                <input
-                  type="number"
-                  name="speed"
-                  value={formData.speed}
-                  onChange={handleChange}
-                  placeholder="30"
-                  className="input-field"
-                  min="0"
-                />
-              </div>
-            </div>
-
-            {/* Notas del DM */}
-            <div>
-              <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                Notas del DM
-              </label>
-              <textarea
-                name="notes"
-                value={formData.notes}
-                onChange={handleChange}
-                placeholder="Secretos del personaje, conexiones con la trama, notas importantes..."
-                className="input-field"
-                style={{ minHeight: '80px', resize: 'vertical' }}
-              />
-            </div>
+        {/* Nombre del personaje y jugador real */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div>
+            <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+              Nombre del personaje *
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Ej: Aragorn"
+              className="input-field"
+              style={{
+                borderColor: errors.name ? '#ef4444' : undefined
+              }}
+            />
+            {errors.name && (
+              <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
+                {errors.name}
+              </p>
+            )}
           </div>
 
-          {/* Botones */}
-          <div style={{ 
-            display: 'flex', 
-            gap: '1rem', 
-            marginTop: '2rem',
-            justifyContent: 'flex-end'
-          }}>
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn-secondary"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="btn-primary"
-            >
-              {player ? '💾 Guardar Cambios' : '➕ Crear Jugador'}
-            </button>
+          <div>
+            <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+              Jugador real
+            </label>
+            <input
+              type="text"
+              name="playerName"
+              value={formData.playerName}
+              onChange={handleChange}
+              placeholder="Nombre del jugador"
+              className="input-field"
+            />
           </div>
-        </form>
+        </div>
+
+        {/* Clase, raza y nivel */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 80px', gap: '1rem' }}>
+          <div>
+            <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+              Clase *
+            </label>
+            <select
+              name="class"
+              value={formData.class}
+              onChange={handleChange}
+              className="input-field"
+              style={{
+                borderColor: errors.class ? '#ef4444' : undefined
+              }}
+            >
+              <option value="">Seleccionar</option>
+              {classOptions.map(cls => (
+                <option key={cls} value={cls}>
+                  {cls}
+                </option>
+              ))}
+            </select>
+            {errors.class && (
+              <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
+                {errors.class}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+              Raza *
+            </label>
+            <select
+              name="race"
+              value={formData.race}
+              onChange={handleChange}
+              className="input-field"
+              style={{
+                borderColor: errors.race ? '#ef4444' : undefined
+              }}
+            >
+              <option value="">Seleccionar</option>
+              {raceOptions.map(race => (
+                <option key={race} value={race}>
+                  {race}
+                </option>
+              ))}
+            </select>
+            {errors.race && (
+              <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
+                {errors.race}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+              Nivel
+            </label>
+            <input
+              type="number"
+              name="level"
+              value={formData.level}
+              onChange={handleChange}
+              min="1"
+              max="20"
+              className="input-field"
+            />
+          </div>
+        </div>
+
+        {/* Trasfondo */}
+        <div>
+          <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+            Trasfondo
+          </label>
+          <input
+            type="text"
+            name="background"
+            value={formData.background}
+            onChange={handleChange}
+            placeholder="Ej: Noble, Forajido, Ermitaño..."
+            className="input-field"
+          />
+        </div>
+
+        {/* Descripción */}
+        <div>
+          <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+            Descripción del personaje
+          </label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            placeholder="Apariencia, personalidad, historia personal..."
+            className="input-field"
+            style={{ minHeight: '100px', resize: 'vertical' }}
+          />
+        </div>
+
+        {/* Estadísticas básicas */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+          <div>
+            <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+              Puntos de vida
+            </label>
+            <input
+              type="number"
+              name="hitPoints"
+              value={formData.hitPoints}
+              onChange={handleChange}
+              placeholder="HP"
+              className="input-field"
+              min="1"
+            />
+          </div>
+
+          <div>
+            <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+              Clase de armadura
+            </label>
+            <input
+              type="number"
+              name="armorClass"
+              value={formData.armorClass}
+              onChange={handleChange}
+              placeholder="CA"
+              className="input-field"
+              min="1"
+            />
+          </div>
+
+          <div>
+            <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+              Velocidad (pies)
+            </label>
+            <input
+              type="number"
+              name="speed"
+              value={formData.speed}
+              onChange={handleChange}
+              placeholder="30"
+              className="input-field"
+              min="0"
+            />
+          </div>
+        </div>
+
+        {/* Notas del DM */}
+        <div>
+          <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+            Notas del DM
+          </label>
+          <textarea
+            name="notes"
+            value={formData.notes}
+            onChange={handleChange}
+            placeholder="Secretos del personaje, conexiones con la trama, notas importantes..."
+            className="input-field"
+            style={{ minHeight: '80px', resize: 'vertical' }}
+          />
+        </div>
       </div>
-    </div>
+
+      {/* Botones */}
+      <div style={{ 
+        display: 'flex', 
+        gap: '1rem', 
+        marginTop: '2rem',
+        justifyContent: 'flex-end'
+      }}>
+        <button
+          type="button"
+          onClick={onClose}
+          className="btn-secondary"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          className="btn-primary"
+        >
+          {player ? '💾 Guardar Cambios' : '➕ Crear Jugador'}
+        </button>
+      </div>
+    </form>
   )
 }
 
