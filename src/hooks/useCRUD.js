@@ -1,9 +1,10 @@
 import { useState } from 'react'
+import React from 'react'
 
 /**
  * Hook personalizado para manejar operaciones CRUD de manera uniforme
  * Elimina código duplicado entre todos los gestores
- * ✅ ACTUALIZADO sin JSX - solo lógica pura
+ * ✅ CORREGIDO: Ahora incluye el componente de notificación
  */
 export function useCRUD(initialData = [], itemName = 'elemento') {
   // Estados principales
@@ -34,7 +35,7 @@ export function useCRUD(initialData = [], itemName = 'elemento') {
   // Función para mostrar notificaciones temporales
   const showNotification = (message, type = 'success') => {
     setNotification({ message, type })
-    setTimeout(() => setNotification(null), 2000)
+    setTimeout(() => setNotification(null), 3000)
   }
 
   // Crear nuevo elemento
@@ -128,6 +129,34 @@ export function useCRUD(initialData = [], itemName = 'elemento') {
   // Estado vacío
   const isEmpty = items.length === 0
 
+  // ✅ COMPONENTE DE NOTIFICACIÓN
+  const NotificationComponent = () => {
+    if (!notification) return null
+
+    return (
+      <div style={{
+        position: 'fixed',
+        top: '2rem',
+        right: '2rem',
+        background: notification.type === 'error' 
+          ? 'rgba(239, 68, 68, 0.9)' 
+          : 'rgba(16, 185, 129, 0.9)',
+        color: 'white',
+        padding: '1rem 1.5rem',
+        borderRadius: '10px',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+        zIndex: 1000,
+        backdropFilter: 'blur(10px)',
+        fontSize: '0.9rem',
+        fontWeight: '600',
+        maxWidth: '400px',
+        animation: 'slideInRight 0.3s ease-out'
+      }}>
+        {notification.message}
+      </div>
+    )
+  }
+
   return {
     // Estados
     items,
@@ -149,6 +178,9 @@ export function useCRUD(initialData = [], itemName = 'elemento') {
     closeDetails,
 
     // Utilidades
-    showNotification
+    showNotification,
+    
+    // ✅ Componente de notificación
+    NotificationComponent
   }
 }

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Search, ArrowLeft, Download, Menu, X } from 'lucide-react'
+import React, { useState, useEffect, useCallback } from 'react'
+import { Search, ArrowLeft, Menu, X } from 'lucide-react'
 import LocationsManager from './LocationsManager'
 import NPCsManager from './NPCsManager'
 import QuestsManager from './QuestsManager'
@@ -10,9 +10,10 @@ import ConnectionModal from './components/ConnectionModal'
 import SearchDropdown from './SearchDropdown'
 import { useConnections } from './hooks/useConnections'
 import { useSearch } from './hooks/useSearch'
+import { saveCampaigns, loadCampaigns } from './services/storage'
 
 // Configuración de las pestañas
-const tabs = [
+const TABS = [
   { id: 'dashboard', name: 'Dashboard', icon: '🏠' },
   { id: 'locations', name: 'Lugares', icon: '📍' },
   { id: 'players', name: 'Jugadores', icon: '👥' },
@@ -28,6 +29,7 @@ function CampaignManager({ campaign, onBackToSelector }) {
   const [selectedItemForNavigation, setSelectedItemForNavigation] = useState(null)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   
   // Detectar si es móvil
   useEffect(() => {
@@ -47,17 +49,46 @@ function CampaignManager({ campaign, onBackToSelector }) {
     setIsMobileMenuOpen(false)
   }, [activeTab])
 
-  const updateCampaign = (updates) => {
+  // ✅ Función mejorada para actualizar la campaña con guardado automático
+  const updateCampaign = useCallback((updates) => {
     console.log('Actualizando campaña:', updates)
-    setCurrentCampaign(prev => ({ ...prev, ...updates }))
-  }
+    setCurrentCampaign(prev => {
+      const newCampaign = { ...prev, ...updates }
+      
+      // Guardar automáticamente los cambios
+      saveChanges(newCampaign)
+      
+      return newCampaign
+    })
+  }, [])
+
+  // ✅ Función para guardar cambios en localStorage
+  const saveChanges = useCallback((campaignToSave) => {
+    if (isSaving) return
+    
+    setIsSaving(true)
+    try {
+      const campaigns = loadCampaigns()
+      const updatedCampaigns = campaigns.map(c => 
+        c.id === campaignToSave.id 
+          ? { ...campaignToSave, lastModified: new Date().toISOString().split('T')[0] }
+          : c
+      )
+      saveCampaigns(updatedCampaigns)
+      console.log('Cambios guardados automáticamente')
+    } catch (error) {
+      console.error('Error al guardar cambios:', error)
+    } finally {
+      setIsSaving(false)
+    }
+  }, [isSaving])
 
   // Hooks
   const connections = useConnections(currentCampaign, updateCampaign)
   const search = useSearch(currentCampaign)
 
-  // Función para navegar a un elemento conectado
-  const navigateToItem = (item, itemType) => {
+  // ✅ Función mejorada para navegar a un elemento conectado
+  const navigateToItem = useCallback((item, itemType) => {
     console.log('Navegando a:', itemType, item.name || item.title)
     
     // Cambiar a la pestaña correcta
@@ -74,13 +105,19 @@ function CampaignManager({ campaign, onBackToSelector }) {
     setTimeout(() => {
       setSelectedItemForNavigation(null)
     }, 100)
-  }
+  }, [])
 
-  // Función para manejar click en resultado de búsqueda
-  const handleSearchItemClick = (item, type) => {
+  // ✅ Función para manejar click en resultado de búsqueda
+  const handleSearchItemClick = useCallback((item, type) => {
     navigateToItem(item, type)
     search.closeSearch()
-  }
+  }, [navigateToItem, search])
+
+  // ✅ Función para cambiar de pestaña
+  const handleTabChange = useCallback((tabId) => {
+    setActiveTab(tabId)
+    setSelectedItemForNavigation(null)
+  }, [])
 
   return (
     <div className="campaign-manager">
@@ -107,10 +144,10 @@ function CampaignManager({ campaign, onBackToSelector }) {
           {!isMobile && (
             <div className="nav-section nav-center">
               <div className="tabs-wrapper">
-                {tabs.map(tab => (
+                {TABS.map(tab => (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={() => handleTabChange(tab.id)}
                     className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
                     aria-current={activeTab === tab.id ? 'page' : undefined}
                   >
@@ -147,6 +184,17 @@ function CampaignManager({ campaign, onBackToSelector }) {
               )}
             </div>
 
+            {/* Indicador de guardado */}
+            {isSaving && (
+              <span style={{ 
+                color: '#10b981', 
+                fontSize: '0.8rem',
+                animation: 'pulse 1s infinite'
+              }}>
+                💾 Guardando...
+              </span>
+            )}
+
             {/* Botón menú móvil */}
             {isMobile && (
               <button
@@ -165,10 +213,10 @@ function CampaignManager({ campaign, onBackToSelector }) {
       {isMobile && isMobileMenuOpen && (
         <div className="mobile-menu-dropdown">
           <div className="mobile-tabs-list">
-            {tabs.map(tab => (
+            {TABS.map(tab => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 className={`mobile-tab-button ${activeTab === tab.id ? 'active' : ''}`}
               >
                 <span className="tab-icon">{tab.icon}</span>
@@ -184,10 +232,11 @@ function CampaignManager({ campaign, onBackToSelector }) {
         <TabContent 
           activeTab={activeTab} 
           campaign={currentCampaign} 
-          onTabChange={setActiveTab} 
+          onTabChange={handleTabChange} 
           connections={connections}
           onNavigateToItem={navigateToItem}
           selectedItemForNavigation={selectedItemForNavigation}
+          updateCampaign={updateCampaign}
         />
       </main>
 
@@ -452,6 +501,11 @@ function CampaignManager({ campaign, onBackToSelector }) {
           }
         }
 
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+
         /* Responsive */
         @media (max-width: 1200px) {
           .search-input {
@@ -540,14 +594,15 @@ function CampaignManager({ campaign, onBackToSelector }) {
   )
 }
 
-// Componente para renderizar el contenido de cada pestaña
+// ✅ Componente mejorado para renderizar el contenido de cada pestaña
 function TabContent({ 
   activeTab, 
   campaign, 
   onTabChange, 
   connections, 
   onNavigateToItem, 
-  selectedItemForNavigation 
+  selectedItemForNavigation,
+  updateCampaign 
 }) {
   // Props comunes para todos los gestores
   const commonProps = {
@@ -556,7 +611,8 @@ function TabContent({
       ...connections,
       navigateToItem: onNavigateToItem
     },
-    selectedItemForNavigation
+    selectedItemForNavigation,
+    updateCampaign
   }
 
   switch (activeTab) {
@@ -579,11 +635,56 @@ function TabContent({
   }
 }
 
-// Dashboard mejorado
-function Dashboard({ campaign, onTabChange }) {
+// ✅ Dashboard mejorado con mejor rendimiento
+const Dashboard = React.memo(function Dashboard({ campaign, onTabChange }) {
   const getCount = (type) => {
     return campaign[type]?.length || 0
   }
+
+  const sections = [
+    {
+      title: "Lugares",
+      type: "locations",
+      icon: "📍",
+      color: "#3b82f6",
+      description: "Escenarios y localizaciones"
+    },
+    {
+      title: "Jugadores",
+      type: "players",
+      icon: "👥",
+      color: "#10b981",
+      description: "Héroes de la aventura"
+    },
+    {
+      title: "NPCs",
+      type: "npcs",
+      icon: "🧙",
+      color: "#8b5cf6",
+      description: "Personajes del mundo"
+    },
+    {
+      title: "Objetos",
+      type: "objects",
+      icon: "📦",
+      color: "#06b6d4",
+      description: "Tesoros y artefactos"
+    },
+    {
+      title: "Misiones",
+      type: "quests",
+      icon: "📜",
+      color: "#f59e0b",
+      description: "Aventuras y objetivos"
+    },
+    {
+      title: "Notas",
+      type: "notes",
+      icon: "📝",
+      color: "#ec4899",
+      description: "Apuntes y recordatorios"
+    }
+  ]
 
   return (
     <div className="dashboard-container fade-in">
@@ -598,54 +699,48 @@ function Dashboard({ campaign, onTabChange }) {
 
       {/* Estadísticas principales */}
       <div className="stats-grid">
-        <DashboardCard
-          title="Lugares"
-          count={getCount('locations')}
-          icon="📍"
-          color="#3b82f6"
-          onClick={() => onTabChange('locations')}
-          description="Escenarios y localizaciones"
-        />
-        <DashboardCard
-          title="Jugadores"
-          count={getCount('players')}
-          icon="👥"
-          color="#10b981"
-          onClick={() => onTabChange('players')}
-          description="Héroes de la aventura"
-        />
-        <DashboardCard
-          title="NPCs"
-          count={getCount('npcs')}
-          icon="🧙"
-          color="#8b5cf6"
-          onClick={() => onTabChange('npcs')}
-          description="Personajes del mundo"
-        />
-        <DashboardCard
-          title="Objetos"
-          count={getCount('objects')}
-          icon="📦"
-          color="#06b6d4"
-          onClick={() => onTabChange('objects')}
-          description="Tesoros y artefactos"
-        />
-        <DashboardCard
-          title="Misiones"
-          count={getCount('quests')}
-          icon="📜"
-          color="#f59e0b"
-          onClick={() => onTabChange('quests')}
-          description="Aventuras y objetivos"
-        />
-        <DashboardCard
-          title="Notas"
-          count={getCount('notes')}
-          icon="📝"
-          color="#ec4899"
-          onClick={() => onTabChange('notes')}
-          description="Apuntes y recordatorios"
-        />
+        {sections.map(section => (
+          <DashboardCard
+            key={section.type}
+            title={section.title}
+            count={getCount(section.type)}
+            icon={section.icon}
+            color={section.color}
+            onClick={() => onTabChange(section.type)}
+            description={section.description}
+          />
+        ))}
+      </div>
+
+      {/* Resumen rápido */}
+      <div style={{
+        marginTop: '3rem',
+        padding: '2rem',
+        background: 'rgba(31, 41, 55, 0.3)',
+        borderRadius: '12px',
+        border: '1px solid rgba(139, 92, 246, 0.1)',
+        textAlign: 'center'
+      }}>
+        <h3 style={{ color: 'white', marginBottom: '1rem' }}>
+          🎲 Estado de la Campaña
+        </h3>
+        <p style={{ color: '#9ca3af', marginBottom: '1rem' }}>
+          Tu campaña "{campaign.name}" tiene un total de{' '}
+          <strong style={{ color: '#8b5cf6' }}>
+            {Object.keys(campaign).reduce((total, key) => {
+              if (Array.isArray(campaign[key])) {
+                return total + campaign[key].length
+              }
+              return total
+            }, 0)}
+          </strong>{' '}
+          elementos creados.
+        </p>
+        {campaign.description && (
+          <p style={{ color: '#6b7280', fontStyle: 'italic' }}>
+            "{campaign.description}"
+          </p>
+        )}
       </div>
 
       <style jsx>{`
@@ -676,10 +771,17 @@ function Dashboard({ campaign, onTabChange }) {
       `}</style>
     </div>
   )
-}
+})
 
-// Componente para las tarjetas del dashboard
-function DashboardCard({ title, count, icon, color, onClick, description }) {
+// ✅ Componente optimizado para las tarjetas del dashboard
+const DashboardCard = React.memo(function DashboardCard({ 
+  title, 
+  count, 
+  icon, 
+  color, 
+  onClick, 
+  description 
+}) {
   return (
     <>
       <div
@@ -697,6 +799,10 @@ function DashboardCard({ title, count, icon, color, onClick, description }) {
         <div className="card-count">{count}</div>
         
         <p className="card-description">{description}</p>
+        
+        <div className="card-action">
+          <span>Ver {title.toLowerCase()} →</span>
+        </div>
       </div>
 
       <style jsx>{`
@@ -734,6 +840,11 @@ function DashboardCard({ title, count, icon, color, onClick, description }) {
           opacity: 1;
         }
 
+        .dashboard-card:hover .card-action {
+          opacity: 1;
+          transform: translateX(0);
+        }
+
         .card-header {
           display: flex;
           align-items: center;
@@ -762,8 +873,17 @@ function DashboardCard({ title, count, icon, color, onClick, description }) {
         .card-description {
           color: #9ca3af;
           font-size: 0.875rem;
-          margin: 0;
+          margin: 0 0 1rem 0;
           line-height: 1.4;
+        }
+
+        .card-action {
+          color: var(--card-color);
+          font-size: 0.875rem;
+          font-weight: 600;
+          opacity: 0;
+          transform: translateX(-10px);
+          transition: all 0.3s ease;
         }
 
         @media (max-width: 768px) {
@@ -774,10 +894,15 @@ function DashboardCard({ title, count, icon, color, onClick, description }) {
           .card-count {
             font-size: 2rem;
           }
+
+          .card-action {
+            opacity: 1;
+            transform: translateX(0);
+          }
         }
       `}</style>
     </>
   )
-}
+})
 
 export default CampaignManager

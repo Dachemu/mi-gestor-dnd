@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useCRUD } from './hooks/useCRUD'
 import ConnectionsDisplay from './components/ConnectionsDisplay'
 
-function LocationsManager({ campaign, connections, selectedItemForNavigation }) {
+function LocationsManager({ campaign, connections, selectedItemForNavigation, updateCampaign }) {
   // ✨ Hook CRUD para manejar todos los estados
   const {
     items: locations,
@@ -10,8 +10,8 @@ function LocationsManager({ campaign, connections, selectedItemForNavigation }) 
     editingItem,
     selectedItem: selectedLocation,
     isEmpty,
-    handleSave,
-    handleDelete,
+    handleSave: handleSaveInternal,
+    handleDelete: handleDeleteInternal,
     selectItem: selectLocation,
     openCreateForm,
     openEditForm,
@@ -19,6 +19,28 @@ function LocationsManager({ campaign, connections, selectedItemForNavigation }) 
     closeDetails,
     NotificationComponent
   } = useCRUD(campaign.locations || [], 'Lugar')
+
+  // ✅ Función mejorada para guardar que actualiza la campaña
+  const handleSave = (itemData) => {
+    const savedItem = handleSaveInternal(itemData)
+    if (savedItem && updateCampaign) {
+      updateCampaign({
+        npcs: editingItem 
+          ? campaign.npcs.map(npc => npc.id === savedItem.id ? savedItem : npc)
+          : [...campaign.npcs, savedItem]
+      })
+    }
+  }
+
+  // ✅ Función mejorada para eliminar que actualiza la campaña
+  const handleDelete = (id, name) => {
+    handleDeleteInternal(id, name)
+    if (updateCampaign) {
+      updateCampaign({
+        npcs: campaign.npcs.filter(npc => npc.id !== id)
+      })
+    }
+  }
 
   // ✨ Efecto para seleccionar automáticamente un lugar cuando se navega desde conexiones
   useEffect(() => {

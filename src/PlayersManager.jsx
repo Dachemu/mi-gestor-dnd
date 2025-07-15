@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useCRUD } from './hooks/useCRUD'
 import ConnectionsDisplay from './components/ConnectionsDisplay'
 
-function PlayersManager({ campaign, connections, selectedItemForNavigation }) {
+function PlayersManager({ campaign, connections, selectedItemForNavigation, updateCampaign }) {
   // ✨ Hook CRUD usando datos de la campaña
   const {
     items: players,
@@ -10,8 +10,8 @@ function PlayersManager({ campaign, connections, selectedItemForNavigation }) {
     editingItem,
     selectedItem: selectedPlayer,
     isEmpty,
-    handleSave,
-    handleDelete,
+    handleSave: handleSaveInternal,
+    handleDelete: handleDeleteInternal,
     selectItem: selectPlayer,
     openCreateForm,
     openEditForm,
@@ -19,6 +19,28 @@ function PlayersManager({ campaign, connections, selectedItemForNavigation }) {
     closeDetails,
     NotificationComponent
   } = useCRUD(campaign.players || [], 'Jugador')
+
+  // ✅ Función mejorada para guardar que actualiza la campaña
+  const handleSave = (itemData) => {
+    const savedItem = handleSaveInternal(itemData)
+    if (savedItem && updateCampaign) {
+      updateCampaign({
+        npcs: editingItem 
+          ? campaign.npcs.map(npc => npc.id === savedItem.id ? savedItem : npc)
+          : [...campaign.npcs, savedItem]
+      })
+    }
+  }
+
+  // ✅ Función mejorada para eliminar que actualiza la campaña
+  const handleDelete = (id, name) => {
+    handleDeleteInternal(id, name)
+    if (updateCampaign) {
+      updateCampaign({
+        npcs: campaign.npcs.filter(npc => npc.id !== id)
+      })
+    }
+  }
 
   // ✨ Efecto para seleccionar automáticamente un jugador cuando se navega desde conexiones
   useEffect(() => {

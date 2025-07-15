@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useCRUD } from './hooks/useCRUD'
 import ConnectionsDisplay from './components/ConnectionsDisplay'
 
-function NotesManager({ campaign, connections, selectedItemForNavigation }) {
+function NotesManager({ campaign, connections, selectedItemForNavigation, updateCampaign }) {
   // ✨ Hook CRUD usando datos de la campaña
   const {
     items: notes,
@@ -10,8 +10,8 @@ function NotesManager({ campaign, connections, selectedItemForNavigation }) {
     editingItem,
     selectedItem: selectedNote,
     isEmpty,
-    handleSave,
-    handleDelete,
+    handleSave: handleSaveInternal,
+    handleDelete: handleDeleteInternal,
     selectItem: selectNote,
     openCreateForm,
     openEditForm,
@@ -19,6 +19,28 @@ function NotesManager({ campaign, connections, selectedItemForNavigation }) {
     closeDetails,
     NotificationComponent
   } = useCRUD(campaign.notes || [], 'Nota')
+
+  // ✅ Función mejorada para guardar que actualiza la campaña
+  const handleSave = (itemData) => {
+    const savedItem = handleSaveInternal(itemData)
+    if (savedItem && updateCampaign) {
+      updateCampaign({
+        npcs: editingItem 
+          ? campaign.npcs.map(npc => npc.id === savedItem.id ? savedItem : npc)
+          : [...campaign.npcs, savedItem]
+      })
+    }
+  }
+
+  // ✅ Función mejorada para eliminar que actualiza la campaña
+  const handleDelete = (id, name) => {
+    handleDeleteInternal(id, name)
+    if (updateCampaign) {
+      updateCampaign({
+        npcs: campaign.npcs.filter(npc => npc.id !== id)
+      })
+    }
+  }
 
   // Estado para filtro por categoría
   const [filterCategory, setFilterCategory] = useState('Todas')

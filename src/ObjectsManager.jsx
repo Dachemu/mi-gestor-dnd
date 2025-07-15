@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useCRUD } from './hooks/useCRUD'
 import ConnectionsDisplay from './components/ConnectionsDisplay'
 
-function ObjectsManager({ campaign, connections, selectedItemForNavigation }) {
+function ObjectsManager({ campaign, connections, selectedItemForNavigation, updateCampaign }) {
   // ✨ Hook CRUD usando datos de la campaña
   const {
     items: objects,
@@ -10,8 +10,8 @@ function ObjectsManager({ campaign, connections, selectedItemForNavigation }) {
     editingItem,
     selectedItem: selectedObject,
     isEmpty,
-    handleSave,
-    handleDelete,
+    handleSave: handleSaveInternal,
+    handleDelete: handleDeleteInternal,
     selectItem: selectObject,
     openCreateForm,
     openEditForm,
@@ -19,6 +19,28 @@ function ObjectsManager({ campaign, connections, selectedItemForNavigation }) {
     closeDetails,
     NotificationComponent
   } = useCRUD(campaign.objects || [], 'Objeto')
+
+  // ✅ Función mejorada para guardar que actualiza la campaña
+  const handleSave = (itemData) => {
+    const savedItem = handleSaveInternal(itemData)
+    if (savedItem && updateCampaign) {
+      updateCampaign({
+        npcs: editingItem 
+          ? campaign.npcs.map(npc => npc.id === savedItem.id ? savedItem : npc)
+          : [...campaign.npcs, savedItem]
+      })
+    }
+  }
+
+  // ✅ Función mejorada para eliminar que actualiza la campaña
+  const handleDelete = (id, name) => {
+    handleDeleteInternal(id, name)
+    if (updateCampaign) {
+      updateCampaign({
+        npcs: campaign.npcs.filter(npc => npc.id !== id)
+      })
+    }
+  }
 
   // ✨ Efecto para seleccionar automáticamente un objeto cuando se navega desde conexiones
   useEffect(() => {

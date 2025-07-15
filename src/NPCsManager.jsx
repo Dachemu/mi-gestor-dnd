@@ -3,7 +3,7 @@ import { useCRUD } from './hooks/useCRUD'
 import ConnectionsDisplay from './components/ConnectionsDisplay'
 import Notification from './components/Notification' // ✅ Componente separado
 
-function NPCsManager({ campaign, connections, selectedItemForNavigation }) {
+function NPCsManager({ campaign, connections, selectedItemForNavigation, updateCampaign }) {
   // ✨ Hook CRUD para manejar todos los estados - USA DATOS DE LA CAMPAÑA
   const {
     items: npcs,
@@ -12,14 +12,36 @@ function NPCsManager({ campaign, connections, selectedItemForNavigation }) {
     selectedItem: selectedNPC,
     isEmpty,
     notification, // ✅ Estado de notificación del hook
-    handleSave,
-    handleDelete,
+    handleSave: handleSaveInternal,
+    handleDelete: handleDeleteInternal,
     selectItem: selectNPC,
     openCreateForm,
     openEditForm,
     closeForm,
     closeDetails
   } = useCRUD(campaign.npcs || [], 'NPC')
+
+  // ✅ Función mejorada para guardar que actualiza la campaña
+  const handleSave = (itemData) => {
+    const savedItem = handleSaveInternal(itemData)
+    if (savedItem && updateCampaign) {
+      updateCampaign({
+        npcs: editingItem 
+          ? campaign.npcs.map(npc => npc.id === savedItem.id ? savedItem : npc)
+          : [...campaign.npcs, savedItem]
+      })
+    }
+  }
+
+  // ✅ Función mejorada para eliminar que actualiza la campaña
+  const handleDelete = (id, name) => {
+    handleDeleteInternal(id, name)
+    if (updateCampaign) {
+      updateCampaign({
+        npcs: campaign.npcs.filter(npc => npc.id !== id)
+      })
+    }
+  }
 
   // ✨ Efecto para seleccionar automáticamente un NPC cuando se navega desde conexiones
   useEffect(() => {
