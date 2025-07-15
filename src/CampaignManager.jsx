@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Search, ArrowLeft, Download } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Search, ArrowLeft, Download, Menu, X } from 'lucide-react'
 import LocationsManager from './LocationsManager'
 import NPCsManager from './NPCsManager'
 import QuestsManager from './QuestsManager'
@@ -26,7 +26,27 @@ function CampaignManager({ campaign, onBackToSelector }) {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [currentCampaign, setCurrentCampaign] = useState(campaign)
   const [selectedItemForNavigation, setSelectedItemForNavigation] = useState(null)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   
+  // Detectar si es móvil
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+      if (window.innerWidth >= 768) {
+        setIsMobileMenuOpen(false)
+      }
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
+
+  // Cerrar menú móvil al cambiar de pestaña
+  useEffect(() => {
+    setIsMobileMenuOpen(false)
+  }, [activeTab])
+
   const updateCampaign = (updates) => {
     console.log('Actualizando campaña:', updates)
     setCurrentCampaign(prev => ({ ...prev, ...updates }))
@@ -36,7 +56,7 @@ function CampaignManager({ campaign, onBackToSelector }) {
   const connections = useConnections(currentCampaign, updateCampaign)
   const search = useSearch(currentCampaign)
 
-  // ✨ Función para navegar a un elemento conectado
+  // Función para navegar a un elemento conectado
   const navigateToItem = (item, itemType) => {
     console.log('Navegando a:', itemType, item.name || item.title)
     
@@ -47,10 +67,10 @@ function CampaignManager({ campaign, onBackToSelector }) {
     setSelectedItemForNavigation({
       item,
       type: itemType,
-      timestamp: Date.now() // Para forzar re-render
+      timestamp: Date.now()
     })
     
-    // Limpiar la selección después de un momento para permitir navegación múltiple
+    // Limpiar la selección después de un momento
     setTimeout(() => {
       setSelectedItemForNavigation(null)
     }, 100)
@@ -63,88 +83,111 @@ function CampaignManager({ campaign, onBackToSelector }) {
   }
 
   return (
-    <div className="gradient-bg">
-      {/* ✨ Navegación limpia y responsive */}
-      <nav className="clean-nav">
-        <div className="clean-nav-container">
-          
-          {/* SECCIÓN 1: Botón volver + Título */}
-          <div className="nav-left">
+    <div className="campaign-manager">
+      {/* Navegación superior */}
+      <nav className="campaign-nav">
+        <div className="nav-container">
+          {/* Sección izquierda */}
+          <div className="nav-section nav-left">
             <button
               onClick={onBackToSelector}
-              className="btn-back-clean"
+              className="btn-back"
+              aria-label="Volver a campañas"
             >
-              <ArrowLeft size={14} />
-              <span>Campañas</span>
+              <ArrowLeft size={16} />
+              {!isMobile && <span>Campañas</span>}
             </button>
             
-            <h1 className="campaign-title-clean">
+            <h1 className="campaign-title-nav">
               {currentCampaign.name}
             </h1>
           </div>
 
-          {/* SECCIÓN 2: Pestañas centradas */}
-          <div className="nav-center">
-            <div className="tabs-container-clean">
-              {tabs.map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`tab-clean ${activeTab === tab.id ? 'active' : ''}`}
-                >
-                  <span>{tab.icon}</span>
-                  <span>{tab.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* SECCIÓN 3: Búsqueda y acciones */}
-          <div className="nav-right">
-            <div className="search-container">
-              <div className="search-input-wrapper">
-                <input
-                  type="text"
-                  placeholder="Buscar..."
-                  value={search.searchTerm}
-                  onChange={(e) => search.setSearchTerm(e.target.value)}
-                  onFocus={() => search.setShowSearchDropdown(true)}
-                  className="search-input"
-                />
-                <Search size={16} className="search-icon" />
+          {/* Sección central - Pestañas (desktop) */}
+          {!isMobile && (
+            <div className="nav-section nav-center">
+              <div className="tabs-wrapper">
+                {tabs.map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
+                    aria-current={activeTab === tab.id ? 'page' : undefined}
+                  >
+                    <span className="tab-icon">{tab.icon}</span>
+                    <span className="tab-text">{tab.name}</span>
+                  </button>
+                ))}
               </div>
+            </div>
+          )}
+
+          {/* Sección derecha */}
+          <div className="nav-section nav-right">
+            <div className="search-box">
+              <input
+                type="text"
+                placeholder="Buscar..."
+                value={search.searchTerm}
+                onChange={(e) => search.handleSearchChange(e.target.value)}
+                onFocus={search.handleSearchFocus}
+                onBlur={search.handleSearchBlur}
+                className="search-input"
+                aria-label="Buscar en la campaña"
+              />
+              <Search size={16} className="search-icon" />
               
-              {search.showSearchDropdown && (
-                <>
-                  <div 
-                    className="search-overlay"
-                    onClick={search.closeSearch}
-                  />
-                  <SearchDropdown
-                    searchTerm={search.searchTerm}
-                    results={search.searchResults}
-                    onItemClick={handleSearchItemClick}
-                    onClose={search.closeSearch}
-                  />
-                </>
+              {search.showSearchDropdown && search.searchResults.length > 0 && (
+                <SearchDropdown
+                  searchTerm={search.searchTerm}
+                  results={search.searchResults}
+                  onItemClick={handleSearchItemClick}
+                  onClose={search.closeSearch}
+                />
               )}
             </div>
+
+            {/* Botón menú móvil */}
+            {isMobile && (
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="mobile-menu-toggle"
+                aria-label="Menú de navegación"
+              >
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            )}
           </div>
         </div>
       </nav>
 
+      {/* Menú móvil */}
+      {isMobile && isMobileMenuOpen && (
+        <div className="mobile-menu-dropdown">
+          <div className="mobile-tabs-list">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`mobile-tab-button ${activeTab === tab.id ? 'active' : ''}`}
+              >
+                <span className="tab-icon">{tab.icon}</span>
+                <span className="tab-text">{tab.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Contenido principal */}
-      <main style={{ 
-        padding: '2rem',
-        marginTop: '80px' // Para que no se superponga con la navegación fija
-      }}>
+      <main className="campaign-content">
         <TabContent 
           activeTab={activeTab} 
           campaign={currentCampaign} 
           onTabChange={setActiveTab} 
           connections={connections}
-          onNavigateToItem={navigateToItem} // ✨ Pasar función de navegación
-          selectedItemForNavigation={selectedItemForNavigation} // ✨ Pasar elemento seleccionado
+          onNavigateToItem={navigateToItem}
+          selectedItemForNavigation={selectedItemForNavigation}
         />
       </main>
 
@@ -161,6 +204,338 @@ function CampaignManager({ campaign, onBackToSelector }) {
           getAvailableItems={connections.getAvailableItems}
         />
       )}
+
+      <style jsx>{`
+        .campaign-manager {
+          min-height: 100vh;
+          background: var(--bg-dark);
+        }
+
+        /* Navegación */
+        .campaign-nav {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          background: rgba(15, 15, 25, 0.95);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+          z-index: 100;
+          padding: 1rem 0;
+        }
+
+        .nav-container {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 0 2rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 2rem;
+        }
+
+        .nav-section {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .nav-left {
+          flex-shrink: 0;
+        }
+
+        .nav-center {
+          flex: 1;
+          display: flex;
+          justify-content: center;
+        }
+
+        .nav-right {
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        /* Botón volver */
+        .btn-back {
+          background: rgba(139, 92, 246, 0.2);
+          border: 1px solid rgba(139, 92, 246, 0.3);
+          border-radius: 8px;
+          color: #a78bfa;
+          padding: 0.5rem 1rem;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.9rem;
+          font-weight: 600;
+          transition: all 0.2s ease;
+        }
+
+        .btn-back:hover {
+          background: rgba(139, 92, 246, 0.3);
+          transform: translateX(-2px);
+        }
+
+        /* Título */
+        .campaign-title-nav {
+          color: white;
+          font-size: 1.5rem;
+          font-weight: 700;
+          margin: 0;
+          background: linear-gradient(135deg, #8b5cf6, #ec4899);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 300px;
+        }
+
+        /* Pestañas */
+        .tabs-wrapper {
+          display: flex;
+          gap: 0.5rem;
+          background: rgba(31, 41, 55, 0.6);
+          border-radius: 12px;
+          padding: 0.5rem;
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .tab-button {
+          background: transparent;
+          border: none;
+          border-radius: 8px;
+          color: #9ca3af;
+          padding: 0.75rem 1rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          font-size: 0.9rem;
+          font-weight: 500;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          white-space: nowrap;
+        }
+
+        .tab-button:hover {
+          background: rgba(139, 92, 246, 0.1);
+          color: #e5e7eb;
+        }
+
+        .tab-button.active {
+          background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+          color: white;
+          font-weight: 600;
+          box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+        }
+
+        /* Búsqueda */
+        .search-box {
+          position: relative;
+        }
+
+        .search-input {
+          width: 280px;
+          background: rgba(31, 41, 55, 0.8);
+          border: 1px solid rgba(139, 92, 246, 0.3);
+          border-radius: 10px;
+          padding: 0.6rem 1rem 0.6rem 2.5rem;
+          color: white;
+          font-size: 0.9rem;
+          outline: none;
+          transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+          background: rgba(31, 41, 55, 0.95);
+          border-color: #8b5cf6;
+          box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .search-input::placeholder {
+          color: #6b7280;
+        }
+
+        .search-icon {
+          position: absolute;
+          left: 0.75rem;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #6b7280;
+          pointer-events: none;
+        }
+
+        /* Menú móvil */
+        .mobile-menu-toggle {
+          display: none;
+          background: rgba(139, 92, 246, 0.2);
+          border: 1px solid rgba(139, 92, 246, 0.3);
+          border-radius: 8px;
+          color: #a78bfa;
+          padding: 0.5rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .mobile-menu-toggle:hover {
+          background: rgba(139, 92, 246, 0.3);
+        }
+
+        .mobile-menu-dropdown {
+          position: fixed;
+          top: 65px;
+          left: 0;
+          right: 0;
+          background: rgba(15, 15, 25, 0.98);
+          backdrop-filter: blur(20px);
+          border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+          z-index: 99;
+          animation: slideDown 0.3s ease-out;
+        }
+
+        .mobile-tabs-list {
+          padding: 1rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .mobile-tab-button {
+          background: rgba(31, 41, 55, 0.6);
+          border: 1px solid rgba(139, 92, 246, 0.2);
+          border-radius: 8px;
+          color: #9ca3af;
+          padding: 0.75rem 1rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          font-size: 0.9rem;
+          font-weight: 500;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          width: 100%;
+          text-align: left;
+        }
+
+        .mobile-tab-button:hover {
+          background: rgba(139, 92, 246, 0.1);
+          color: #e5e7eb;
+        }
+
+        .mobile-tab-button.active {
+          background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+          color: white;
+          font-weight: 600;
+        }
+
+        /* Contenido */
+        .campaign-content {
+          padding: 2rem;
+          margin-top: 80px;
+          min-height: calc(100vh - 80px);
+        }
+
+        /* Animaciones */
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+          .search-input {
+            width: 220px;
+          }
+        }
+
+        @media (max-width: 1024px) {
+          .nav-container {
+            padding: 0 1rem;
+            gap: 1rem;
+          }
+
+          .campaign-title-nav {
+            font-size: 1.2rem;
+            max-width: 200px;
+          }
+
+          .tab-button {
+            padding: 0.6rem 0.8rem;
+            font-size: 0.85rem;
+          }
+
+          .search-input {
+            width: 180px;
+            font-size: 0.85rem;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .campaign-nav {
+            padding: 0.75rem 0;
+          }
+
+          .mobile-menu-toggle {
+            display: flex;
+          }
+
+          .nav-center {
+            display: none;
+          }
+
+          .campaign-title-nav {
+            font-size: 1.1rem;
+            max-width: 150px;
+          }
+
+          .btn-back {
+            padding: 0.4rem 0.6rem;
+          }
+
+          .search-input {
+            width: 140px;
+            padding: 0.5rem 0.75rem 0.5rem 2rem;
+            font-size: 0.8rem;
+          }
+
+          .search-icon {
+            width: 14px;
+            height: 14px;
+          }
+
+          .campaign-content {
+            padding: 1rem;
+            margin-top: 65px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .nav-container {
+            padding: 0 0.75rem;
+            gap: 0.5rem;
+          }
+
+          .campaign-title-nav {
+            font-size: 1rem;
+            max-width: 100px;
+          }
+
+          .search-input {
+            width: 100px;
+          }
+        }
+      `}</style>
     </div>
   )
 }
@@ -179,10 +554,9 @@ function TabContent({
     campaign,
     connections: {
       ...connections,
-      // ✨ Agregar función de navegación a connections
       navigateToItem: onNavigateToItem
     },
-    selectedItemForNavigation // ✨ Pasar elemento seleccionado para navegación
+    selectedItemForNavigation
   }
 
   switch (activeTab) {
@@ -205,27 +579,32 @@ function TabContent({
   }
 }
 
-// ✨ Dashboard mejorado con navegación directa
+// Dashboard mejorado
 function Dashboard({ campaign, onTabChange }) {
   const getCount = (type) => {
     return campaign[type]?.length || 0
   }
 
   return (
-    <div className="fade-in">
-      {/* Estadísticas principales */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: '1.5rem',
-        marginBottom: '3rem'
+    <div className="dashboard-container fade-in">
+      <h2 style={{ 
+        color: 'white', 
+        fontSize: '2rem', 
+        marginBottom: '2rem',
+        textAlign: 'center'
       }}>
+        📊 Resumen de {campaign.name}
+      </h2>
+
+      {/* Estadísticas principales */}
+      <div className="stats-grid">
         <DashboardCard
           title="Lugares"
           count={getCount('locations')}
           icon="📍"
           color="#3b82f6"
           onClick={() => onTabChange('locations')}
+          description="Escenarios y localizaciones"
         />
         <DashboardCard
           title="Jugadores"
@@ -233,6 +612,7 @@ function Dashboard({ campaign, onTabChange }) {
           icon="👥"
           color="#10b981"
           onClick={() => onTabChange('players')}
+          description="Héroes de la aventura"
         />
         <DashboardCard
           title="NPCs"
@@ -240,6 +620,7 @@ function Dashboard({ campaign, onTabChange }) {
           icon="🧙"
           color="#8b5cf6"
           onClick={() => onTabChange('npcs')}
+          description="Personajes del mundo"
         />
         <DashboardCard
           title="Objetos"
@@ -247,6 +628,7 @@ function Dashboard({ campaign, onTabChange }) {
           icon="📦"
           color="#06b6d4"
           onClick={() => onTabChange('objects')}
+          description="Tesoros y artefactos"
         />
         <DashboardCard
           title="Misiones"
@@ -254,6 +636,7 @@ function Dashboard({ campaign, onTabChange }) {
           icon="📜"
           color="#f59e0b"
           onClick={() => onTabChange('quests')}
+          description="Aventuras y objetivos"
         />
         <DashboardCard
           title="Notas"
@@ -261,73 +644,36 @@ function Dashboard({ campaign, onTabChange }) {
           icon="📝"
           color="#ec4899"
           onClick={() => onTabChange('notes')}
+          description="Apuntes y recordatorios"
         />
       </div>
 
-      {/* Resumen de actividad reciente */}
-      <div style={{
-        background: 'var(--glass-bg)',
-        border: '1px solid var(--glass-border)',
-        borderRadius: '16px',
-        padding: '2rem'
-      }}>
-        <h3 style={{
-          color: 'white',
-          fontSize: '1.5rem',
-          marginBottom: '1rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem'
-        }}>
-          📊 Resumen de la Campaña
-        </h3>
-        
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '1.5rem'
-        }}>
-          <div>
-            <h4 style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-              📈 Estadísticas Generales
-            </h4>
-            <ul style={{ color: 'var(--text-muted)', lineHeight: 1.6 }}>
-              <li>Total de elementos: {getCount('locations') + getCount('players') + getCount('npcs') + getCount('objects') + getCount('quests') + getCount('notes')}</li>
-              <li>Campaña creada: {new Date(campaign.createdAt).toLocaleDateString()}</li>
-              <li>Última modificación: {new Date(campaign.lastModified).toLocaleDateString()}</li>
-            </ul>
-          </div>
-          
-          <div>
-            <h4 style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-              🎯 Acciones Rápidas
-            </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <button
-                onClick={() => onTabChange('locations')}
-                className="btn-secondary"
-                style={{ justifyContent: 'flex-start' }}
-              >
-                📍 Gestionar Lugares
-              </button>
-              <button
-                onClick={() => onTabChange('quests')}
-                className="btn-secondary"
-                style={{ justifyContent: 'flex-start' }}
-              >
-                📜 Ver Misiones
-              </button>
-              <button
-                onClick={() => onTabChange('notes')}
-                className="btn-secondary"
-                style={{ justifyContent: 'flex-start' }}
-              >
-                📝 Revisar Notas
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <style jsx>{`
+        .dashboard-container {
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 1.5rem;
+          margin-bottom: 3rem;
+        }
+
+        @media (max-width: 768px) {
+          .stats-grid {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .stats-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
     </div>
   )
 }
@@ -335,62 +681,102 @@ function Dashboard({ campaign, onTabChange }) {
 // Componente para las tarjetas del dashboard
 function DashboardCard({ title, count, icon, color, onClick, description }) {
   return (
-    <div
-      onClick={onClick}
-      style={{
-        background: 'rgba(31, 41, 55, 0.5)',
-        border: '1px solid rgba(139, 92, 246, 0.1)',
-        borderRadius: '12px',
-        padding: '1.25rem',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.background = 'rgba(31, 41, 55, 0.7)'
-        e.currentTarget.style.borderColor = `${color}40`
-        e.currentTarget.style.transform = 'translateY(-2px)'
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background = 'rgba(31, 41, 55, 0.5)'
-        e.currentTarget.style.borderColor = 'rgba(139, 92, 246, 0.1)'
-        e.currentTarget.style.transform = 'translateY(0)'
-      }}
-    >
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        gap: '0.75rem',
-        marginBottom: '0.5rem'
-      }}>
-        <span style={{ fontSize: '1.5rem' }}>{icon}</span>
-        <h4 style={{ 
-          color: 'white', 
-          fontSize: '1rem', 
-          fontWeight: '600',
-          margin: 0
-        }}>
-          {title}
-        </h4>
+    <>
+      <div
+        onClick={onClick}
+        className="dashboard-card"
+        style={{
+          '--card-color': color
+        }}
+      >
+        <div className="card-header">
+          <span className="card-icon">{icon}</span>
+          <h4 className="card-title">{title}</h4>
+        </div>
+        
+        <div className="card-count">{count}</div>
+        
+        <p className="card-description">{description}</p>
       </div>
-      
-      <div style={{
-        fontSize: '2rem',
-        fontWeight: 'bold',
-        color: color,
-        marginBottom: '0.5rem'
-      }}>
-        {count}
-      </div>
-      
-      <p style={{ 
-        color: 'var(--text-muted)', 
-        fontSize: '0.875rem',
-        margin: 0,
-        lineHeight: '1.4'
-      }}>
-        {description || `${count === 1 ? 'elemento' : 'elementos'} en total`}
-      </p>
-    </div>
+
+      <style jsx>{`
+        .dashboard-card {
+          background: rgba(31, 41, 55, 0.5);
+          border: 1px solid rgba(139, 92, 246, 0.1);
+          border-radius: 12px;
+          padding: 1.5rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .dashboard-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 4px;
+          background: var(--card-color);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+          background: rgba(31, 41, 55, 0.7);
+          border-color: var(--card-color);
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .dashboard-card:hover::before {
+          opacity: 1;
+        }
+
+        .card-header {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          margin-bottom: 1rem;
+        }
+
+        .card-icon {
+          font-size: 1.5rem;
+        }
+
+        .card-title {
+          color: white;
+          font-size: 1.1rem;
+          font-weight: 600;
+          margin: 0;
+        }
+
+        .card-count {
+          font-size: 2.5rem;
+          font-weight: bold;
+          color: var(--card-color);
+          margin-bottom: 0.5rem;
+        }
+
+        .card-description {
+          color: #9ca3af;
+          font-size: 0.875rem;
+          margin: 0;
+          line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+          .dashboard-card {
+            padding: 1.25rem;
+          }
+
+          .card-count {
+            font-size: 2rem;
+          }
+        }
+      `}</style>
+    </>
   )
 }
 
