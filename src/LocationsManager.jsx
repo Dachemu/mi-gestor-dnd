@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { useCRUD } from './hooks/useCRUD'
+import { useCRUD } from './hooks/useCRUD.jsx'
 import ConnectionsDisplay from './components/ConnectionsDisplay'
+import Modal from './components/Modal'
+import CompactList from './components/CompactList'
 
 function LocationsManager({ campaign, connections, selectedItemForNavigation, updateCampaign }) {
   // ✨ Hook CRUD para manejar todos los estados
@@ -25,9 +27,9 @@ function LocationsManager({ campaign, connections, selectedItemForNavigation, up
     const savedItem = handleSaveInternal(itemData)
     if (savedItem && updateCampaign) {
       updateCampaign({
-        npcs: editingItem 
-          ? campaign.npcs.map(npc => npc.id === savedItem.id ? savedItem : npc)
-          : [...campaign.npcs, savedItem]
+        locations: editingItem 
+          ? campaign.locations.map(location => location.id === savedItem.id ? savedItem : location)
+          : [...(campaign.locations || []), savedItem]
       })
     }
   }
@@ -37,7 +39,7 @@ function LocationsManager({ campaign, connections, selectedItemForNavigation, up
     handleDeleteInternal(id, name)
     if (updateCampaign) {
       updateCampaign({
-        npcs: campaign.npcs.filter(npc => npc.id !== id)
+        locations: (campaign.locations || []).filter(location => location.id !== id)
       })
     }
   }
@@ -85,38 +87,37 @@ function LocationsManager({ campaign, connections, selectedItemForNavigation, up
         </button>
       </div>
 
-      {/* Vista principal */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: selectedLocation ? '1fr 400px' : '1fr',
-        gap: '2rem',
-        transition: 'all 0.3s ease'
-      }}>
-        
-        {/* Lista de lugares */}
-        <div>
-          {isEmpty ? (
-            <EmptyState onAddFirst={openCreateForm} />
-          ) : (
-            <div style={{
-              display: 'grid',
-              gap: '1rem'
-            }}>
-              {locations.map(location => (
-                <LocationCard
-                  key={location.id}
-                  location={location}
-                  isSelected={selectedLocation?.id === location.id}
-                  onClick={() => selectLocation(location)}
-                  onEdit={() => openEditForm(location)}
-                  onDelete={() => handleDelete(location.id, location.name)}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+      {/* Lista compacta de lugares */}
+      <CompactList
+        items={locations}
+        itemType="locations"
+        onSelectItem={selectLocation}
+        getConnectionCount={connections?.getConnectionCount}
+        emptyMessage="No hay lugares aún. ¡Añade el primer escenario de tu campaña!"
+        emptyIcon="📍"
+      />
 
-        {/* Panel de detalles */}
+      {/* Modal de formulario */}
+      <Modal
+        isOpen={showForm}
+        onClose={closeForm}
+        title={editingItem ? 'Editar Lugar' : 'Nuevo Lugar'}
+        size="large"
+      >
+        <LocationForm
+          location={editingItem}
+          onSave={handleSave}
+          onClose={closeForm}
+        />
+      </Modal>
+
+      {/* Modal de detalles */}
+      <Modal
+        isOpen={!!selectedLocation}
+        onClose={closeDetails}
+        title={selectedLocation?.name}
+        size="large"
+      >
         {selectedLocation && (
           <LocationDetails
             location={selectedLocation}
@@ -127,16 +128,7 @@ function LocationsManager({ campaign, connections, selectedItemForNavigation, up
             campaign={campaign}
           />
         )}
-      </div>
-
-      {/* Modal de formulario */}
-      {showForm && (
-        <LocationForm
-          location={editingItem}
-          onSave={handleSave}
-          onClose={closeForm}
-        />
-      )}
+      </Modal>
     </div>
   )
 }

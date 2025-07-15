@@ -6,7 +6,8 @@ const CONNECTION_TYPES = {
   players: { name: 'Jugadores', icon: '👥', color: '#10b981' },
   npcs: { name: 'NPCs', icon: '🧙', color: '#8b5cf6' },
   quests: { name: 'Misiones', icon: '📜', color: '#f59e0b' },
-  objects: { name: 'Objetos', icon: '📦', color: '#06b6d4' }
+  objects: { name: 'Objetos', icon: '📦', color: '#06b6d4' },
+  notes: { name: 'Notas', icon: '📝', color: '#ef4444' }
 }
 
 function ConnectionModal({ 

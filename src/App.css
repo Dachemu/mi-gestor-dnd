@@ -12,12 +12,23 @@
   --info: #3b82f6;
   --bg-dark: #0a0a0f;
   --bg-darker: #050508;
+  --bg-primary: #0f0f23;
+  --bg-secondary: #1a1a2e;
   --glass-bg: rgba(15, 15, 25, 0.85);
   --glass-border: rgba(139, 92, 246, 0.2);
+  --border-color: rgba(255, 255, 255, 0.1);
   --text-primary: #ffffff;
   --text-secondary: #e5e7eb;
   --text-muted: #9ca3af;
   --text-disabled: #6b7280;
+  
+  /* Colores para badges y estados */
+  --accent-blue: #3b82f6;
+  --accent-green: #10b981;
+  --accent-purple: #8b5cf6;
+  --accent-orange: #f59e0b;
+  --accent-red: #ef4444;
+  --accent-gray: #6b7280;
 }
 
 /* ====================================
@@ -244,11 +255,12 @@ textarea.input-field {
 .clean-nav-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1rem;
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: 2rem;
+  gap: 1rem;
   align-items: center;
+  overflow: hidden;
 }
 
 /* Sección izquierda */
@@ -339,6 +351,9 @@ textarea.input-field {
   display: flex;
   align-items: center;
   gap: 1rem;
+  justify-content: flex-end;
+  min-width: 0;
+  flex-shrink: 1;
 }
 
 /* ====================================
@@ -346,8 +361,11 @@ textarea.input-field {
    ==================================== */
 .search-container {
   position: relative;
-  width: 350px;
+  width: 100%;
+  max-width: 300px;
+  min-width: 200px;
   z-index: 6000;
+  flex-shrink: 1;
 }
 
 .search-input-wrapper {

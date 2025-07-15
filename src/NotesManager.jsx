@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { useCRUD } from './hooks/useCRUD'
+import { useCRUD } from './hooks/useCRUD.jsx'
 import ConnectionsDisplay from './components/ConnectionsDisplay'
+import Modal from './components/Modal'
+import CompactList from './components/CompactList'
 
 function NotesManager({ campaign, connections, selectedItemForNavigation, updateCampaign }) {
   // ✨ Hook CRUD usando datos de la campaña
@@ -25,9 +27,9 @@ function NotesManager({ campaign, connections, selectedItemForNavigation, update
     const savedItem = handleSaveInternal(itemData)
     if (savedItem && updateCampaign) {
       updateCampaign({
-        npcs: editingItem 
-          ? campaign.npcs.map(npc => npc.id === savedItem.id ? savedItem : npc)
-          : [...campaign.npcs, savedItem]
+        notes: editingItem 
+          ? campaign.notes.map(note => note.id === savedItem.id ? savedItem : note)
+          : [...(campaign.notes || []), savedItem]
       })
     }
   }
@@ -37,7 +39,7 @@ function NotesManager({ campaign, connections, selectedItemForNavigation, update
     handleDeleteInternal(id, name)
     if (updateCampaign) {
       updateCampaign({
-        npcs: campaign.npcs.filter(npc => npc.id !== id)
+        notes: (campaign.notes || []).filter(note => note.id !== id)
       })
     }
   }
@@ -127,43 +129,79 @@ function NotesManager({ campaign, connections, selectedItemForNavigation, update
         </div>
       )}
 
-      {/* Vista principal */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: selectedNote ? '1fr 400px' : '1fr',
-        gap: '2rem',
-        transition: 'all 0.3s ease'
-      }}>
-        
-        {/* Lista de notas */}
-        <div>
-          {isEmpty ? (
-            <EmptyState onAddFirst={openCreateForm} />
-          ) : filteredNotes.length === 0 ? (
-            <EmptyCategory 
-              category={filterCategory} 
-              onResetFilter={() => setFilterCategory('Todas')} 
-            />
-          ) : (
-            <div style={{
-              display: 'grid',
-              gap: '1rem'
-            }}>
-              {filteredNotes.map(note => (
-                <NoteCard
-                  key={note.id}
-                  note={note}
-                  isSelected={selectedNote?.id === note.id}
-                  onClick={() => selectNote(note)}
-                  onEdit={() => openEditForm(note)}
-                  onDelete={() => handleDelete(note.id, note.title)}
-                />
-              ))}
-            </div>
-          )}
+      {/* Lista compacta de notas */}
+      {isEmpty ? (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '4rem 2rem',
+          color: 'var(--text-muted)',
+          textAlign: 'center'
+        }}>
+          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>
+            📝
+          </div>
+          <p style={{ fontSize: '1.1rem', margin: 0 }}>
+            No hay notas aún. ¡Añade la primera nota de tu campaña!
+          </p>
+          <button onClick={openCreateForm} className="btn-primary" style={{ marginTop: '1rem' }}>
+            📝 Crear Primera Nota
+          </button>
         </div>
+      ) : filteredNotes.length === 0 ? (
+        <div style={{
+          textAlign: 'center',
+          padding: '3rem 2rem',
+          color: 'var(--text-muted)'
+        }}>
+          <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>
+            🔍
+          </div>
+          <h3 style={{ color: 'white', marginBottom: '1rem' }}>
+            No hay notas en "{filterCategory}"
+          </h3>
+          <p style={{ marginBottom: '2rem' }}>
+            No se encontraron notas en esta categoría.
+          </p>
+          <button onClick={() => setFilterCategory('Todas')} className="btn-secondary">
+            Ver todas las notas
+          </button>
+        </div>
+      ) : (
+        <CompactList
+          items={filteredNotes}
+          itemType="notes"
+          onSelectItem={selectNote}
+          getConnectionCount={connections?.getConnectionCount}
+          emptyMessage="No hay notas aún. ¡Añade la primera nota de tu campaña!"
+          emptyIcon="📝"
+        />
+      )}
 
-        {/* Panel de detalles */}
+      {/* Modal de formulario */}
+      <Modal
+        isOpen={showForm}
+        onClose={closeForm}
+        title={editingItem ? '✏️ Editar Nota' : '📝 Nueva Nota'}
+        size="large"
+      >
+        <NoteForm
+          note={editingItem}
+          onSave={handleSave}
+          onClose={closeForm}
+          existingCategories={categories.filter(c => c !== 'Todas')}
+        />
+      </Modal>
+
+      {/* Modal de detalles */}
+      <Modal
+        isOpen={!!selectedNote}
+        onClose={closeDetails}
+        title={selectedNote ? `📝 ${selectedNote.title}` : ''}
+        size="large"
+      >
         {selectedNote && (
           <NoteDetails
             note={selectedNote}
@@ -174,235 +212,11 @@ function NotesManager({ campaign, connections, selectedItemForNavigation, update
             campaign={campaign}
           />
         )}
-      </div>
-
-      {/* Modal de formulario */}
-      {showForm && (
-        <NoteForm
-          note={editingItem}
-          onSave={handleSave}
-          onClose={closeForm}
-          existingCategories={categories.filter(c => c !== 'Todas')}
-        />
-      )}
+      </Modal>
     </div>
   )
 }
 
-// Estado vacío
-function EmptyState({ onAddFirst }) {
-  return (
-    <div style={{
-      textAlign: 'center',
-      padding: '4rem 2rem',
-      color: 'var(--text-muted)'
-    }}>
-      <div style={{ fontSize: '4rem', marginBottom: '1rem', opacity: 0.5 }}>
-        📝
-      </div>
-      <h3 style={{ color: 'white', marginBottom: '1rem' }}>
-        No hay notas creadas aún
-      </h3>
-      <p style={{ marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem' }}>
-        Las notas te ayudan a recordar detalles importantes, planificar sesiones 
-        y llevar un registro de eventos de tu campaña.
-      </p>
-      <button onClick={onAddFirst} className="btn-primary">
-        📝 Crear Primera Nota
-      </button>
-    </div>
-  )
-}
-
-// Estado de categoría vacía
-function EmptyCategory({ category, onResetFilter }) {
-  return (
-    <div style={{
-      textAlign: 'center',
-      padding: '3rem 2rem',
-      color: 'var(--text-muted)'
-    }}>
-      <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>
-        🔍
-      </div>
-      <h3 style={{ color: 'white', marginBottom: '1rem' }}>
-        No hay notas en "{category}"
-      </h3>
-      <p style={{ marginBottom: '2rem' }}>
-        No se encontraron notas en esta categoría.
-      </p>
-      <button onClick={onResetFilter} className="btn-secondary">
-        Ver todas las notas
-      </button>
-    </div>
-  )
-}
-
-// Tarjeta de nota
-function NoteCard({ note, isSelected, onClick, onEdit, onDelete }) {
-  const getCategoryColor = (category) => {
-    const colors = {
-      'General': '#6b7280',
-      'Sesión': '#3b82f6',
-      'Trama': '#8b5cf6',
-      'Personajes': '#10b981',
-      'Mundo': '#f59e0b',
-      'Reglas': '#ef4444'
-    }
-    return colors[category] || '#6b7280'
-  }
-
-  // Función para extraer texto plano del contenido (por si tiene HTML)
-  const getPlainTextContent = (content) => {
-    if (!content) return ''
-    
-    // Remover tags HTML básicos y obtener solo texto
-    const plainText = content
-      .replace(/<[^>]*>/g, '') // Remover tags HTML
-      .replace(/&nbsp;/g, ' ') // Reemplazar espacios no rompibles
-      .replace(/&amp;/g, '&') // Reemplazar entidades HTML
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .trim()
-    
-    return plainText
-  }
-
-  const plainContent = getPlainTextContent(note.content)
-
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        background: isSelected 
-          ? 'rgba(139, 92, 246, 0.2)' 
-          : 'rgba(31, 41, 55, 0.5)',
-        border: isSelected 
-          ? '1px solid rgba(139, 92, 246, 0.5)' 
-          : '1px solid rgba(139, 92, 246, 0.1)',
-        borderRadius: '12px',
-        padding: '1.5rem',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: '1rem'
-      }}
-    >
-      {/* Icono */}
-      <div style={{
-        fontSize: '1.5rem',
-        flexShrink: 0,
-        width: '40px',
-        height: '40px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'rgba(236, 72, 153, 0.2)',
-        borderRadius: '8px'
-      }}>
-        {note.icon || '📝'}
-      </div>
-
-      {/* Información principal */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem', marginBottom: '0.5rem' }}>
-          <h4 style={{ 
-            color: 'white', 
-            margin: 0,
-            fontSize: '1.1rem',
-            fontWeight: '600',
-            flex: 1
-          }}>
-            {note.title}
-          </h4>
-          
-          {/* Categoría */}
-          {note.category && (
-            <span style={{
-              padding: '0.25rem 0.5rem',
-              background: `${getCategoryColor(note.category)}20`,
-              color: getCategoryColor(note.category),
-              borderRadius: '6px',
-              fontSize: '0.75rem',
-              fontWeight: '600',
-              flexShrink: 0
-            }}>
-              {note.category}
-            </span>
-          )}
-        </div>
-
-        {/* Contenido preview */}
-        {plainContent && (
-          <p style={{ 
-            color: 'var(--text-muted)', 
-            margin: '0 0 0.5rem 0',
-            fontSize: '0.85rem',
-            lineHeight: '1.4',
-            overflow: 'hidden',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical'
-          }}>
-            {plainContent}
-          </p>
-        )}
-
-        {/* Fecha */}
-        <div style={{ 
-          fontSize: '0.8rem', 
-          color: '#6b7280',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <span>
-            📅 {new Date(note.createdAt).toLocaleDateString()}
-          </span>
-          
-          {/* Acciones */}
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                onEdit()
-              }}
-              style={{
-                background: 'rgba(139, 92, 246, 0.2)',
-                border: '1px solid rgba(139, 92, 246, 0.3)',
-                borderRadius: '6px',
-                color: '#a78bfa',
-                padding: '0.25rem 0.5rem',
-                cursor: 'pointer',
-                fontSize: '0.8rem'
-              }}
-            >
-              ✏️
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                onDelete()
-              }}
-              style={{
-                background: 'rgba(239, 68, 68, 0.2)',
-                border: '1px solid rgba(239, 68, 68, 0.3)',
-                borderRadius: '6px',
-                color: '#ef4444',
-                padding: '0.25rem 0.5rem',
-                cursor: 'pointer',
-                fontSize: '0.8rem'
-              }}
-            >
-              🗑️
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 // Panel de detalles de la nota seleccionada
 function NoteDetails({ note, onClose, onEdit, onDelete, connections, campaign }) {
@@ -422,60 +236,33 @@ function NoteDetails({ note, onClose, onEdit, onDelete, connections, campaign })
   }
 
   return (
-    <div style={{
-      background: 'var(--glass-bg)',
-      border: '1px solid var(--glass-border)',
-      borderRadius: '16px',
-      padding: '2rem',
-      position: 'sticky',
-      top: '2rem',
-      maxHeight: 'calc(100vh - 4rem)',
-      overflowY: 'auto'
-    }}>
+    <div>
       {/* Header */}
       <div style={{ 
         display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'flex-start',
+        alignItems: 'center',
+        gap: '1rem',
         marginBottom: '2rem'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ fontSize: '2.5rem' }}>
-            {note.icon || '📝'}
-          </div>
-          <div>
-            <h3 style={{ color: 'white', margin: 0, fontSize: '1.5rem' }}>
-              {note.title}
-            </h3>
-            {note.category && (
-              <span style={{
-                display: 'inline-block',
-                marginTop: '0.5rem',
-                padding: '0.5rem 1rem',
-                background: `${getCategoryColor(note.category)}20`,
-                color: getCategoryColor(note.category),
-                borderRadius: '8px',
-                fontSize: '0.9rem',
-                fontWeight: '600'
-              }}>
-                {note.category}
-              </span>
-            )}
-          </div>
+        <div style={{ fontSize: '2.5rem' }}>
+          {note.icon || '📝'}
         </div>
-        <button
-          onClick={onClose}
-          style={{
-            background: 'rgba(239, 68, 68, 0.2)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: '8px',
-            color: '#ef4444',
-            padding: '0.5rem',
-            cursor: 'pointer'
-          }}
-        >
-          ✕
-        </button>
+        <div>
+          {note.category && (
+            <span style={{
+              display: 'inline-block',
+              marginBottom: '0.5rem',
+              padding: '0.5rem 1rem',
+              background: `${getCategoryColor(note.category)}20`,
+              color: getCategoryColor(note.category),
+              borderRadius: '8px',
+              fontSize: '0.9rem',
+              fontWeight: '600'
+            }}>
+              {note.category}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Contenido */}
@@ -593,40 +380,7 @@ function NoteForm({ note, onSave, onClose, existingCategories }) {
   }
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      background: 'rgba(0, 0, 0, 0.8)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      backdropFilter: 'blur(10px)'
-    }}>
-      <div style={{
-        background: 'var(--glass-bg)',
-        border: '1px solid var(--glass-border)',
-        borderRadius: '20px',
-        padding: '2rem',
-        width: '90%',
-        maxWidth: '700px',
-        maxHeight: '90vh',
-        overflowY: 'auto'
-      }}>
-        <h2 style={{ 
-          color: 'white', 
-          marginBottom: '2rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem'
-        }}>
-          {note ? '✏️ Editar Nota' : '📝 Nueva Nota'}
-        </h2>
-
-        <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit}>
           <div style={{
             display: 'grid',
             gap: '1.5rem',
@@ -704,30 +458,28 @@ function NoteForm({ note, onSave, onClose, existingCategories }) {
             </div>
           </div>
 
-          {/* Botones */}
-          <div style={{ 
-            display: 'flex', 
-            gap: '1rem', 
-            marginTop: '2rem',
-            justifyContent: 'flex-end'
-          }}>
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn-secondary"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="btn-primary"
-            >
-              {note ? '💾 Guardar Cambios' : '➕ Crear Nota'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        {/* Botones */}
+        <div style={{ 
+          display: 'flex', 
+          gap: '1rem', 
+          marginTop: '2rem',
+          justifyContent: 'flex-end'
+        }}>
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn-secondary"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            className="btn-primary"
+          >
+            {note ? '💾 Guardar Cambios' : '➕ Crear Nota'}
+          </button>
+        </div>
+      </form>
   )
 }
 

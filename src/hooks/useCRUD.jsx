@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import React from 'react'
 
 /**
@@ -13,6 +13,24 @@ export function useCRUD(initialData = [], itemName = 'elemento') {
   const [editingItem, setEditingItem] = useState(null)
   const [selectedItem, setSelectedItem] = useState(null)
   const [notification, setNotification] = useState(null)
+
+  // ✅ Sincronizar con datos externos cuando cambien
+  useEffect(() => {
+    setItems(initialData || [])
+  }, [initialData])
+
+  // ✅ Separar la sincronización del selectedItem para evitar bucles
+  useEffect(() => {
+    if (selectedItem && initialData) {
+      const updatedSelectedItem = initialData.find(item => item.id === selectedItem.id)
+      if (updatedSelectedItem && JSON.stringify(updatedSelectedItem) !== JSON.stringify(selectedItem)) {
+        setSelectedItem(updatedSelectedItem)
+      } else if (!updatedSelectedItem) {
+        // El elemento seleccionado ya no existe, deseleccionar
+        setSelectedItem(null)
+      }
+    }
+  }, [initialData, selectedItem?.id]) // Solo depender del ID para evitar bucles
 
   // ✅ Función para inicializar linkedItems si no existe
   const ensureLinkedItems = (item) => {

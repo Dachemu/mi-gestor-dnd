@@ -1,15 +1,55 @@
 import { useState, useCallback } from 'react'
 
+// ✨ Función para obtener tipo de relación inversa
+const getInverseRelationship = (relationshipType) => {
+  const inverseMap = {
+    ally: 'ally',
+    enemy: 'enemy',
+    mentor: 'serves', // El mentor es servido por el estudiante
+    serves: 'mentor', // El que sirve tiene un mentor
+    rival: 'rival',
+    family: 'family',
+    romantic: 'romantic',
+    business: 'business',
+    secret: 'secret',
+    location: 'owns', // Si A está ubicado en B, entonces B posee a A
+    owns: 'location', // Si A posee B, entonces B está ubicado en A
+    created: 'general', // Relación general para lo creado
+    destroyed: 'general', // Relación general para lo destruido
+    general: 'general'
+  }
+  return inverseMap[relationshipType] || 'general'
+}
+
+// ✨ Tipos de relación narrativa para organización
+export const RELATIONSHIP_TYPES = {
+  general: { name: 'General', icon: '🔗', color: '#6b7280' },
+  ally: { name: 'Aliado', icon: '🤝', color: '#10b981' },
+  enemy: { name: 'Enemigo', icon: '⚔️', color: '#ef4444' },
+  mentor: { name: 'Mentor', icon: '🎓', color: '#8b5cf6' },
+  rival: { name: 'Rival', icon: '🥊', color: '#f59e0b' },
+  family: { name: 'Familia', icon: '👨‍👩‍👧‍👦', color: '#ec4899' },
+  romantic: { name: 'Romance', icon: '💕', color: '#f43f5e' },
+  business: { name: 'Negocio', icon: '💼', color: '#06b6d4' },
+  secret: { name: 'Secreto', icon: '🤫', color: '#64748b' },
+  location: { name: 'Ubicado en', icon: '📍', color: '#3b82f6' },
+  owns: { name: 'Posee', icon: '🏠', color: '#84cc16' },
+  serves: { name: 'Sirve a', icon: '🛡️', color: '#a855f7' },
+  created: { name: 'Creó', icon: '🔨', color: '#f97316' },
+  destroyed: { name: 'Destruyó', icon: '💥', color: '#dc2626' }
+}
+
 /**
  * Hook para manejar las conexiones entre elementos de la campaña
  * Permite conectar cualquier tipo de elemento con cualquier otro
+ * ✨ MEJORADO: Ahora incluye tipos de relación narrativa
  */
 export function useConnections(campaign, updateCampaign) {
   const [showConnectionModal, setShowConnectionModal] = useState(false)
   const [connectionSource, setConnectionSource] = useState(null)
 
-  // Crear conexión bidireccional entre dos elementos
-  const createConnection = useCallback((sourceItem, sourceType, targetItem, targetType) => {
+  // Crear conexión bidireccional entre dos elementos con tipo de relación
+  const createConnection = useCallback((sourceItem, sourceType, targetItem, targetType, relationshipType = 'general', context = '') => {
     if (!campaign || !updateCampaign) return
 
     console.log('Conectando:', sourceItem.name, 'con', targetItem.name)
@@ -28,9 +68,17 @@ export function useConnections(campaign, updateCampaign) {
         sourceItems[sourceIndex].linkedItems[targetType] = []
       }
       
-      // Evitar duplicados
-      if (!sourceItems[sourceIndex].linkedItems[targetType].includes(targetItem.id)) {
-        sourceItems[sourceIndex].linkedItems[targetType].push(targetItem.id)
+      // Crear objeto de conexión con tipo de relación
+      const connectionData = {
+        id: targetItem.id,
+        relationshipType,
+        context,
+        createdAt: new Date().toISOString()
+      }
+      
+      // Evitar duplicados (verificar por ID)
+      if (!sourceItems[sourceIndex].linkedItems[targetType].some(conn => conn.id === targetItem.id)) {
+        sourceItems[sourceIndex].linkedItems[targetType].push(connectionData)
       }
       updates[sourceType] = sourceItems
     }
@@ -47,9 +95,17 @@ export function useConnections(campaign, updateCampaign) {
         targetItems[targetIndex].linkedItems[sourceType] = []
       }
       
-      // Evitar duplicados
-      if (!targetItems[targetIndex].linkedItems[sourceType].includes(sourceItem.id)) {
-        targetItems[targetIndex].linkedItems[sourceType].push(sourceItem.id)
+      // Crear objeto de conexión inversa
+      const inverseConnectionData = {
+        id: sourceItem.id,
+        relationshipType: getInverseRelationship(relationshipType),
+        context,
+        createdAt: new Date().toISOString()
+      }
+      
+      // Evitar duplicados (verificar por ID)
+      if (!targetItems[targetIndex].linkedItems[sourceType].some(conn => conn.id === sourceItem.id)) {
+        targetItems[targetIndex].linkedItems[sourceType].push(inverseConnectionData)
       }
       updates[targetType] = targetItems
     }
@@ -71,7 +127,11 @@ export function useConnections(campaign, updateCampaign) {
     
     if (sourceIndex !== -1 && sourceItems[sourceIndex].linkedItems?.[targetType]) {
       sourceItems[sourceIndex].linkedItems[targetType] = 
-        sourceItems[sourceIndex].linkedItems[targetType].filter(id => id !== targetItem.id)
+        sourceItems[sourceIndex].linkedItems[targetType].filter(conn => {
+          // Compatibilidad: conn puede ser ID (legacy) o objeto
+          const connId = typeof conn === 'object' ? conn.id : conn
+          return connId !== targetItem.id
+        })
       updates[sourceType] = sourceItems
     }
 
@@ -81,7 +141,11 @@ export function useConnections(campaign, updateCampaign) {
     
     if (targetIndex !== -1 && targetItems[targetIndex].linkedItems?.[sourceType]) {
       targetItems[targetIndex].linkedItems[sourceType] = 
-        targetItems[targetIndex].linkedItems[sourceType].filter(id => id !== sourceItem.id)
+        targetItems[targetIndex].linkedItems[sourceType].filter(conn => {
+          // Compatibilidad: conn puede ser ID (legacy) o objeto
+          const connId = typeof conn === 'object' ? conn.id : conn
+          return connId !== sourceItem.id
+        })
       updates[targetType] = targetItems
     }
 
@@ -108,9 +172,25 @@ export function useConnections(campaign, updateCampaign) {
       }
       
       // ✅ Buscar elementos existentes y filtrar los que no existen
-      linked[linkedType] = ids.map(id => 
-        campaignItems.find(i => i.id === id)
-      ).filter(Boolean) // Filtrar elementos que ya no existen
+      linked[linkedType] = ids.map(conn => {
+        // Compatibilidad: conn puede ser ID (legacy) o objeto con metadata
+        const targetId = typeof conn === 'object' ? conn.id : conn
+        const foundItem = campaignItems.find(i => i.id === targetId)
+        
+        if (foundItem && typeof conn === 'object') {
+          // Agregar metadata de la conexión al item encontrado
+          return {
+            ...foundItem,
+            _connectionMeta: {
+              relationshipType: conn.relationshipType,
+              context: conn.context,
+              createdAt: conn.createdAt
+            }
+          }
+        }
+        
+        return foundItem
+      }).filter(Boolean) // Filtrar elementos que ya no existen
     })
     
     return linked
@@ -134,8 +214,11 @@ export function useConnections(campaign, updateCampaign) {
     return campaignItems.filter(item => {
       // No conectar consigo mismo
       if (targetType === sourceType && item.id === sourceItem.id) return false
-      // No incluir los ya conectados
-      return !safeExistingLinks.includes(item.id)
+      // No incluir los ya conectados (verificar tanto IDs legacy como objetos)
+      return !safeExistingLinks.some(conn => {
+        const connId = typeof conn === 'object' ? conn.id : conn
+        return connId === item.id
+      })
     })
   }, [campaign])
 

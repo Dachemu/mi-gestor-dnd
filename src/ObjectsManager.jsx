@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { useCRUD } from './hooks/useCRUD'
+import { useCRUD } from './hooks/useCRUD.jsx'
 import ConnectionsDisplay from './components/ConnectionsDisplay'
+import Modal from './components/Modal'
+import CompactList from './components/CompactList'
 
 function ObjectsManager({ campaign, connections, selectedItemForNavigation, updateCampaign }) {
   // ✨ Hook CRUD usando datos de la campaña
@@ -25,9 +27,9 @@ function ObjectsManager({ campaign, connections, selectedItemForNavigation, upda
     const savedItem = handleSaveInternal(itemData)
     if (savedItem && updateCampaign) {
       updateCampaign({
-        npcs: editingItem 
-          ? campaign.npcs.map(npc => npc.id === savedItem.id ? savedItem : npc)
-          : [...campaign.npcs, savedItem]
+        objects: editingItem 
+          ? campaign.objects.map(object => object.id === savedItem.id ? savedItem : object)
+          : [...(campaign.objects || []), savedItem]
       })
     }
   }
@@ -37,7 +39,7 @@ function ObjectsManager({ campaign, connections, selectedItemForNavigation, upda
     handleDeleteInternal(id, name)
     if (updateCampaign) {
       updateCampaign({
-        npcs: campaign.npcs.filter(npc => npc.id !== id)
+        objects: (campaign.objects || []).filter(object => object.id !== id)
       })
     }
   }
@@ -85,38 +87,37 @@ function ObjectsManager({ campaign, connections, selectedItemForNavigation, upda
         </button>
       </div>
 
-      {/* Vista principal */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: selectedObject ? '1fr 400px' : '1fr',
-        gap: '2rem',
-        transition: 'all 0.3s ease'
-      }}>
-        
-        {/* Lista de objetos */}
-        <div>
-          {isEmpty ? (
-            <EmptyState onAddFirst={openCreateForm} />
-          ) : (
-            <div style={{
-              display: 'grid',
-              gap: '1rem'
-            }}>
-              {objects.map(object => (
-                <ObjectCard
-                  key={object.id}
-                  object={object}
-                  isSelected={selectedObject?.id === object.id}
-                  onClick={() => selectObject(object)}
-                  onEdit={() => openEditForm(object)}
-                  onDelete={() => handleDelete(object.id, object.name)}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+      {/* Lista compacta de objetos */}
+      <CompactList
+        items={objects}
+        itemType="objects"
+        onSelectItem={selectObject}
+        getConnectionCount={connections?.getConnectionCount}
+        emptyMessage="No hay objetos aún. ¡Añade el primer tesoro de tu campaña!"
+        emptyIcon="📦"
+      />
 
-        {/* Panel de detalles */}
+      {/* Modal de formulario */}
+      <Modal
+        isOpen={showForm}
+        onClose={closeForm}
+        title={editingItem ? '✏️ Editar Objeto' : '📦 Nuevo Objeto'}
+        size="large"
+      >
+        <ObjectForm
+          object={editingItem}
+          onSave={handleSave}
+          onClose={closeForm}
+        />
+      </Modal>
+
+      {/* Modal de detalles */}
+      <Modal
+        isOpen={!!selectedObject}
+        onClose={closeDetails}
+        title={selectedObject ? `📦 ${selectedObject.name}` : ''}
+        size="large"
+      >
         {selectedObject && (
           <ObjectDetails
             object={selectedObject}
@@ -127,207 +128,11 @@ function ObjectsManager({ campaign, connections, selectedItemForNavigation, upda
             campaign={campaign}
           />
         )}
-      </div>
-
-      {/* Modal de formulario */}
-      {showForm && (
-        <ObjectForm
-          object={editingItem}
-          onSave={handleSave}
-          onClose={closeForm}
-        />
-      )}
+      </Modal>
     </div>
   )
 }
 
-// Estado vacío
-function EmptyState({ onAddFirst }) {
-  return (
-    <div style={{
-      textAlign: 'center',
-      padding: '4rem 2rem',
-      color: 'var(--text-muted)'
-    }}>
-      <div style={{ fontSize: '4rem', marginBottom: '1rem', opacity: 0.5 }}>
-        📦
-      </div>
-      <h3 style={{ color: 'white', marginBottom: '1rem' }}>
-        No hay objetos creados aún
-      </h3>
-      <p style={{ marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem' }}>
-        Los objetos son elementos importantes de tu campaña: armas mágicas, 
-        tesoros, artefactos ancestrales, pociones y más.
-      </p>
-      <button onClick={onAddFirst} className="btn-primary">
-        📦 Crear Primer Objeto
-      </button>
-    </div>
-  )
-}
-
-// Tarjeta de objeto
-function ObjectCard({ object, isSelected, onClick, onEdit, onDelete }) {
-  const getRarityColor = (rarity) => {
-    switch (rarity) {
-      case 'Legendario': return '#ff6b35'
-      case 'Épico': return '#8b5cf6'
-      case 'Raro': return '#3b82f6'
-      case 'Poco común': return '#10b981'
-      case 'Común': return '#6b7280'
-      default: return '#6b7280'
-    }
-  }
-
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        background: isSelected 
-          ? 'rgba(139, 92, 246, 0.2)' 
-          : 'rgba(31, 41, 55, 0.5)',
-        border: isSelected 
-          ? '1px solid rgba(139, 92, 246, 0.5)' 
-          : '1px solid rgba(139, 92, 246, 0.1)',
-        borderRadius: '12px',
-        padding: '1.5rem',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '1rem'
-      }}
-    >
-      {/* Icono */}
-      <div style={{
-        fontSize: '2rem',
-        flexShrink: 0,
-        width: '50px',
-        height: '50px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'rgba(6, 182, 212, 0.2)',
-        borderRadius: '10px'
-      }}>
-        {object.icon || '📦'}
-      </div>
-
-      {/* Información principal */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <h4 style={{ 
-          color: 'white', 
-          margin: '0 0 0.25rem 0',
-          fontSize: '1.1rem',
-          fontWeight: '600'
-        }}>
-          {object.name}
-        </h4>
-        
-        {/* Tipo y Rareza */}
-        <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
-          {object.type && (
-            <p style={{ 
-              color: 'var(--text-muted)', 
-              margin: 0,
-              fontSize: '0.9rem'
-            }}>
-              📝 {object.type}
-            </p>
-          )}
-          
-          {object.rarity && (
-            <span style={{
-              padding: '0.25rem 0.5rem',
-              background: `${getRarityColor(object.rarity)}20`,
-              color: getRarityColor(object.rarity),
-              borderRadius: '6px',
-              fontSize: '0.75rem',
-              fontWeight: '600'
-            }}>
-              {object.rarity === 'Legendario' && '⭐'} 
-              {object.rarity === 'Épico' && '💜'} 
-              {object.rarity === 'Raro' && '💙'} 
-              {object.rarity === 'Poco común' && '💚'} 
-              {object.rarity === 'Común' && '⚪'} 
-              {object.rarity}
-            </span>
-          )}
-        </div>
-
-        {/* Propietario y ubicación */}
-        <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>
-          {object.owner && (
-            <p style={{ margin: '0 0 0.25rem 0' }}>
-              👤 Propietario: {object.owner}
-            </p>
-          )}
-          {object.location && (
-            <p style={{ margin: 0 }}>
-              📍 Ubicación: {object.location}
-            </p>
-          )}
-        </div>
-
-        {/* Descripción corta */}
-        {object.description && (
-          <p style={{ 
-            color: 'var(--text-muted)', 
-            margin: '0.5rem 0 0 0',
-            fontSize: '0.85rem',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap'
-          }}>
-            {object.description}
-          </p>
-        )}
-      </div>
-
-      {/* Acciones */}
-      <div style={{ 
-        display: 'flex', 
-        gap: '0.5rem',
-        marginLeft: 'auto'
-      }}>
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            onEdit()
-          }}
-          style={{
-            background: 'rgba(139, 92, 246, 0.2)',
-            border: '1px solid rgba(139, 92, 246, 0.3)',
-            borderRadius: '6px',
-            color: '#a78bfa',
-            padding: '0.25rem 0.5rem',
-            cursor: 'pointer',
-            fontSize: '0.8rem'
-          }}
-        >
-          ✏️
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            onDelete()
-          }}
-          style={{
-            background: 'rgba(239, 68, 68, 0.2)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: '6px',
-            color: '#ef4444',
-            padding: '0.25rem 0.5rem',
-            cursor: 'pointer',
-            fontSize: '0.8rem'
-          }}
-        >
-          🗑️
-        </button>
-      </div>
-    </div>
-  )
-}
 
 // Panel de detalles del objeto seleccionado
 function ObjectDetails({ object, onClose, onEdit, onDelete, connections, campaign }) {
@@ -346,70 +151,43 @@ function ObjectDetails({ object, onClose, onEdit, onDelete, connections, campaig
   }
 
   return (
-    <div style={{
-      background: 'var(--glass-bg)',
-      border: '1px solid var(--glass-border)',
-      borderRadius: '16px',
-      padding: '2rem',
-      position: 'sticky',
-      top: '2rem',
-      maxHeight: 'calc(100vh - 4rem)',
-      overflowY: 'auto'
-    }}>
+    <div>
       {/* Header */}
       <div style={{ 
         display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'flex-start',
+        alignItems: 'center',
+        gap: '1rem',
         marginBottom: '2rem'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ fontSize: '3rem' }}>
-            {object.icon || '📦'}
-          </div>
-          <div>
-            <h3 style={{ color: 'white', margin: 0, fontSize: '1.5rem' }}>
-              {object.name}
-            </h3>
-            {object.type && (
-              <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>
-                {object.type}
-              </p>
-            )}
-            {object.rarity && (
-              <span style={{
-                display: 'inline-block',
-                marginTop: '0.5rem',
-                padding: '0.5rem 1rem',
-                background: `${getRarityColor(object.rarity)}20`,
-                color: getRarityColor(object.rarity),
-                borderRadius: '8px',
-                fontSize: '0.9rem',
-                fontWeight: '600'
-              }}>
-                {object.rarity === 'Legendario' && '⭐ '} 
-                {object.rarity === 'Épico' && '💜 '} 
-                {object.rarity === 'Raro' && '💙 '} 
-                {object.rarity === 'Poco común' && '💚 '} 
-                {object.rarity === 'Común' && '⚪ '} 
-                {object.rarity}
-              </span>
-            )}
-          </div>
+        <div style={{ fontSize: '3rem' }}>
+          {object.icon || '📦'}
         </div>
-        <button
-          onClick={onClose}
-          style={{
-            background: 'rgba(239, 68, 68, 0.2)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: '8px',
-            color: '#ef4444',
-            padding: '0.5rem',
-            cursor: 'pointer'
-          }}
-        >
-          ✕
-        </button>
+        <div>
+          {object.type && (
+            <p style={{ color: 'var(--text-muted)', margin: '0 0 0.25rem 0' }}>
+              {object.type}
+            </p>
+          )}
+          {object.rarity && (
+            <span style={{
+              display: 'inline-block',
+              marginBottom: '0.5rem',
+              padding: '0.5rem 1rem',
+              background: `${getRarityColor(object.rarity)}20`,
+              color: getRarityColor(object.rarity),
+              borderRadius: '8px',
+              fontSize: '0.9rem',
+              fontWeight: '600'
+            }}>
+              {object.rarity === 'Legendario' && '⭐ '} 
+              {object.rarity === 'Épico' && '💜 '} 
+              {object.rarity === 'Raro' && '💙 '} 
+              {object.rarity === 'Poco común' && '💚 '} 
+              {object.rarity === 'Común' && '⚪ '} 
+              {object.rarity}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Información básica */}
@@ -552,40 +330,7 @@ function ObjectForm({ object, onSave, onClose }) {
   }
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      background: 'rgba(0, 0, 0, 0.8)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      backdropFilter: 'blur(10px)'
-    }}>
-      <div style={{
-        background: 'var(--glass-bg)',
-        border: '1px solid var(--glass-border)',
-        borderRadius: '20px',
-        padding: '2rem',
-        width: '90%',
-        maxWidth: '600px',
-        maxHeight: '90vh',
-        overflowY: 'auto'
-      }}>
-        <h2 style={{ 
-          color: 'white', 
-          marginBottom: '2rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem'
-        }}>
-          {object ? '✏️ Editar Objeto' : '📦 Nuevo Objeto'}
-        </h2>
-
-        <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit}>
           <div style={{
             display: 'grid',
             gap: '1.5rem',
@@ -740,30 +485,28 @@ function ObjectForm({ object, onSave, onClose }) {
             </div>
           </div>
 
-          {/* Botones */}
-          <div style={{ 
-            display: 'flex', 
-            gap: '1rem', 
-            marginTop: '2rem',
-            justifyContent: 'flex-end'
-          }}>
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn-secondary"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="btn-primary"
-            >
-              {object ? '💾 Guardar Cambios' : '➕ Crear Objeto'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        {/* Botones */}
+        <div style={{ 
+          display: 'flex', 
+          gap: '1rem', 
+          marginTop: '2rem',
+          justifyContent: 'flex-end'
+        }}>
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn-secondary"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            className="btn-primary"
+          >
+            {object ? '💾 Guardar Cambios' : '➕ Crear Objeto'}
+          </button>
+        </div>
+      </form>
   )
 }
 

@@ -686,19 +686,24 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange }) {
     }
   ]
 
+  const activeQuests = (campaign.quests || []).filter(quest => quest.status === 'En progreso')
+  const completedQuests = (campaign.quests || []).filter(quest => quest.status === 'Completada')
+  const pendingQuests = (campaign.quests || []).filter(quest => quest.status === 'Pendiente')
+
   return (
     <div className="dashboard-container fade-in">
-      <h2 style={{ 
-        color: 'white', 
-        fontSize: '2rem', 
-        marginBottom: '2rem',
-        textAlign: 'center'
-      }}>
-        📊 Resumen de {campaign.name}
-      </h2>
+      {/* Header del Dashboard */}
+      <div className="dashboard-header">
+        <div className="campaign-overview">
+          <h1 className="campaign-title">🏰 {campaign.name}</h1>
+          {campaign.description && (
+            <p className="campaign-description">"{campaign.description}"</p>
+          )}
+        </div>
+      </div>
 
-      {/* Estadísticas principales */}
-      <div className="stats-grid">
+      {/* Grid de Secciones */}
+      <div className="dashboard-grid">
         {sections.map(section => (
           <DashboardCard
             key={section.type}
@@ -712,59 +717,266 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange }) {
         ))}
       </div>
 
-      {/* Resumen rápido */}
-      <div style={{
-        marginTop: '3rem',
-        padding: '2rem',
-        background: 'rgba(31, 41, 55, 0.3)',
-        borderRadius: '12px',
-        border: '1px solid rgba(139, 92, 246, 0.1)',
-        textAlign: 'center'
-      }}>
-        <h3 style={{ color: 'white', marginBottom: '1rem' }}>
-          🎲 Estado de la Campaña
-        </h3>
-        <p style={{ color: '#9ca3af', marginBottom: '1rem' }}>
-          Tu campaña "{campaign.name}" tiene un total de{' '}
-          <strong style={{ color: '#8b5cf6' }}>
-            {Object.keys(campaign).reduce((total, key) => {
-              if (Array.isArray(campaign[key])) {
-                return total + campaign[key].length
-              }
-              return total
-            }, 0)}
-          </strong>{' '}
-          elementos creados.
-        </p>
-        {campaign.description && (
-          <p style={{ color: '#6b7280', fontStyle: 'italic' }}>
-            "{campaign.description}"
-          </p>
-        )}
+      {/* Sección de Estado de Misiones */}
+      <div className="quests-status">
+        <h3 className="section-title">📊 Estado de Misiones</h3>
+        <div className="quests-grid">
+          <div className="quest-status-card active">
+            <div className="quest-status-header">
+              <span className="quest-status-icon">⏳</span>
+              <h4>En Progreso</h4>
+            </div>
+            <div className="quest-count">{activeQuests.length}</div>
+            <p>Misiones activas</p>
+          </div>
+          
+          <div className="quest-status-card completed">
+            <div className="quest-status-header">
+              <span className="quest-status-icon">✅</span>
+              <h4>Completadas</h4>
+            </div>
+            <div className="quest-count">{completedQuests.length}</div>
+            <p>Misiones finalizadas</p>
+          </div>
+          
+          <div className="quest-status-card pending">
+            <div className="quest-status-header">
+              <span className="quest-status-icon">⏸️</span>
+              <h4>Pendientes</h4>
+            </div>
+            <div className="quest-count">{pendingQuests.length}</div>
+            <p>Misiones por comenzar</p>
+          </div>
+        </div>
       </div>
 
       <style jsx>{`
         .dashboard-container {
-          max-width: 1200px;
+          max-width: 1400px;
           margin: 0 auto;
+          padding: 2rem;
+          min-height: calc(100vh - 120px);
         }
 
-        .stats-grid {
+        .dashboard-header {
+          margin-bottom: 3rem;
+          padding: 2rem;
+          background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.05));
+          border-radius: 20px;
+          border: 1px solid rgba(139, 92, 246, 0.2);
+          text-align: center;
+        }
+
+        .campaign-title {
+          font-size: 2.5rem;
+          font-weight: 800;
+          margin: 0 0 0.5rem 0;
+          background: linear-gradient(135deg, #ffffff, #e5e7eb);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .campaign-description {
+          color: var(--text-muted);
+          font-size: 1.1rem;
+          font-style: italic;
+          margin: 0;
+        }
+
+        .stat-highlight {
+          text-align: center;
+          padding: 1.5rem;
+          background: rgba(139, 92, 246, 0.1);
+          border-radius: 16px;
+          border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .stat-number {
+          display: block;
+          font-size: 3rem;
+          font-weight: 900;
+          background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .stat-label {
+          display: block;
+          color: var(--text-muted);
+          font-size: 0.9rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .dashboard-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 1.5rem;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 2rem;
           margin-bottom: 3rem;
         }
 
-        @media (max-width: 768px) {
-          .stats-grid {
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-          }
+        .recent-activity {
+          margin-top: 3rem;
         }
 
-        @media (max-width: 480px) {
-          .stats-grid {
+        .section-title {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: white;
+          margin-bottom: 1.5rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .activity-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 1.5rem;
+        }
+
+        .activity-card {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 1.5rem;
+          background: linear-gradient(135deg, rgba(31, 41, 55, 0.6), rgba(31, 41, 55, 0.3));
+          border-radius: 16px;
+          border: 1px solid rgba(139, 92, 246, 0.2);
+          transition: all 0.3s ease;
+        }
+
+        .activity-card:hover {
+          transform: translateY(-2px);
+          border-color: rgba(139, 92, 246, 0.4);
+          box-shadow: 0 8px 25px rgba(139, 92, 246, 0.1);
+        }
+
+        .activity-icon {
+          font-size: 2rem;
+          width: 60px;
+          height: 60px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(139, 92, 246, 0.2);
+          border-radius: 12px;
+        }
+
+        .activity-content h4 {
+          color: white;
+          font-size: 1.1rem;
+          margin: 0 0 0.25rem 0;
+          font-weight: 600;
+        }
+
+        .quests-status {
+          margin-top: 3rem;
+        }
+
+        .quests-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 1.5rem;
+        }
+
+        .quest-status-card {
+          padding: 2rem;
+          background: linear-gradient(135deg, rgba(31, 41, 55, 0.8), rgba(31, 41, 55, 0.4));
+          border-radius: 20px;
+          border: 1px solid rgba(139, 92, 246, 0.2);
+          text-align: center;
+          transition: all 0.3s ease;
+        }
+
+        .quest-status-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .quest-status-card.active {
+          border-color: rgba(245, 158, 11, 0.5);
+          background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(31, 41, 55, 0.4));
+        }
+
+        .quest-status-card.completed {
+          border-color: rgba(16, 185, 129, 0.5);
+          background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(31, 41, 55, 0.4));
+        }
+
+        .quest-status-card.pending {
+          border-color: rgba(107, 114, 128, 0.5);
+          background: linear-gradient(135deg, rgba(107, 114, 128, 0.1), rgba(31, 41, 55, 0.4));
+        }
+
+        .quest-status-header {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.75rem;
+          margin-bottom: 1rem;
+        }
+
+        .quest-status-icon {
+          font-size: 1.5rem;
+        }
+
+        .quest-status-header h4 {
+          color: white;
+          margin: 0;
+          font-size: 1.1rem;
+          font-weight: 600;
+        }
+
+        .quest-count {
+          font-size: 3rem;
+          font-weight: 900;
+          color: white;
+          margin-bottom: 0.5rem;
+        }
+
+        .quest-status-card.active .quest-count {
+          color: #f59e0b;
+        }
+
+        .quest-status-card.completed .quest-count {
+          color: #10b981;
+        }
+
+        .quest-status-card.pending .quest-count {
+          color: #6b7280;
+        }
+
+        .quest-status-card p {
+          color: var(--text-muted);
+          margin: 0;
+          font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+          .dashboard-container {
+            padding: 1rem;
+          }
+          
+          .dashboard-header {
+            grid-template-columns: 1fr;
+            text-align: center;
+            gap: 1rem;
+          }
+
+          .campaign-title {
+            font-size: 2rem;
+          }
+          
+          .dashboard-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+          }
+
+          .activity-grid {
             grid-template-columns: 1fr;
           }
         }
