@@ -1,10 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useCRUD } from './hooks/useCRUD'
 import ConnectionsDisplay from './components/ConnectionsDisplay'
+import Notification from './components/Notification' // ✅ Componente separado
 
-// 🎯 SIN DATOS DE EJEMPLO - usa directamente los datos de la campaña
-
-function NPCsManager({ campaign, connections }) {
+function NPCsManager({ campaign, connections, selectedItemForNavigation }) {
   // ✨ Hook CRUD para manejar todos los estados - USA DATOS DE LA CAMPAÑA
   const {
     items: npcs,
@@ -12,6 +11,7 @@ function NPCsManager({ campaign, connections }) {
     editingItem,
     selectedItem: selectedNPC,
     isEmpty,
+    notification, // ✅ Estado de notificación del hook
     handleSave,
     handleDelete,
     selectItem: selectNPC,
@@ -21,8 +21,21 @@ function NPCsManager({ campaign, connections }) {
     closeDetails
   } = useCRUD(campaign.npcs || [], 'NPC')
 
+  // ✨ Efecto para seleccionar automáticamente un NPC cuando se navega desde conexiones
+  useEffect(() => {
+    if (selectedItemForNavigation && selectedItemForNavigation.type === 'npcs') {
+      const npcToSelect = npcs.find(npc => npc.id === selectedItemForNavigation.item.id)
+      if (npcToSelect) {
+        selectNPC(npcToSelect)
+      }
+    }
+  }, [selectedItemForNavigation, npcs, selectNPC])
+
   return (
     <div className="fade-in">
+      {/* ✨ Componente de notificación separado */}
+      <Notification notification={notification} />
+
       {/* Header */}
       <div style={{ 
         display: 'flex', 
@@ -64,20 +77,27 @@ function NPCsManager({ campaign, connections }) {
           {isEmpty ? (
             <EmptyState onAddFirst={openCreateForm} />
           ) : (
-            <NPCsList 
-              npcs={npcs}
-              onEdit={openEditForm}
-              onDelete={handleDelete}
-              onSelect={selectNPC}
-              selectedId={selectedNPC?.id}
-              connections={connections}
-            />
+            <div style={{
+              display: 'grid',
+              gap: '1rem'
+            }}>
+              {npcs.map(npc => (
+                <NPCCard
+                  key={npc.id}
+                  npc={npc}
+                  isSelected={selectedNPC?.id === npc.id}
+                  onClick={() => selectNPC(npc)}
+                  onEdit={() => openEditForm(npc)}
+                  onDelete={() => handleDelete(npc.id, npc.name)}
+                />
+              ))}
+            </div>
           )}
         </div>
 
         {/* Panel de detalles */}
         {selectedNPC && (
-          <NPCDetails 
+          <NPCDetails
             npc={selectedNPC}
             onClose={closeDetails}
             onEdit={() => openEditForm(selectedNPC)}
@@ -88,7 +108,7 @@ function NPCsManager({ campaign, connections }) {
         )}
       </div>
 
-      {/* Formulario modal */}
+      {/* Modal de formulario */}
       {showForm && (
         <NPCForm
           npc={editingItem}
@@ -100,180 +120,194 @@ function NPCsManager({ campaign, connections }) {
   )
 }
 
-// Componente de estado vacío
+// Estado vacío
 function EmptyState({ onAddFirst }) {
   return (
-    <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
-      <div style={{ fontSize: '5rem', marginBottom: '1rem' }}>🧙</div>
-      <h3 style={{ color: 'var(--text-muted)', fontSize: '1.5rem', marginBottom: '1rem' }}>
-        No hay NPCs creados
+    <div style={{
+      textAlign: 'center',
+      padding: '4rem 2rem',
+      color: 'var(--text-muted)'
+    }}>
+      <div style={{ fontSize: '4rem', marginBottom: '1rem', opacity: 0.5 }}>
+        🧙
+      </div>
+      <h3 style={{ color: 'white', marginBottom: '1rem' }}>
+        No hay NPCs aún
       </h3>
-      <p style={{ color: 'var(--text-disabled)', marginBottom: '2rem' }}>
-        Los NPCs dan vida a tu mundo. Crea personajes memorables que interactúen con tus jugadores.
+      <p style={{ marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem' }}>
+        Los NPCs (Personajes No Jugadores) son la clave para dar vida a tu mundo. 
+        Crea comerciantes, nobles, villanos y aliados memorables.
       </p>
       <button onClick={onAddFirst} className="btn-primary">
-        🧙 Crear el primer NPC
+        🧙 Crear Primer NPC
       </button>
     </div>
   )
 }
 
-// Lista de NPCs
-function NPCsList({ npcs, onEdit, onDelete, onSelect, selectedId, connections }) {
-  return (
-    <div style={{ display: 'grid', gap: '1rem' }}>
-      {npcs.map(npc => (
-        <NPCCard
-          key={npc.id}
-          npc={npc}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          onSelect={onSelect}
-          isSelected={selectedId === npc.id}
-          connectionCount={connections?.getConnectionCount(npc) || 0}
-        />
-      ))}
-    </div>
-  )
-}
-
-// Tarjeta individual de NPC
-function NPCCard({ npc, onEdit, onDelete, onSelect, isSelected, connectionCount }) {
-  const attitudeColors = {
-    'Amistoso': '#10b981',
-    'Neutral': '#6b7280', 
-    'Hostil': '#ef4444'
-  }
-
+// Tarjeta de NPC
+function NPCCard({ npc, isSelected, onClick, onEdit, onDelete }) {
   return (
     <div
-      onClick={() => onSelect(npc)}
+      onClick={onClick}
       style={{
         background: isSelected 
-          ? 'rgba(139, 92, 246, 0.15)' 
-          : 'var(--glass-bg)',
-        border: `1px solid ${isSelected 
-          ? 'var(--primary)' 
-          : 'var(--glass-border)'}`,
-        borderRadius: '16px',
+          ? 'rgba(139, 92, 246, 0.2)' 
+          : 'rgba(31, 41, 55, 0.5)',
+        border: isSelected 
+          ? '1px solid rgba(139, 92, 246, 0.5)' 
+          : '1px solid rgba(139, 92, 246, 0.1)',
+        borderRadius: '12px',
         padding: '1.5rem',
         cursor: 'pointer',
-        transition: 'all 0.3s ease'
+        transition: 'all 0.2s ease',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1rem'
       }}
     >
-      {/* Header con icono y nombre */}
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        marginBottom: '1rem'
+      {/* Avatar/Icono */}
+      <div style={{
+        fontSize: '2rem',
+        flexShrink: 0,
+        width: '50px',
+        height: '50px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(139, 92, 246, 0.2)',
+        borderRadius: '10px'
       }}>
-        <div style={{ fontSize: '2rem', marginRight: '1rem' }}>
-          {npc.icon || '👤'}
-        </div>
-        <div style={{ flex: 1 }}>
-          <h3 style={{ 
-            color: 'white', 
-            margin: 0, 
-            fontSize: '1.25rem',
-            fontWeight: 'bold'
-          }}>
-            {npc.name}
-          </h3>
-          <p style={{ 
-            color: 'var(--text-muted)', 
-            margin: '0.25rem 0 0 0',
-            fontSize: '0.9rem'
-          }}>
-            {npc.role} {npc.location && `• ${npc.location}`}
-          </p>
-        </div>
-        
-        {/* Actitud */}
-        <div style={{
-          background: `${attitudeColors[npc.attitude] || '#6b7280'}20`,
-          color: attitudeColors[npc.attitude] || '#6b7280',
-          padding: '0.25rem 0.75rem',
-          borderRadius: '20px',
-          fontSize: '0.8rem',
-          fontWeight: '600'
-        }}>
-          {npc.attitude || 'Neutral'}
-        </div>
+        {npc.icon || '👤'}
       </div>
 
-      {/* Descripción */}
-      <p style={{ 
-        color: 'var(--text-secondary)', 
-        marginBottom: '1rem',
-        lineHeight: '1.5',
-        display: '-webkit-box',
-        WebkitLineClamp: 2,
-        WebkitBoxOrient: 'vertical',
-        overflow: 'hidden'
-      }}>
-        {npc.description}
-      </p>
-
-      {/* Footer con conexiones y acciones */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        {/* Contador de conexiones */}
-        {connectionCount > 0 && (
-          <span style={{ 
-            color: 'var(--text-muted)', 
-            fontSize: '0.8rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.25rem'
+      {/* Información principal */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <h4 style={{ 
+          color: 'white', 
+          margin: '0 0 0.25rem 0',
+          fontSize: '1.1rem',
+          fontWeight: '600'
+        }}>
+          {npc.name}
+        </h4>
+        <p style={{ 
+          color: 'var(--text-muted)', 
+          margin: '0 0 0.25rem 0',
+          fontSize: '0.9rem'
+        }}>
+          {npc.role}
+        </p>
+        {npc.location && (
+          <p style={{ 
+            color: '#6b7280', 
+            margin: 0,
+            fontSize: '0.8rem'
           }}>
-            🔗 {connectionCount} conexión{connectionCount !== 1 ? 'es' : ''}
-          </span>
+            📍 {npc.location}
+          </p>
+        )}
+        {npc.attitude && (
+          <span style={{
+            display: 'inline-block',
+            marginTop: '0.5rem',
+            padding: '0.25rem 0.5rem',
+            background: npc.attitude === 'Amistoso' 
+              ? 'rgba(16, 185, 129, 0.2)' 
+              : npc.attitude === 'Hostil' 
+                ? 'rgba(239, 68, 68, 0.2)' 
+                : 'rgba(139, 92, 246, 0.2)',
+            color: npc.attitude === 'Amistoso' 
+              ? '#10b981' 
+              : npc.attitude === 'Hostil' 
+                ? '#ef4444' 
+                : '#8b5cf6',
+            borderRadius: '6px',
+            fontSize: '0.75rem',
+            fontWeight: '600'
+          }}>
+          {npc.attitude === 'Amistoso' && '😊'} 
+          {npc.attitude === 'Hostil' && '😠'} 
+          {npc.attitude === 'Neutral' && '😐'} 
+          {npc.attitude || 'Neutral'}
+        </span>
         )}
 
-        {/* Acciones */}
-        <div style={{ 
-          display: 'flex', 
-          gap: '0.5rem',
-          marginLeft: 'auto'
-        }}>
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onEdit(npc)
-            }}
-            style={{
-              background: 'rgba(139, 92, 246, 0.2)',
-              border: '1px solid rgba(139, 92, 246, 0.3)',
-              borderRadius: '6px',
-              color: '#a78bfa',
-              padding: '0.25rem 0.5rem',
-              cursor: 'pointer',
-              fontSize: '0.8rem'
-            }}
-          >
-            ✏️
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              onDelete(npc.id, npc.name)
-            }}
-            style={{
-              background: 'rgba(239, 68, 68, 0.2)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              borderRadius: '6px',
-              color: '#ef4444',
-              padding: '0.25rem 0.5rem',
-              cursor: 'pointer',
-              fontSize: '0.8rem'
-            }}
-          >
-            🗑️
-          </button>
-        </div>
+        {/* Tags */}
+        {npc.tags && npc.tags.length > 0 && (
+          <div style={{ 
+            display: 'flex', 
+            gap: '0.25rem', 
+            marginTop: '0.5rem',
+            flexWrap: 'wrap'
+          }}>
+            {npc.tags.slice(0, 3).map((tag, index) => (
+              <span
+                key={index}
+                style={{
+                  background: 'rgba(139, 92, 246, 0.2)',
+                  color: '#a78bfa',
+                  padding: '0.125rem 0.375rem',
+                  borderRadius: '4px',
+                  fontSize: '0.7rem'
+                }}
+              >
+                {tag}
+              </span>
+            ))}
+            {npc.tags.length > 3 && (
+              <span style={{
+                color: 'var(--text-muted)',
+                fontSize: '0.7rem',
+                padding: '0.125rem 0.375rem'
+              }}>
+                +{npc.tags.length - 3}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Acciones */}
+      <div style={{ 
+        display: 'flex', 
+        gap: '0.5rem',
+        marginLeft: 'auto'
+      }}>
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onEdit(npc)
+          }}
+          style={{
+            background: 'rgba(139, 92, 246, 0.2)',
+            border: '1px solid rgba(139, 92, 246, 0.3)',
+            borderRadius: '6px',
+            color: '#a78bfa',
+            padding: '0.25rem 0.5rem',
+            cursor: 'pointer',
+            fontSize: '0.8rem'
+          }}
+        >
+          ✏️
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onDelete(npc.id, npc.name)
+          }}
+          style={{
+            background: 'rgba(239, 68, 68, 0.2)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '6px',
+            color: '#ef4444',
+            padding: '0.25rem 0.5rem',
+            cursor: 'pointer',
+            fontSize: '0.8rem'
+          }}
+        >
+          🗑️
+        </button>
       </div>
     </div>
   )
@@ -318,69 +352,78 @@ function NPCDetails({ npc, onClose, onEdit, onDelete, connections, campaign }) {
         <button
           onClick={onClose}
           style={{
-            background: 'none',
-            border: 'none',
-            color: 'var(--text-muted)',
-            cursor: 'pointer',
-            fontSize: '1.5rem'
+            background: 'rgba(239, 68, 68, 0.2)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '8px',
+            color: '#ef4444',
+            padding: '0.5rem',
+            cursor: 'pointer'
           }}
         >
           ✕
         </button>
       </div>
 
-      {/* Ubicación */}
-      {npc.location && (
-        <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Ubicación</h4>
-          <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-            📍 {npc.location}
-          </p>
-        </div>
-      )}
-
-      {/* Descripción */}
-      {npc.description && (
-        <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Descripción</h4>
-          <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-            {npc.description}
-          </p>
-        </div>
-      )}
-
-      {/* Actitud */}
-      {npc.attitude && (
-        <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Actitud</h4>
-          <div style={{
-            display: 'inline-block',
-            background: `${
-              npc.attitude === 'Amistoso' ? '#10b981' :
-              npc.attitude === 'Hostil' ? '#ef4444' : '#6b7280'
-            }20`,
-            color: npc.attitude === 'Amistoso' ? '#10b981' :
-                   npc.attitude === 'Hostil' ? '#ef4444' : '#6b7280',
-            padding: '0.5rem 1rem',
-            borderRadius: '8px',
-            fontWeight: '600'
-          }}>
-            {npc.attitude}
+      {/* Información básica */}
+      <div style={{ marginBottom: '2rem' }}>
+        {npc.description && (
+          <div style={{ marginBottom: '1rem' }}>
+            <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Descripción</h4>
+            <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+              {npc.description}
+            </p>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Notas */}
+        {npc.location && (
+          <div style={{ marginBottom: '1rem' }}>
+            <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Ubicación</h4>
+            <p style={{ color: 'var(--text-secondary)' }}>
+              📍 {npc.location}
+            </p>
+          </div>
+        )}
+
+        {npc.attitude && (
+          <div style={{ marginBottom: '1rem' }}>
+            <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Actitud</h4>
+            <span style={{
+              display: 'inline-block',
+              padding: '0.5rem 1rem',
+              background: npc.attitude === 'Amistoso' 
+                ? 'rgba(16, 185, 129, 0.2)' 
+                : npc.attitude === 'Hostil' 
+                  ? 'rgba(239, 68, 68, 0.2)' 
+                  : 'rgba(139, 92, 246, 0.2)',
+              color: npc.attitude === 'Amistoso' 
+                ? '#10b981' 
+                : npc.attitude === 'Hostil' 
+                  ? '#ef4444' 
+                  : '#8b5cf6',
+              borderRadius: '8px',
+              fontSize: '0.9rem',
+              fontWeight: '600'
+            }}>
+            {npc.attitude === 'Amistoso' && '😊 '} 
+            {npc.attitude === 'Hostil' && '😠 '} 
+            {npc.attitude === 'Neutral' && '😐 '} 
+            {npc.attitude}
+          </span>
+          </div>
+        )}
+      </div>
+
+      {/* Notas del DM */}
       {npc.notes && (
         <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Notas</h4>
+          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Notas del DM</h4>
           <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
             {npc.notes}
           </p>
         </div>
       )}
 
-      {/* 🔗 SISTEMA DE CONEXIONES */}
+      {/* 🔗 SISTEMA DE CONEXIONES CON NAVEGACIÓN */}
       {connections && (
         <div style={{ marginBottom: '2rem' }}>
           <ConnectionsDisplay
@@ -389,6 +432,7 @@ function NPCDetails({ npc, onClose, onEdit, onDelete, connections, campaign }) {
             linkedItems={linkedItems}
             onRemoveConnection={connections.removeConnection}
             onOpenConnectionModal={connections.openConnectionModal}
+            onNavigateToItem={connections.navigateToItem} // ✨ Función de navegación
           />
         </div>
       )}
@@ -426,8 +470,8 @@ function NPCForm({ npc, onSave, onClose }) {
   const [formData, setFormData] = useState({
     name: npc?.name || '',
     role: npc?.role || '',
-    location: npc?.location || '',
     description: npc?.description || '',
+    location: npc?.location || '',
     attitude: npc?.attitude || 'Neutral',
     notes: npc?.notes || '',
     icon: npc?.icon || '👤'
@@ -435,39 +479,33 @@ function NPCForm({ npc, onSave, onClose }) {
 
   const [errors, setErrors] = useState({})
 
-  // Opciones para actitud
-  const attitudeOptions = ['Amistoso', 'Neutral', 'Hostil']
+  // Opciones para el select de actitud
+  const attitudeOptions = ['Amistoso', 'Neutral', 'Hostil', 'Desconfiado', 'Servicial']
 
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-    // Limpiar error del campo
-    if (errors[name]) {
+    
+    // Limpiar error si el campo ahora tiene valor
+    if (errors[name] && value.trim()) {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
-  }
-
-  const validateForm = () => {
-    const newErrors = {}
-    
-    if (!formData.name.trim()) {
-      newErrors.name = 'El nombre es obligatorio'
-    }
-    
-    if (!formData.description.trim()) {
-      newErrors.description = 'La descripción es obligatoria'
-    }
-    
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
     
-    if (!validateForm()) return
+    // Validaciones
+    const newErrors = {}
+    if (!formData.name.trim()) newErrors.name = 'El nombre es obligatorio'
+    if (!formData.role.trim()) newErrors.role = 'El rol es obligatorio'
+    if (!formData.description.trim()) newErrors.description = 'La descripción es obligatoria'
     
-    onSave(formData)
+    setErrors(newErrors)
+    
+    if (Object.keys(newErrors).length === 0) {
+      onSave(formData)
+    }
   }
 
   return (
@@ -475,37 +513,41 @@ function NPCForm({ npc, onSave, onClose }) {
       position: 'fixed',
       top: 0,
       left: 0,
-      right: 0,
-      bottom: 0,
+      width: '100%',
+      height: '100%',
       background: 'rgba(0, 0, 0, 0.8)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 1000,
-      padding: '1rem'
+      backdropFilter: 'blur(10px)'
     }}>
       <div style={{
         background: 'var(--glass-bg)',
         border: '1px solid var(--glass-border)',
         borderRadius: '20px',
         padding: '2rem',
+        width: '90%',
         maxWidth: '600px',
-        width: '100%',
         maxHeight: '90vh',
         overflowY: 'auto'
       }}>
-        <h3 style={{ 
+        <h2 style={{ 
           color: 'white', 
           marginBottom: '2rem',
           display: 'flex',
           alignItems: 'center',
           gap: '0.5rem'
         }}>
-          🧙 {npc ? 'Editar NPC' : 'Nuevo NPC'}
-        </h3>
+          {npc ? '✏️ Editar NPC' : '🧙 Nuevo NPC'}
+        </h2>
 
         <form onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gap: '1.5rem' }}>
+          <div style={{
+            display: 'grid',
+            gap: '1.5rem',
+            marginBottom: '2rem'
+          }}>
             {/* Nombre */}
             <div>
               <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
@@ -516,10 +558,10 @@ function NPCForm({ npc, onSave, onClose }) {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="Ej: Eldara la Sabia"
+                placeholder="Ej: Maestro Elrond"
                 className="input-field"
-                style={{ 
-                  border: errors.name ? '1px solid #ef4444' : undefined
+                style={{
+                  borderColor: errors.name ? '#ef4444' : undefined
                 }}
               />
               {errors.name && (
@@ -532,16 +574,48 @@ function NPCForm({ npc, onSave, onClose }) {
             {/* Rol */}
             <div>
               <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                Rol/Profesión
+                Rol o Profesión *
               </label>
               <input
                 type="text"
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                placeholder="Ej: Bibliotecaria, Comerciante, Guardia"
+                placeholder="Ej: Posadero, Comerciante, Guardia..."
                 className="input-field"
+                style={{
+                  borderColor: errors.role ? '#ef4444' : undefined
+                }}
               />
+              {errors.role && (
+                <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
+                  {errors.role}
+                </p>
+              )}
+            </div>
+
+            {/* Descripción */}
+            <div>
+              <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+                Descripción *
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Apariencia física, personalidad, trasfondo..."
+                className="input-field"
+                style={{ 
+                  minHeight: '100px', 
+                  resize: 'vertical',
+                  borderColor: errors.description ? '#ef4444' : undefined
+                }}
+              />
+              {errors.description && (
+                <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
+                  {errors.description}
+                </p>
+              )}
             </div>
 
             {/* Ubicación */}
@@ -554,33 +628,9 @@ function NPCForm({ npc, onSave, onClose }) {
                 name="location"
                 value={formData.location}
                 onChange={handleChange}
-                placeholder="¿Dónde se puede encontrar normalmente?"
+                placeholder="¿Dónde se le puede encontrar normalmente?"
                 className="input-field"
               />
-            </div>
-
-            {/* Descripción */}
-            <div>
-              <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                Descripción *
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Apariencia física, personalidad, primera impresión..."
-                className="input-field"
-                style={{ 
-                  minHeight: '100px', 
-                  resize: 'vertical',
-                  border: errors.description ? '1px solid #ef4444' : undefined
-                }}
-              />
-              {errors.description && (
-                <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
-                  {errors.description}
-                </p>
-              )}
             </div>
 
             {/* Actitud */}

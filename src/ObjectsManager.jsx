@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useCRUD } from './hooks/useCRUD'
 import ConnectionsDisplay from './components/ConnectionsDisplay'
 
-function ObjectsManager({ campaign, connections }) {
+function ObjectsManager({ campaign, connections, selectedItemForNavigation }) {
   // ✨ Hook CRUD usando datos de la campaña
   const {
     items: objects,
@@ -16,11 +16,25 @@ function ObjectsManager({ campaign, connections }) {
     openCreateForm,
     openEditForm,
     closeForm,
-    closeDetails
+    closeDetails,
+    NotificationComponent
   } = useCRUD(campaign.objects || [], 'Objeto')
+
+  // ✨ Efecto para seleccionar automáticamente un objeto cuando se navega desde conexiones
+  useEffect(() => {
+    if (selectedItemForNavigation && selectedItemForNavigation.type === 'objects') {
+      const objectToSelect = objects.find(object => object.id === selectedItemForNavigation.item.id)
+      if (objectToSelect) {
+        selectObject(objectToSelect)
+      }
+    }
+  }, [selectedItemForNavigation, objects, selectObject])
 
   return (
     <div className="fade-in">
+      {/* ✨ Componente de notificación */}
+      <NotificationComponent />
+
       {/* Header */}
       <div style={{ 
         display: 'flex', 
@@ -62,20 +76,27 @@ function ObjectsManager({ campaign, connections }) {
           {isEmpty ? (
             <EmptyState onAddFirst={openCreateForm} />
           ) : (
-            <ObjectsList 
-              objects={objects}
-              onEdit={openEditForm}
-              onDelete={handleDelete}
-              onSelect={selectObject}
-              selectedId={selectedObject?.id}
-              connections={connections}
-            />
+            <div style={{
+              display: 'grid',
+              gap: '1rem'
+            }}>
+              {objects.map(object => (
+                <ObjectCard
+                  key={object.id}
+                  object={object}
+                  isSelected={selectedObject?.id === object.id}
+                  onClick={() => selectObject(object)}
+                  onEdit={() => openEditForm(object)}
+                  onDelete={() => handleDelete(object.id, object.name)}
+                />
+              ))}
+            </div>
           )}
         </div>
 
         {/* Panel de detalles */}
         {selectedObject && (
-          <ObjectDetails 
+          <ObjectDetails
             object={selectedObject}
             onClose={closeDetails}
             onEdit={() => openEditForm(selectedObject)}
@@ -86,7 +107,7 @@ function ObjectsManager({ campaign, connections }) {
         )}
       </div>
 
-      {/* Formulario modal */}
+      {/* Modal de formulario */}
       {showForm && (
         <ObjectForm
           object={editingItem}
@@ -98,172 +119,159 @@ function ObjectsManager({ campaign, connections }) {
   )
 }
 
-// Componente de estado vacío
+// Estado vacío
 function EmptyState({ onAddFirst }) {
   return (
-    <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
-      <div style={{ fontSize: '5rem', marginBottom: '1rem' }}>📦</div>
-      <h3 style={{ color: 'var(--text-muted)', fontSize: '1.5rem', marginBottom: '1rem' }}>
-        No hay objetos creados
+    <div style={{
+      textAlign: 'center',
+      padding: '4rem 2rem',
+      color: 'var(--text-muted)'
+    }}>
+      <div style={{ fontSize: '4rem', marginBottom: '1rem', opacity: 0.5 }}>
+        📦
+      </div>
+      <h3 style={{ color: 'white', marginBottom: '1rem' }}>
+        No hay objetos creados aún
       </h3>
-      <p style={{ color: 'var(--text-disabled)', marginBottom: '2rem' }}>
-        Los objetos enriquecen tu mundo. Crea armas, pociones, artefactos y tesoros.
+      <p style={{ marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem' }}>
+        Los objetos son elementos importantes de tu campaña: armas mágicas, 
+        tesoros, artefactos ancestrales, pociones y más.
       </p>
       <button onClick={onAddFirst} className="btn-primary">
-        📦 Crear el primer objeto
+        📦 Crear Primer Objeto
       </button>
     </div>
   )
 }
 
-// Lista de objetos
-function ObjectsList({ objects, onEdit, onDelete, onSelect, selectedId, connections }) {
-  return (
-    <div style={{ display: 'grid', gap: '1rem' }}>
-      {objects.map(object => (
-        <ObjectCard
-          key={object.id}
-          object={object}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          onSelect={onSelect}
-          isSelected={selectedId === object.id}
-          connectionCount={connections?.getConnectionCount(object) || 0}
-        />
-      ))}
-    </div>
-  )
-}
-
-// Tarjeta individual de objeto
-function ObjectCard({ object, onEdit, onDelete, onSelect, isSelected, connectionCount }) {
-  const rarityColors = {
-    'Común': '#6b7280',
-    'Poco común': '#10b981',
-    'Raro': '#3b82f6',
-    'Épico': '#8b5cf6', 
-    'Legendario': '#f59e0b'
-  }
-
-  const typeColors = {
-    'Arma': '#ef4444',
-    'Armadura': '#3b82f6',
-    'Poción': '#10b981',
-    'Pergamino': '#8b5cf6',
-    'Joya': '#f59e0b',
-    'Herramienta': '#6b7280',
-    'Reliquia': '#f59e0b',
-    'Otro': '#9ca3af'
+// Tarjeta de objeto
+function ObjectCard({ object, isSelected, onClick, onEdit, onDelete }) {
+  const getRarityColor = (rarity) => {
+    switch (rarity) {
+      case 'Legendario': return '#ff6b35'
+      case 'Épico': return '#8b5cf6'
+      case 'Raro': return '#3b82f6'
+      case 'Poco común': return '#10b981'
+      case 'Común': return '#6b7280'
+      default: return '#6b7280'
+    }
   }
 
   return (
     <div
-      onClick={() => onSelect(object)}
+      onClick={onClick}
       style={{
         background: isSelected 
-          ? 'rgba(139, 92, 246, 0.15)' 
-          : 'var(--glass-bg)',
-        border: `1px solid ${isSelected 
-          ? 'rgba(139, 92, 246, 0.4)' 
-          : 'var(--glass-border)'}`,
-        borderRadius: '16px',
+          ? 'rgba(139, 92, 246, 0.2)' 
+          : 'rgba(31, 41, 55, 0.5)',
+        border: isSelected 
+          ? '1px solid rgba(139, 92, 246, 0.5)' 
+          : '1px solid rgba(139, 92, 246, 0.1)',
+        borderRadius: '12px',
         padding: '1.5rem',
         cursor: 'pointer',
         transition: 'all 0.2s ease',
-        transform: isSelected ? 'translateY(-2px)' : 'none',
-        boxShadow: isSelected 
-          ? '0 8px 25px rgba(139, 92, 246, 0.2)' 
-          : '0 2px 8px rgba(0, 0, 0, 0.1)'
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1rem'
       }}
     >
-      {/* Header de la tarjeta */}
+      {/* Icono */}
       <div style={{
+        fontSize: '2rem',
+        flexShrink: 0,
+        width: '50px',
+        height: '50px',
         display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: '1rem'
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(6, 182, 212, 0.2)',
+        borderRadius: '10px'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ fontSize: '2rem' }}>{object.icon}</span>
-          <div>
-            <h3 style={{ 
-              color: 'white', 
-              fontSize: '1.25rem', 
-              fontWeight: 'bold',
-              margin: 0
-            }}>
-              {object.name}
-            </h3>
-            <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>
-              {object.type}
-            </p>
-          </div>
-        </div>
+        {object.icon || '📦'}
+      </div>
+
+      {/* Información principal */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <h4 style={{ 
+          color: 'white', 
+          margin: '0 0 0.25rem 0',
+          fontSize: '1.1rem',
+          fontWeight: '600'
+        }}>
+          {object.name}
+        </h4>
         
-        {/* Badges */}
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-          <span style={{
-            background: `${rarityColors[object.rarity]}20`,
-            color: rarityColors[object.rarity],
-            padding: '0.25rem 0.5rem',
-            borderRadius: '8px',
-            fontSize: '0.75rem',
-            fontWeight: '600'
-          }}>
-            {object.rarity}
-          </span>
-          {connectionCount > 0 && (
+        {/* Tipo y Rareza */}
+        <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
+          {object.type && (
+            <p style={{ 
+              color: 'var(--text-muted)', 
+              margin: 0,
+              fontSize: '0.9rem'
+            }}>
+              📝 {object.type}
+            </p>
+          )}
+          
+          {object.rarity && (
             <span style={{
-              background: 'rgba(139, 92, 246, 0.2)',
-              color: '#a78bfa',
               padding: '0.25rem 0.5rem',
-              borderRadius: '8px',
+              background: `${getRarityColor(object.rarity)}20`,
+              color: getRarityColor(object.rarity),
+              borderRadius: '6px',
               fontSize: '0.75rem',
               fontWeight: '600'
             }}>
-              🔗 {connectionCount}
+              {object.rarity === 'Legendario' && '⭐'} 
+              {object.rarity === 'Épico' && '💜'} 
+              {object.rarity === 'Raro' && '💙'} 
+              {object.rarity === 'Poco común' && '💚'} 
+              {object.rarity === 'Común' && '⚪'} 
+              {object.rarity}
             </span>
           )}
         </div>
+
+        {/* Propietario y ubicación */}
+        <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+          {object.owner && (
+            <p style={{ margin: '0 0 0.25rem 0' }}>
+              👤 Propietario: {object.owner}
+            </p>
+          )}
+          {object.location && (
+            <p style={{ margin: 0 }}>
+              📍 Ubicación: {object.location}
+            </p>
+          )}
+        </div>
+
+        {/* Descripción corta */}
+        {object.description && (
+          <p style={{ 
+            color: 'var(--text-muted)', 
+            margin: '0.5rem 0 0 0',
+            fontSize: '0.85rem',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}>
+            {object.description}
+          </p>
+        )}
       </div>
-
-      {/* Descripción */}
-      <p style={{ 
-        color: 'var(--text-secondary)', 
-        marginBottom: '1rem',
-        lineHeight: '1.5',
-        display: '-webkit-box',
-        WebkitLineClamp: 2,
-        WebkitBoxOrient: 'vertical',
-        overflow: 'hidden'
-      }}>
-        {object.description}
-      </p>
-
-      {/* Propietario o Ubicación */}
-      {(object.owner || object.location) && (
-        <p style={{ 
-          color: 'var(--text-muted)', 
-          fontSize: '0.9rem',
-          marginBottom: '1rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem'
-        }}>
-          {object.owner ? `👤 ${object.owner}` : `📍 ${object.location}`}
-        </p>
-      )}
 
       {/* Acciones */}
       <div style={{ 
         display: 'flex', 
         gap: '0.5rem',
-        justifyContent: 'flex-end'
+        marginLeft: 'auto'
       }}>
         <button
           onClick={(e) => {
             e.stopPropagation()
-            onEdit(object)
+            onEdit()
           }}
           style={{
             background: 'rgba(139, 92, 246, 0.2)',
@@ -280,7 +288,7 @@ function ObjectCard({ object, onEdit, onDelete, onSelect, isSelected, connection
         <button
           onClick={(e) => {
             e.stopPropagation()
-            onDelete(object.id, object.name)
+            onDelete()
           }}
           style={{
             background: 'rgba(239, 68, 68, 0.2)',
@@ -304,94 +312,120 @@ function ObjectDetails({ object, onClose, onEdit, onDelete, connections, campaig
   // Obtener elementos conectados
   const linkedItems = connections?.getLinkedItems(object) || {}
 
+  const getRarityColor = (rarity) => {
+    switch (rarity) {
+      case 'Legendario': return '#ff6b35'
+      case 'Épico': return '#8b5cf6'
+      case 'Raro': return '#3b82f6'
+      case 'Poco común': return '#10b981'
+      case 'Común': return '#6b7280'
+      default: return '#6b7280'
+    }
+  }
+
   return (
     <div style={{
       background: 'var(--glass-bg)',
       border: '1px solid var(--glass-border)',
       borderRadius: '16px',
       padding: '2rem',
-      height: 'fit-content',
       position: 'sticky',
       top: '2rem',
       maxHeight: 'calc(100vh - 4rem)',
       overflowY: 'auto'
     }}>
       {/* Header */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
         alignItems: 'flex-start',
-        marginBottom: '1.5rem'
+        marginBottom: '2rem'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ fontSize: '3rem' }}>{object.icon}</span>
+          <div style={{ fontSize: '3rem' }}>
+            {object.icon || '📦'}
+          </div>
           <div>
-            <h3 style={{ 
-              color: 'white', 
-              fontSize: '1.5rem', 
-              fontWeight: 'bold',
-              margin: 0
-            }}>
+            <h3 style={{ color: 'white', margin: 0, fontSize: '1.5rem' }}>
               {object.name}
             </h3>
-            <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>
-              {object.type} • {object.rarity}
-            </p>
+            {object.type && (
+              <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>
+                {object.type}
+              </p>
+            )}
+            {object.rarity && (
+              <span style={{
+                display: 'inline-block',
+                marginTop: '0.5rem',
+                padding: '0.5rem 1rem',
+                background: `${getRarityColor(object.rarity)}20`,
+                color: getRarityColor(object.rarity),
+                borderRadius: '8px',
+                fontSize: '0.9rem',
+                fontWeight: '600'
+              }}>
+                {object.rarity === 'Legendario' && '⭐ '} 
+                {object.rarity === 'Épico' && '💜 '} 
+                {object.rarity === 'Raro' && '💙 '} 
+                {object.rarity === 'Poco común' && '💚 '} 
+                {object.rarity === 'Común' && '⚪ '} 
+                {object.rarity}
+              </span>
+            )}
           </div>
         </div>
         <button
           onClick={onClose}
           style={{
-            background: 'rgba(107, 114, 128, 0.2)',
-            border: '1px solid rgba(107, 114, 128, 0.3)',
-            borderRadius: '6px',
-            color: '#9ca3af',
-            padding: '0.25rem 0.5rem',
-            cursor: 'pointer',
-            fontSize: '0.8rem'
+            background: 'rgba(239, 68, 68, 0.2)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '8px',
+            color: '#ef4444',
+            padding: '0.5rem',
+            cursor: 'pointer'
           }}
         >
           ✕
         </button>
       </div>
 
-      {/* Descripción */}
+      {/* Información básica */}
       <div style={{ marginBottom: '2rem' }}>
-        <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Descripción</h4>
-        <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-          {object.description}
-        </p>
+        {object.description && (
+          <div style={{ marginBottom: '1rem' }}>
+            <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Descripción</h4>
+            <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+              {object.description}
+            </p>
+          </div>
+        )}
+
+        {object.properties && (
+          <div style={{ marginBottom: '1rem' }}>
+            <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Propiedades</h4>
+            <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+              {object.properties}
+            </p>
+          </div>
+        )}
+
+        {(object.owner || object.location) && (
+          <div style={{ marginBottom: '1rem' }}>
+            <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Ubicación</h4>
+            {object.owner && (
+              <p style={{ color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
+                👤 Propietario: {object.owner}
+              </p>
+            )}
+            {object.location && (
+              <p style={{ color: 'var(--text-secondary)' }}>
+                📍 Ubicación: {object.location}
+              </p>
+            )}
+          </div>
+        )}
       </div>
-
-      {/* Propiedades */}
-      {object.properties && (
-        <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Propiedades</h4>
-          <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-            {object.properties}
-          </p>
-        </div>
-      )}
-
-      {/* Propietario */}
-      {object.owner && (
-        <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Propietario</h4>
-          <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-            {object.owner}
-          </p>
-        </div>
-      )}
-
-      {/* Ubicación */}
-      {object.location && (
-        <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Ubicación</h4>
-          <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-            {object.location}
-          </p>
-        </div>
-      )}
 
       {/* Notas */}
       {object.notes && (
@@ -412,6 +446,7 @@ function ObjectDetails({ object, onClose, onEdit, onDelete, connections, campaig
             linkedItems={linkedItems}
             onRemoveConnection={connections.removeConnection}
             onOpenConnectionModal={connections.openConnectionModal}
+            onNavigateToItem={connections.navigateToItem}
           />
         </div>
       )}
@@ -469,43 +504,29 @@ function ObjectForm({ object, onSave, onClose }) {
 
   const rarityOptions = ['Común', 'Poco común', 'Raro', 'Épico', 'Legendario']
 
-  const iconOptions = [
-    '📦', '⚔️', '🗡️', '🛡️', '🏹', '🪓', '🔨', '🧪', '💎', '💍', '🔮', '📜',
-    '📚', '🗝️', '🪙', '💰', '🏺', '⚱️', '🎭', '🎵', '🎨', '🧿', '📿', '⚗️',
-    '🔥', '⚡', '❄️', '🌟', '✨', '💫', '🌙', '☀️', '🍯', '🧬', '🔬', '⭐'
-  ]
-
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
     
-    // Limpiar error cuando el usuario empiece a escribir
-    if (errors[name]) {
+    // Limpiar error si el campo ahora tiene valor
+    if (errors[name] && value.trim()) {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
-  }
-
-  const validateForm = () => {
-    const newErrors = {}
-    
-    if (!formData.name.trim()) {
-      newErrors.name = 'El nombre es obligatorio'
-    }
-    
-    if (!formData.description.trim()) {
-      newErrors.description = 'La descripción es obligatoria'
-    }
-    
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
     
-    if (!validateForm()) return
+    // Validaciones
+    const newErrors = {}
+    if (!formData.name.trim()) newErrors.name = 'El nombre es obligatorio'
+    if (!formData.description.trim()) newErrors.description = 'La descripción es obligatoria'
     
-    onSave(formData)
+    setErrors(newErrors)
+    
+    if (Object.keys(newErrors).length === 0) {
+      onSave(formData)
+    }
   }
 
   return (
@@ -513,97 +534,62 @@ function ObjectForm({ object, onSave, onClose }) {
       position: 'fixed',
       top: 0,
       left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.85)',
+      width: '100%',
+      height: '100%',
+      background: 'rgba(0, 0, 0, 0.8)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 1000,
-      padding: '1rem'
+      backdropFilter: 'blur(10px)'
     }}>
       <div style={{
         background: 'var(--glass-bg)',
-        backdropFilter: 'blur(20px)',
         border: '1px solid var(--glass-border)',
         borderRadius: '20px',
         padding: '2rem',
+        width: '90%',
         maxWidth: '600px',
-        width: '100%',
         maxHeight: '90vh',
-        overflowY: 'auto',
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)'
+        overflowY: 'auto'
       }}>
-        {/* Header */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
+        <h2 style={{ 
+          color: 'white', 
+          marginBottom: '2rem',
+          display: 'flex',
           alignItems: 'center',
-          marginBottom: '2rem'
+          gap: '0.5rem'
         }}>
-          <h3 style={{ 
-            fontSize: '1.8rem',
-            fontWeight: 'bold',
-            color: 'white',
-            margin: 0
-          }}>
-            {object ? '✏️ Editar Objeto' : '➕ Nuevo Objeto'}
-          </h3>
-          <button onClick={onClose} style={{
-            background: 'rgba(107, 114, 128, 0.2)',
-            border: '1px solid rgba(107, 114, 128, 0.3)',
-            borderRadius: '6px',
-            color: '#9ca3af',
-            padding: '0.5rem',
-            cursor: 'pointer',
-            fontSize: '1rem'
-          }}>
-            ✕
-          </button>
-        </div>
+          {object ? '✏️ Editar Objeto' : '📦 Nuevo Objeto'}
+        </h2>
 
-        {/* Formulario */}
         <form onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gap: '1.5rem' }}>
-            
-            {/* Nombre e Icono */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '1rem' }}>
-              <div>
-                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                  Nombre del Objeto
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Ej: Espada de la Luna Creciente"
-                  className="input-field"
-                  style={{ border: errors.name ? '1px solid #ef4444' : undefined }}
-                />
-                {errors.name && (
-                  <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
-                    {errors.name}
-                  </p>
-                )}
-              </div>
-              
-              <div>
-                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                  Icono
-                </label>
-                <select
-                  name="icon"
-                  value={formData.icon}
-                  onChange={handleChange}
-                  className="input-field"
-                  style={{ fontSize: '1.5rem', textAlign: 'center', width: '60px' }}
-                >
-                  {iconOptions.map(icon => (
-                    <option key={icon} value={icon}>{icon}</option>
-                  ))}
-                </select>
-              </div>
+          <div style={{
+            display: 'grid',
+            gap: '1.5rem',
+            marginBottom: '2rem'
+          }}>
+            {/* Nombre */}
+            <div>
+              <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+                Nombre *
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Ej: Espada Llameante de Ignis"
+                className="input-field"
+                style={{
+                  borderColor: errors.name ? '#ef4444' : undefined
+                }}
+              />
+              {errors.name && (
+                <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
+                  {errors.name}
+                </p>
+              )}
             </div>
 
             {/* Tipo y Rareza */}
@@ -618,9 +604,11 @@ function ObjectForm({ object, onSave, onClose }) {
                   onChange={handleChange}
                   className="input-field"
                 >
-                  <option value="">Selecciona un tipo</option>
+                  <option value="">Seleccionar tipo</option>
                   {typeOptions.map(type => (
-                    <option key={type} value={type}>{type}</option>
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -636,7 +624,9 @@ function ObjectForm({ object, onSave, onClose }) {
                   className="input-field"
                 >
                   {rarityOptions.map(rarity => (
-                    <option key={rarity} value={rarity}>{rarity}</option>
+                    <option key={rarity} value={rarity}>
+                      {rarity}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -645,18 +635,18 @@ function ObjectForm({ object, onSave, onClose }) {
             {/* Descripción */}
             <div>
               <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                Descripción
+                Descripción *
               </label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                placeholder="Describe la apariencia y características del objeto..."
+                placeholder="Apariencia, historia, características especiales..."
                 className="input-field"
                 style={{ 
                   minHeight: '100px', 
                   resize: 'vertical',
-                  border: errors.description ? '1px solid #ef4444' : undefined
+                  borderColor: errors.description ? '#ef4444' : undefined
                 }}
               />
               {errors.description && (
@@ -669,13 +659,13 @@ function ObjectForm({ object, onSave, onClose }) {
             {/* Propiedades */}
             <div>
               <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                Propiedades Mágicas
+                Propiedades mágicas
               </label>
               <textarea
                 name="properties"
                 value={formData.properties}
                 onChange={handleChange}
-                placeholder="Ej: +2 al ataque, daño radiante contra no-muertos"
+                placeholder="Efectos mágicos, bonificaciones, habilidades especiales..."
                 className="input-field"
                 style={{ minHeight: '80px', resize: 'vertical' }}
               />

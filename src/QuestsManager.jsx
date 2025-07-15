@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useCRUD } from './hooks/useCRUD'
 import ConnectionsDisplay from './components/ConnectionsDisplay'
 
-function QuestsManager({ campaign, connections }) {
+function QuestsManager({ campaign, connections, selectedItemForNavigation }) {
   // ✨ Hook CRUD usando datos de la campaña
   const {
     items: quests,
@@ -16,11 +16,25 @@ function QuestsManager({ campaign, connections }) {
     openCreateForm,
     openEditForm,
     closeForm,
-    closeDetails
+    closeDetails,
+    NotificationComponent
   } = useCRUD(campaign.quests || [], 'Misión')
+
+  // ✨ Efecto para seleccionar automáticamente una misión cuando se navega desde conexiones
+  useEffect(() => {
+    if (selectedItemForNavigation && selectedItemForNavigation.type === 'quests') {
+      const questToSelect = quests.find(quest => quest.id === selectedItemForNavigation.item.id)
+      if (questToSelect) {
+        selectQuest(questToSelect)
+      }
+    }
+  }, [selectedItemForNavigation, quests, selectQuest])
 
   return (
     <div className="fade-in">
+      {/* ✨ Componente de notificación */}
+      <NotificationComponent />
+
       {/* Header */}
       <div style={{ 
         display: 'flex', 
@@ -62,31 +76,38 @@ function QuestsManager({ campaign, connections }) {
           {isEmpty ? (
             <EmptyState onAddFirst={openCreateForm} />
           ) : (
-            <QuestsList 
-              quests={quests}
-              onEdit={openEditForm}
-              onDelete={handleDelete}
-              onSelect={selectQuest}
-              selectedId={selectedQuest?.id}
-              connections={connections}
-            />
+            <div style={{
+              display: 'grid',
+              gap: '1rem'
+            }}>
+              {quests.map(quest => (
+                <QuestCard
+                  key={quest.id}
+                  quest={quest}
+                  isSelected={selectedQuest?.id === quest.id}
+                  onClick={() => selectQuest(quest)}
+                  onEdit={() => openEditForm(quest)}
+                  onDelete={() => handleDelete(quest.id, quest.name)}
+                />
+              ))}
+            </div>
           )}
         </div>
 
         {/* Panel de detalles */}
         {selectedQuest && (
-          <QuestDetails 
+          <QuestDetails
             quest={selectedQuest}
             onClose={closeDetails}
             onEdit={() => openEditForm(selectedQuest)}
-            onDelete={() => handleDelete(selectedQuest.id, selectedQuest.title)}
+            onDelete={() => handleDelete(selectedQuest.id, selectedQuest.name)}
             connections={connections}
             campaign={campaign}
           />
         )}
       </div>
 
-      {/* Formulario modal */}
+      {/* Modal de formulario */}
       {showForm && (
         <QuestForm
           quest={editingItem}
@@ -98,177 +119,172 @@ function QuestsManager({ campaign, connections }) {
   )
 }
 
-// Componente de estado vacío
+// Estado vacío
 function EmptyState({ onAddFirst }) {
   return (
-    <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
-      <div style={{ fontSize: '5rem', marginBottom: '1rem' }}>📜</div>
-      <h3 style={{ color: 'var(--text-muted)', fontSize: '1.5rem', marginBottom: '1rem' }}>
-        No hay misiones creadas
+    <div style={{
+      textAlign: 'center',
+      padding: '4rem 2rem',
+      color: 'var(--text-muted)'
+    }}>
+      <div style={{ fontSize: '4rem', marginBottom: '1rem', opacity: 0.5 }}>
+        📜
+      </div>
+      <h3 style={{ color: 'white', marginBottom: '1rem' }}>
+        No hay misiones creadas aún
       </h3>
-      <p style={{ color: 'var(--text-disabled)', marginBottom: '2rem' }}>
-        Las misiones dan propósito a la aventura. Crea objetivos épicos para tus jugadores.
+      <p style={{ marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem' }}>
+        Las misiones son el corazón de tu campaña. Crea aventuras épicas, 
+        misiones secundarias y objetivos que motiven a tus jugadores.
       </p>
       <button onClick={onAddFirst} className="btn-primary">
-        📜 Crear la primera misión
+        📜 Crear Primera Misión
       </button>
     </div>
   )
 }
 
-// Lista de misiones
-function QuestsList({ quests, onEdit, onDelete, onSelect, selectedId, connections }) {
-  return (
-    <div style={{ display: 'grid', gap: '1rem' }}>
-      {quests.map(quest => (
-        <QuestCard
-          key={quest.id}
-          quest={quest}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          onSelect={onSelect}
-          isSelected={selectedId === quest.id}
-          connectionCount={connections?.getConnectionCount(quest) || 0}
-        />
-      ))}
-    </div>
-  )
-}
-
-// Tarjeta individual de misión
-function QuestCard({ quest, onEdit, onDelete, onSelect, isSelected, connectionCount }) {
-  const statusColors = {
-    'Pendiente': '#6b7280',
-    'En progreso': '#f59e0b', 
-    'Completada': '#10b981',
-    'Fallida': '#ef4444'
+// Tarjeta de misión
+function QuestCard({ quest, isSelected, onClick, onEdit, onDelete }) {
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Completada': return '#10b981'
+      case 'En progreso': return '#f59e0b'
+      case 'Pendiente': return '#6b7280'
+      case 'Fallida': return '#ef4444'
+      default: return '#6b7280'
+    }
   }
 
-  const priorityColors = {
-    'Baja': '#6b7280',
-    'Media': '#f59e0b',
-    'Alta': '#ef4444',
-    'Crítica': '#8b5cf6'
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case 'Alta': return '#ef4444'
+      case 'Media': return '#f59e0b'
+      case 'Baja': return '#10b981'
+      default: return '#6b7280'
+    }
   }
 
   return (
     <div
-      onClick={() => onSelect(quest)}
+      onClick={onClick}
       style={{
         background: isSelected 
-          ? 'rgba(139, 92, 246, 0.15)' 
-          : 'var(--glass-bg)',
-        border: `1px solid ${isSelected 
-          ? 'rgba(139, 92, 246, 0.4)' 
-          : 'var(--glass-border)'}`,
-        borderRadius: '16px',
+          ? 'rgba(139, 92, 246, 0.2)' 
+          : 'rgba(31, 41, 55, 0.5)',
+        border: isSelected 
+          ? '1px solid rgba(139, 92, 246, 0.5)' 
+          : '1px solid rgba(139, 92, 246, 0.1)',
+        borderRadius: '12px',
         padding: '1.5rem',
         cursor: 'pointer',
         transition: 'all 0.2s ease',
-        transform: isSelected ? 'translateY(-2px)' : 'none',
-        boxShadow: isSelected 
-          ? '0 8px 25px rgba(139, 92, 246, 0.2)' 
-          : '0 2px 8px rgba(0, 0, 0, 0.1)'
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1rem'
       }}
     >
-      {/* Header de la tarjeta */}
+      {/* Icono */}
       <div style={{
+        fontSize: '2rem',
+        flexShrink: 0,
+        width: '50px',
+        height: '50px',
         display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: '1rem'
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(245, 158, 11, 0.2)',
+        borderRadius: '10px'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ fontSize: '2rem' }}>{quest.icon}</span>
-          <div>
-            <h3 style={{ 
-              color: 'white', 
-              fontSize: '1.25rem', 
-              fontWeight: 'bold',
-              margin: 0
-            }}>
-              {quest.title}
-            </h3>
-            <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>
-              {quest.location && `📍 ${quest.location}`}
-            </p>
-          </div>
-        </div>
+        {quest.icon || '📜'}
+      </div>
+
+      {/* Información principal */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <h4 style={{ 
+          color: 'white', 
+          margin: '0 0 0.25rem 0',
+          fontSize: '1.1rem',
+          fontWeight: '600'
+        }}>
+          {quest.name}
+        </h4>
         
-        {/* Badges */}
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-          <span style={{
-            background: `${statusColors[quest.status]}20`,
-            color: statusColors[quest.status],
-            padding: '0.25rem 0.5rem',
-            borderRadius: '8px',
-            fontSize: '0.75rem',
-            fontWeight: '600'
-          }}>
-            {quest.status}
-          </span>
-          <span style={{
-            background: `${priorityColors[quest.priority]}20`,
-            color: priorityColors[quest.priority],
-            padding: '0.25rem 0.5rem',
-            borderRadius: '8px',
-            fontSize: '0.75rem',
-            fontWeight: '600'
-          }}>
-            {quest.priority}
-          </span>
-          {connectionCount > 0 && (
+        {/* Estado y prioridad */}
+        <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
+          {quest.status && (
             <span style={{
-              background: 'rgba(139, 92, 246, 0.2)',
-              color: '#a78bfa',
               padding: '0.25rem 0.5rem',
-              borderRadius: '8px',
+              background: `${getStatusColor(quest.status)}20`,
+              color: getStatusColor(quest.status),
+              borderRadius: '6px',
               fontSize: '0.75rem',
               fontWeight: '600'
             }}>
-              🔗 {connectionCount}
+              {quest.status === 'Completada' && '✅'} 
+              {quest.status === 'En progreso' && '⏳'} 
+              {quest.status === 'Pendiente' && '⏸️'} 
+              {quest.status === 'Fallida' && '❌'} 
+              {quest.status}
+            </span>
+          )}
+          
+          {quest.priority && (
+            <span style={{
+              padding: '0.25rem 0.5rem',
+              background: `${getPriorityColor(quest.priority)}20`,
+              color: getPriorityColor(quest.priority),
+              borderRadius: '6px',
+              fontSize: '0.75rem',
+              fontWeight: '600'
+            }}>
+              {quest.priority === 'Alta' && '🔥'} 
+              {quest.priority === 'Media' && '⭐'} 
+              {quest.priority === 'Baja' && '💫'} 
+              {quest.priority}
             </span>
           )}
         </div>
+
+        {/* Ubicación y recompensa */}
+        <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+          {quest.location && (
+            <p style={{ margin: '0 0 0.25rem 0' }}>
+              📍 {quest.location}
+            </p>
+          )}
+          {quest.reward && (
+            <p style={{ margin: 0 }}>
+              💰 {quest.reward}
+            </p>
+          )}
+        </div>
+
+        {/* Descripción corta */}
+        {quest.description && (
+          <p style={{ 
+            color: 'var(--text-muted)', 
+            margin: '0.5rem 0 0 0',
+            fontSize: '0.85rem',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}>
+            {quest.description}
+          </p>
+        )}
       </div>
-
-      {/* Descripción */}
-      <p style={{ 
-        color: 'var(--text-secondary)', 
-        marginBottom: '1rem',
-        lineHeight: '1.5',
-        display: '-webkit-box',
-        WebkitLineClamp: 2,
-        WebkitBoxOrient: 'vertical',
-        overflow: 'hidden'
-      }}>
-        {quest.description}
-      </p>
-
-      {/* Recompensa */}
-      {quest.reward && (
-        <p style={{ 
-          color: 'var(--text-muted)', 
-          fontSize: '0.9rem',
-          marginBottom: '1rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem'
-        }}>
-          💰 {quest.reward}
-        </p>
-      )}
 
       {/* Acciones */}
       <div style={{ 
         display: 'flex', 
         gap: '0.5rem',
-        justifyContent: 'flex-end'
+        marginLeft: 'auto'
       }}>
         <button
           onClick={(e) => {
             e.stopPropagation()
-            onEdit(quest)
+            onEdit()
           }}
           style={{
             background: 'rgba(139, 92, 246, 0.2)',
@@ -285,7 +301,7 @@ function QuestCard({ quest, onEdit, onDelete, onSelect, isSelected, connectionCo
         <button
           onClick={(e) => {
             e.stopPropagation()
-            onDelete(quest.id, quest.title)
+            onDelete()
           }}
           style={{
             background: 'rgba(239, 68, 68, 0.2)',
@@ -309,89 +325,138 @@ function QuestDetails({ quest, onClose, onEdit, onDelete, connections, campaign 
   // Obtener elementos conectados
   const linkedItems = connections?.getLinkedItems(quest) || {}
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Completada': return '#10b981'
+      case 'En progreso': return '#f59e0b'
+      case 'Pendiente': return '#6b7280'
+      case 'Fallida': return '#ef4444'
+      default: return '#6b7280'
+    }
+  }
+
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case 'Alta': return '#ef4444'
+      case 'Media': return '#f59e0b'
+      case 'Baja': return '#10b981'
+      default: return '#6b7280'
+    }
+  }
+
   return (
     <div style={{
       background: 'var(--glass-bg)',
       border: '1px solid var(--glass-border)',
       borderRadius: '16px',
       padding: '2rem',
-      height: 'fit-content',
       position: 'sticky',
       top: '2rem',
       maxHeight: 'calc(100vh - 4rem)',
       overflowY: 'auto'
     }}>
       {/* Header */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
         alignItems: 'flex-start',
-        marginBottom: '1.5rem'
+        marginBottom: '2rem'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ fontSize: '3rem' }}>{quest.icon}</span>
+          <div style={{ fontSize: '3rem' }}>
+            {quest.icon || '📜'}
+          </div>
           <div>
-            <h3 style={{ 
-              color: 'white', 
-              fontSize: '1.5rem', 
-              fontWeight: 'bold',
-              margin: 0
-            }}>
-              {quest.title}
+            <h3 style={{ color: 'white', margin: 0, fontSize: '1.5rem' }}>
+              {quest.name}
             </h3>
-            <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>
-              {quest.status} • Prioridad {quest.priority}
-            </p>
+            
+            {/* Estado y prioridad */}
+            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+              {quest.status && (
+                <span style={{
+                  padding: '0.5rem 1rem',
+                  background: `${getStatusColor(quest.status)}20`,
+                  color: getStatusColor(quest.status),
+                  borderRadius: '8px',
+                  fontSize: '0.9rem',
+                  fontWeight: '600'
+                }}>
+                  {quest.status === 'Completada' && '✅ '} 
+                  {quest.status === 'En progreso' && '⏳ '} 
+                  {quest.status === 'Pendiente' && '⏸️ '} 
+                  {quest.status === 'Fallida' && '❌ '} 
+                  {quest.status}
+                </span>
+              )}
+              
+              {quest.priority && (
+                <span style={{
+                  padding: '0.5rem 1rem',
+                  background: `${getPriorityColor(quest.priority)}20`,
+                  color: getPriorityColor(quest.priority),
+                  borderRadius: '8px',
+                  fontSize: '0.9rem',
+                  fontWeight: '600'
+                }}>
+                  {quest.priority === 'Alta' && '🔥 '} 
+                  {quest.priority === 'Media' && '⭐ '} 
+                  {quest.priority === 'Baja' && '💫 '} 
+                  {quest.priority}
+                </span>
+              )}
+            </div>
           </div>
         </div>
         <button
           onClick={onClose}
           style={{
-            background: 'rgba(107, 114, 128, 0.2)',
-            border: '1px solid rgba(107, 114, 128, 0.3)',
-            borderRadius: '6px',
-            color: '#9ca3af',
-            padding: '0.25rem 0.5rem',
-            cursor: 'pointer',
-            fontSize: '0.8rem'
+            background: 'rgba(239, 68, 68, 0.2)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '8px',
+            color: '#ef4444',
+            padding: '0.5rem',
+            cursor: 'pointer'
           }}
         >
           ✕
         </button>
       </div>
 
-      {/* Descripción */}
+      {/* Información básica */}
       <div style={{ marginBottom: '2rem' }}>
-        <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Descripción</h4>
-        <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-          {quest.description}
-        </p>
+        {quest.description && (
+          <div style={{ marginBottom: '1rem' }}>
+            <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Descripción</h4>
+            <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+              {quest.description}
+            </p>
+          </div>
+        )}
+
+        {quest.location && (
+          <div style={{ marginBottom: '1rem' }}>
+            <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Ubicación</h4>
+            <p style={{ color: 'var(--text-secondary)' }}>
+              📍 {quest.location}
+            </p>
+          </div>
+        )}
+
+        {quest.reward && (
+          <div style={{ marginBottom: '1rem' }}>
+            <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Recompensa</h4>
+            <p style={{ color: 'var(--text-secondary)' }}>
+              💰 {quest.reward}
+            </p>
+          </div>
+        )}
       </div>
 
-      {/* Ubicación */}
-      {quest.location && (
-        <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Ubicación</h4>
-          <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-            {quest.location}
-          </p>
-        </div>
-      )}
-
-      {/* Recompensa */}
-      {quest.reward && (
-        <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Recompensa</h4>
-          <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-            {quest.reward}
-          </p>
-        </div>
-      )}
-
-      {/* Notas */}
+      {/* Notas del DM */}
       {quest.notes && (
         <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Notas</h4>
+          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Notas del DM</h4>
           <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
             {quest.notes}
           </p>
@@ -407,6 +472,7 @@ function QuestDetails({ quest, onClose, onEdit, onDelete, connections, campaign 
             linkedItems={linkedItems}
             onRemoveConnection={connections.removeConnection}
             onOpenConnectionModal={connections.openConnectionModal}
+            onNavigateToItem={connections.navigateToItem}
           />
         </div>
       )}
@@ -442,7 +508,7 @@ function QuestDetails({ quest, onClose, onEdit, onDelete, connections, campaign 
 // Formulario para crear/editar misiones
 function QuestForm({ quest, onSave, onClose }) {
   const [formData, setFormData] = useState({
-    title: quest?.title || '',
+    name: quest?.name || '',
     description: quest?.description || '',
     status: quest?.status || 'Pendiente',
     priority: quest?.priority || 'Media',
@@ -456,45 +522,31 @@ function QuestForm({ quest, onSave, onClose }) {
 
   // Opciones para selects
   const statusOptions = ['Pendiente', 'En progreso', 'Completada', 'Fallida']
-  const priorityOptions = ['Baja', 'Media', 'Alta', 'Crítica']
-
-  const iconOptions = [
-    '📜', '🗡️', '⚔️', '🛡️', '🏹', '👑', '💎', '🔮', '📚', '🗝️', '⚰️', '🏰',
-    '🗼', '🌋', '🗻', '🏞️', '🎯', '🎪', '🎭', '⚡', '🔥', '💫', '⭐', '🌟',
-    '🤴', '👸', '🧙', '🧝', '🧛', '🧚', '👹', '👺', '💀', '☠️', '🎲'
-  ]
+  const priorityOptions = ['Alta', 'Media', 'Baja']
 
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
     
-    // Limpiar error cuando el usuario empiece a escribir
-    if (errors[name]) {
+    // Limpiar error si el campo ahora tiene valor
+    if (errors[name] && value.trim()) {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
-  }
-
-  const validateForm = () => {
-    const newErrors = {}
-    
-    if (!formData.title.trim()) {
-      newErrors.title = 'El título es obligatorio'
-    }
-    
-    if (!formData.description.trim()) {
-      newErrors.description = 'La descripción es obligatoria'
-    }
-    
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
     
-    if (!validateForm()) return
+    // Validaciones
+    const newErrors = {}
+    if (!formData.name.trim()) newErrors.name = 'El nombre es obligatorio'
+    if (!formData.description.trim()) newErrors.description = 'La descripción es obligatoria'
     
-    onSave(formData)
+    setErrors(newErrors)
+    
+    if (Object.keys(newErrors).length === 0) {
+      onSave(formData)
+    }
   }
 
   return (
@@ -502,97 +554,86 @@ function QuestForm({ quest, onSave, onClose }) {
       position: 'fixed',
       top: 0,
       left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.85)',
+      width: '100%',
+      height: '100%',
+      background: 'rgba(0, 0, 0, 0.8)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 1000,
-      padding: '1rem'
+      backdropFilter: 'blur(10px)'
     }}>
       <div style={{
         background: 'var(--glass-bg)',
-        backdropFilter: 'blur(20px)',
         border: '1px solid var(--glass-border)',
         borderRadius: '20px',
         padding: '2rem',
+        width: '90%',
         maxWidth: '600px',
-        width: '100%',
         maxHeight: '90vh',
-        overflowY: 'auto',
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)'
+        overflowY: 'auto'
       }}>
-        {/* Header */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
+        <h2 style={{ 
+          color: 'white', 
+          marginBottom: '2rem',
+          display: 'flex',
           alignItems: 'center',
-          marginBottom: '2rem'
+          gap: '0.5rem'
         }}>
-          <h3 style={{ 
-            fontSize: '1.8rem',
-            fontWeight: 'bold',
-            color: 'white',
-            margin: 0
-          }}>
-            {quest ? '✏️ Editar Misión' : '➕ Nueva Misión'}
-          </h3>
-          <button onClick={onClose} style={{
-            background: 'rgba(107, 114, 128, 0.2)',
-            border: '1px solid rgba(107, 114, 128, 0.3)',
-            borderRadius: '6px',
-            color: '#9ca3af',
-            padding: '0.5rem',
-            cursor: 'pointer',
-            fontSize: '1rem'
-          }}>
-            ✕
-          </button>
-        </div>
+          {quest ? '✏️ Editar Misión' : '📜 Nueva Misión'}
+        </h2>
 
-        {/* Formulario */}
         <form onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gap: '1.5rem' }}>
-            
-            {/* Título e Icono */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '1rem' }}>
-              <div>
-                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                  Título de la Misión
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  placeholder="Ej: El Rescate del Príncipe Perdido"
-                  className="input-field"
-                  style={{ border: errors.title ? '1px solid #ef4444' : undefined }}
-                />
-                {errors.title && (
-                  <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
-                    {errors.title}
-                  </p>
-                )}
-              </div>
-              
-              <div>
-                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                  Icono
-                </label>
-                <select
-                  name="icon"
-                  value={formData.icon}
-                  onChange={handleChange}
-                  className="input-field"
-                  style={{ fontSize: '1.5rem', textAlign: 'center', width: '60px' }}
-                >
-                  {iconOptions.map(icon => (
-                    <option key={icon} value={icon}>{icon}</option>
-                  ))}
-                </select>
-              </div>
+          <div style={{
+            display: 'grid',
+            gap: '1.5rem',
+            marginBottom: '2rem'
+          }}>
+            {/* Nombre */}
+            <div>
+              <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+                Nombre de la misión *
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Ej: Recuperar el Amuleto Perdido"
+                className="input-field"
+                style={{
+                  borderColor: errors.name ? '#ef4444' : undefined
+                }}
+              />
+              {errors.name && (
+                <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
+                  {errors.name}
+                </p>
+              )}
+            </div>
+
+            {/* Descripción */}
+            <div>
+              <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+                Descripción *
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Describe la misión: objetivos, contexto, lo que deben hacer los jugadores..."
+                className="input-field"
+                style={{ 
+                  minHeight: '100px', 
+                  resize: 'vertical',
+                  borderColor: errors.description ? '#ef4444' : undefined
+                }}
+              />
+              {errors.description && (
+                <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
+                  {errors.description}
+                </p>
+              )}
             </div>
 
             {/* Estado y Prioridad */}
@@ -608,7 +649,9 @@ function QuestForm({ quest, onSave, onClose }) {
                   className="input-field"
                 >
                   {statusOptions.map(status => (
-                    <option key={status} value={status}>{status}</option>
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -624,34 +667,12 @@ function QuestForm({ quest, onSave, onClose }) {
                   className="input-field"
                 >
                   {priorityOptions.map(priority => (
-                    <option key={priority} value={priority}>{priority}</option>
+                    <option key={priority} value={priority}>
+                      {priority}
+                    </option>
                   ))}
                 </select>
               </div>
-            </div>
-
-            {/* Descripción */}
-            <div>
-              <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                Descripción
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Describe los objetivos y contexto de la misión..."
-                className="input-field"
-                style={{ 
-                  minHeight: '100px', 
-                  resize: 'vertical',
-                  border: errors.description ? '1px solid #ef4444' : undefined
-                }}
-              />
-              {errors.description && (
-                <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
-                  {errors.description}
-                </p>
-              )}
             </div>
 
             {/* Ubicación */}

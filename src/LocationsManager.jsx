@@ -1,11 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useCRUD } from './hooks/useCRUD'
 import ConnectionsDisplay from './components/ConnectionsDisplay'
 
-// 🎯 SIN DATOS DE EJEMPLO - usa directamente los datos de la campaña
-
-function LocationsManager({ campaign, connections }) {
-  // ✨ Hook CRUD para manejar todos los estados - USA DATOS DE LA CAMPAÑA
+function LocationsManager({ campaign, connections, selectedItemForNavigation }) {
+  // ✨ Hook CRUD para manejar todos los estados
   const {
     items: locations,
     showForm,
@@ -18,11 +16,25 @@ function LocationsManager({ campaign, connections }) {
     openCreateForm,
     openEditForm,
     closeForm,
-    closeDetails
+    closeDetails,
+    NotificationComponent
   } = useCRUD(campaign.locations || [], 'Lugar')
+
+  // ✨ Efecto para seleccionar automáticamente un lugar cuando se navega desde conexiones
+  useEffect(() => {
+    if (selectedItemForNavigation && selectedItemForNavigation.type === 'locations') {
+      const locationToSelect = locations.find(location => location.id === selectedItemForNavigation.item.id)
+      if (locationToSelect) {
+        selectLocation(locationToSelect)
+      }
+    }
+  }, [selectedItemForNavigation, locations, selectLocation])
 
   return (
     <div className="fade-in">
+      {/* ✨ Componente de notificación */}
+      <NotificationComponent />
+
       {/* Header */}
       <div style={{ 
         display: 'flex', 
@@ -43,7 +55,7 @@ function LocationsManager({ campaign, connections }) {
             📍 Lugares
           </h2>
           <p style={{ color: 'var(--text-muted)', margin: '0.5rem 0 0 0' }}>
-            Los lugares dan vida a tu mundo de {campaign.name}
+            Los escenarios donde transcurren las aventuras de {campaign.name}
           </p>
         </div>
         <button onClick={openCreateForm} className="btn-primary">
@@ -64,20 +76,27 @@ function LocationsManager({ campaign, connections }) {
           {isEmpty ? (
             <EmptyState onAddFirst={openCreateForm} />
           ) : (
-            <LocationsList 
-              locations={locations}
-              onEdit={openEditForm}
-              onDelete={handleDelete}
-              onSelect={selectLocation}
-              selectedId={selectedLocation?.id}
-              connections={connections}
-            />
+            <div style={{
+              display: 'grid',
+              gap: '1rem'
+            }}>
+              {locations.map(location => (
+                <LocationCard
+                  key={location.id}
+                  location={location}
+                  isSelected={selectedLocation?.id === location.id}
+                  onClick={() => selectLocation(location)}
+                  onEdit={() => openEditForm(location)}
+                  onDelete={() => handleDelete(location.id, location.name)}
+                />
+              ))}
+            </div>
           )}
         </div>
 
         {/* Panel de detalles */}
         {selectedLocation && (
-          <LocationDetails 
+          <LocationDetails
             location={selectedLocation}
             onClose={closeDetails}
             onEdit={() => openEditForm(selectedLocation)}
@@ -88,7 +107,7 @@ function LocationsManager({ campaign, connections }) {
         )}
       </div>
 
-      {/* Formulario modal */}
+      {/* Modal de formulario */}
       {showForm && (
         <LocationForm
           location={editingItem}
@@ -100,173 +119,139 @@ function LocationsManager({ campaign, connections }) {
   )
 }
 
-// Componente de estado vacío
+// Estado vacío
 function EmptyState({ onAddFirst }) {
   return (
-    <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
-      <div style={{ fontSize: '5rem', marginBottom: '1rem' }}>📍</div>
-      <h3 style={{ color: 'var(--text-muted)', fontSize: '1.5rem', marginBottom: '1rem' }}>
-        No hay lugares creados
+    <div style={{
+      textAlign: 'center',
+      padding: '4rem 2rem',
+      color: 'var(--text-muted)'
+    }}>
+      <div style={{ fontSize: '4rem', marginBottom: '1rem', opacity: 0.5 }}>
+        📍
+      </div>
+      <h3 style={{ color: 'white', marginBottom: '1rem' }}>
+        No hay lugares creados aún
       </h3>
-      <p style={{ color: 'var(--text-disabled)', marginBottom: '2rem' }}>
-        Los lugares dan vida a tu mundo. Crea ciudades, mazmorras, bosques y territorios épicos.
+      <p style={{ marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem' }}>
+        Los lugares son los escenarios donde transcurren tus aventuras. 
+        Crea ciudades, mazmorras, bosques y cualquier ubicación importante.
       </p>
       <button onClick={onAddFirst} className="btn-primary">
-        📍 Crear el primer lugar
+        📍 Crear Primer Lugar
       </button>
     </div>
   )
 }
 
-// Lista de lugares
-function LocationsList({ locations, onEdit, onDelete, onSelect, selectedId, connections }) {
-  return (
-    <div style={{ display: 'grid', gap: '1rem' }}>
-      {locations.map(location => (
-        <LocationCard
-          key={location.id}
-          location={location}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          onSelect={onSelect}
-          isSelected={selectedId === location.id}
-          connectionCount={connections?.getConnectionCount(location) || 0}
-        />
-      ))}
-    </div>
-  )
-}
-
-// Tarjeta individual de lugar
-function LocationCard({ location, onEdit, onDelete, onSelect, isSelected, connectionCount }) {
-  const importanceColors = {
-    'Baja': '#6b7280',
-    'Media': '#f59e0b',
-    'Alta': '#ef4444'
-  }
-
-  const typeColors = {
-    'Ciudad': '#3b82f6',
-    'Mazmorra': '#8b5cf6',
-    'Naturaleza': '#10b981',
-    'Comercio': '#f59e0b',
-    'Fortaleza': '#ef4444',
-    'Templo': '#06b6d4',
-    'Otro': '#9ca3af'
+// Tarjeta de lugar
+function LocationCard({ location, isSelected, onClick, onEdit, onDelete }) {
+  const getImportanceColor = (importance) => {
+    switch (importance) {
+      case 'Alta': return '#ef4444'
+      case 'Media': return '#f59e0b'
+      case 'Baja': return '#10b981'
+      default: return '#6b7280'
+    }
   }
 
   return (
     <div
-      onClick={() => onSelect(location)}
+      onClick={onClick}
       style={{
         background: isSelected 
-          ? 'rgba(139, 92, 246, 0.15)' 
-          : 'var(--glass-bg)',
-        border: `1px solid ${isSelected 
-          ? 'rgba(139, 92, 246, 0.5)' 
-          : 'var(--glass-border)'}`,
-        borderRadius: '16px',
+          ? 'rgba(139, 92, 246, 0.2)' 
+          : 'rgba(31, 41, 55, 0.5)',
+        border: isSelected 
+          ? '1px solid rgba(139, 92, 246, 0.5)' 
+          : '1px solid rgba(139, 92, 246, 0.1)',
+        borderRadius: '12px',
         padding: '1.5rem',
         cursor: 'pointer',
-        transition: 'all 0.3s ease',
-        position: 'relative'
+        transition: 'all 0.2s ease',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1rem'
       }}
+      className="location-card"
     >
-      {/* Header */}
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'flex-start',
-        justifyContent: 'space-between',
-        marginBottom: '1rem'
+      {/* Icono */}
+      <div style={{
+        fontSize: '2rem',
+        flexShrink: 0,
+        width: '50px',
+        height: '50px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(59, 130, 246, 0.2)',
+        borderRadius: '10px'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <span style={{ fontSize: '2rem' }}>{location.icon}</span>
-          <div>
-            <h3 style={{ 
-              color: 'white', 
-              fontSize: '1.2rem', 
-              fontWeight: 'bold',
-              margin: 0
-            }}>
-              {location.name}
-            </h3>
-            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.25rem' }}>
-              <span style={{
-                background: `${typeColors[location.type] || '#9ca3af'}20`,
-                color: typeColors[location.type] || '#9ca3af',
-                padding: '0.125rem 0.5rem',
-                borderRadius: '12px',
-                fontSize: '0.75rem',
-                fontWeight: '600'
-              }}>
-                {location.type}
-              </span>
-              <span style={{
-                background: `${importanceColors[location.importance] || '#6b7280'}20`,
-                color: importanceColors[location.importance] || '#6b7280',
-                padding: '0.125rem 0.5rem',
-                borderRadius: '12px',
-                fontSize: '0.75rem',
-                fontWeight: '600'
-              }}>
-                {location.importance}
-              </span>
-            </div>
-          </div>
-        </div>
+        {location.icon || '🏛️'}
+      </div>
 
-        {/* Conexiones */}
-        {connectionCount > 0 && (
-          <div style={{
-            background: 'rgba(139, 92, 246, 0.2)',
-            color: '#a78bfa',
+      {/* Información principal */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <h4 style={{ 
+          color: 'white', 
+          margin: '0 0 0.25rem 0',
+          fontSize: '1.1rem',
+          fontWeight: '600'
+        }}>
+          {location.name}
+        </h4>
+        <p style={{ 
+          color: 'var(--text-muted)', 
+          margin: '0 0 0.25rem 0',
+          fontSize: '0.9rem',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap'
+        }}>
+          {location.description}
+        </p>
+        
+        {/* Importancia */}
+        {location.importance && (
+          <span style={{
+            display: 'inline-block',
+            marginTop: '0.5rem',
             padding: '0.25rem 0.5rem',
-            borderRadius: '12px',
+            background: `${getImportanceColor(location.importance)}20`,
+            color: getImportanceColor(location.importance),
+            borderRadius: '6px',
             fontSize: '0.75rem',
             fontWeight: '600'
           }}>
-            🔗 {connectionCount}
-          </div>
+            {location.importance === 'Alta' && '🔥'} 
+            {location.importance === 'Media' && '⭐'} 
+            {location.importance === 'Baja' && '💫'} 
+            {location.importance} importancia
+          </span>
+        )}
+
+        {/* Habitantes */}
+        {location.inhabitants && (
+          <p style={{ 
+            color: '#6b7280', 
+            margin: '0.25rem 0 0 0',
+            fontSize: '0.8rem'
+          }}>
+            👥 {location.inhabitants}
+          </p>
         )}
       </div>
-
-      {/* Descripción */}
-      <p style={{ 
-        color: 'var(--text-secondary)', 
-        marginBottom: '1rem',
-        lineHeight: '1.5',
-        display: '-webkit-box',
-        WebkitLineClamp: 2,
-        WebkitBoxOrient: 'vertical',
-        overflow: 'hidden'
-      }}>
-        {location.description}
-      </p>
-
-      {/* Habitantes */}
-      {location.inhabitants && (
-        <p style={{ 
-          color: 'var(--text-muted)', 
-          fontSize: '0.9rem',
-          marginBottom: '1rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem'
-        }}>
-          👥 {location.inhabitants}
-        </p>
-      )}
 
       {/* Acciones */}
       <div style={{ 
         display: 'flex', 
         gap: '0.5rem',
-        justifyContent: 'flex-end'
+        marginLeft: 'auto'
       }}>
         <button
           onClick={(e) => {
             e.stopPropagation()
-            onEdit(location)
+            onEdit()
           }}
           style={{
             background: 'rgba(139, 92, 246, 0.2)',
@@ -283,7 +268,7 @@ function LocationCard({ location, onEdit, onDelete, onSelect, isSelected, connec
         <button
           onClick={(e) => {
             e.stopPropagation()
-            onDelete(location.id, location.name)
+            onDelete()
           }}
           style={{
             background: 'rgba(239, 68, 68, 0.2)',
@@ -313,78 +298,89 @@ function LocationDetails({ location, onClose, onEdit, onDelete, connections, cam
       border: '1px solid var(--glass-border)',
       borderRadius: '16px',
       padding: '2rem',
-      height: 'fit-content',
       position: 'sticky',
-      top: '2rem'
+      top: '2rem',
+      maxHeight: 'calc(100vh - 4rem)',
+      overflowY: 'auto'
     }}>
       {/* Header */}
       <div style={{ 
         display: 'flex', 
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start',
         marginBottom: '2rem'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <span style={{ fontSize: '2.5rem' }}>{location.icon}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ fontSize: '3rem' }}>
+            {location.icon || '🏛️'}
+          </div>
           <div>
-            <h3 style={{ 
-              color: 'white', 
-              fontSize: '1.5rem', 
-              fontWeight: 'bold',
-              margin: 0
-            }}>
+            <h3 style={{ color: 'white', margin: 0, fontSize: '1.5rem' }}>
               {location.name}
             </h3>
-            <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>
-              {location.type} - {location.importance} importancia
-            </p>
+            {location.importance && (
+              <p style={{ 
+                color: location.importance === 'Alta' ? '#ef4444' : 
+                       location.importance === 'Media' ? '#f59e0b' : '#10b981',
+                margin: '0.25rem 0 0 0',
+                fontSize: '0.9rem',
+                fontWeight: '600'
+              }}>
+                {location.importance === 'Alta' && '🔥'} 
+                {location.importance === 'Media' && '⭐'} 
+                {location.importance === 'Baja' && '💫'} 
+                {location.importance} importancia
+              </p>
+            )}
           </div>
         </div>
         <button
           onClick={onClose}
           style={{
-            background: 'none',
-            border: 'none',
-            color: 'var(--text-muted)',
-            cursor: 'pointer',
-            fontSize: '1.5rem'
+            background: 'rgba(239, 68, 68, 0.2)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '8px',
+            color: '#ef4444',
+            padding: '0.5rem',
+            cursor: 'pointer'
           }}
         >
           ✕
         </button>
       </div>
 
-      {/* Descripción */}
-      {location.description && (
-        <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Descripción</h4>
-          <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-            {location.description}
-          </p>
-        </div>
-      )}
+      {/* Información básica */}
+      <div style={{ marginBottom: '2rem' }}>
+        {location.description && (
+          <div style={{ marginBottom: '1rem' }}>
+            <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Descripción</h4>
+            <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+              {location.description}
+            </p>
+          </div>
+        )}
 
-      {/* Habitantes */}
-      {location.inhabitants && (
-        <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Habitantes</h4>
-          <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-            👥 {location.inhabitants}
-          </p>
-        </div>
-      )}
+        {location.inhabitants && (
+          <div style={{ marginBottom: '1rem' }}>
+            <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Habitantes</h4>
+            <p style={{ color: 'var(--text-secondary)' }}>
+              👥 {location.inhabitants}
+            </p>
+          </div>
+        )}
+      </div>
 
-      {/* Notas */}
+      {/* Notas del DM */}
       {location.notes && (
         <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Notas</h4>
+          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Notas del DM</h4>
           <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
             {location.notes}
           </p>
         </div>
       )}
 
-      {/* 🔗 SISTEMA DE CONEXIONES */}
+      {/* 🔗 SISTEMA DE CONEXIONES CON NAVEGACIÓN */}
       {connections && (
         <div style={{ marginBottom: '2rem' }}>
           <ConnectionsDisplay
@@ -393,6 +389,7 @@ function LocationDetails({ location, onClose, onEdit, onDelete, connections, cam
             linkedItems={linkedItems}
             onRemoveConnection={connections.removeConnection}
             onOpenConnectionModal={connections.openConnectionModal}
+            onNavigateToItem={connections.navigateToItem}
           />
         </div>
       )}
@@ -429,89 +426,41 @@ function LocationDetails({ location, onClose, onEdit, onDelete, connections, cam
 function LocationForm({ location, onSave, onClose }) {
   const [formData, setFormData] = useState({
     name: location?.name || '',
-    type: location?.type || 'Ciudad',
     description: location?.description || '',
-    inhabitants: location?.inhabitants || '',
     importance: location?.importance || 'Media',
+    inhabitants: location?.inhabitants || '',
     notes: location?.notes || '',
-    icon: location?.icon || '🏰'
+    icon: location?.icon || '🏛️'
   })
 
   const [errors, setErrors] = useState({})
 
-  // Opciones para selects
-  const typeOptions = [
-    'Ciudad', 'Mazmorra', 'Naturaleza', 'Comercio', 
-    'Fortaleza', 'Templo', 'Otro'
-  ]
-  
-  const importanceOptions = ['Baja', 'Media', 'Alta']
+  // Opciones para el select de importancia
+  const importanceOptions = ['Alta', 'Media', 'Baja']
 
-  // Manejar cambios en los inputs
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
+    setFormData(prev => ({ ...prev, [name]: value }))
     
-    // Limpiar error cuando el usuario empiece a escribir
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }))
+    // Limpiar error si el campo ahora tiene valor
+    if (errors[name] && value.trim()) {
+      setErrors(prev => ({ ...prev, [name]: '' }))
     }
   }
 
-  // Validar formulario
-  const validateForm = () => {
-    const newErrors = {}
-    
-    if (!formData.name.trim()) {
-      newErrors.name = 'El nombre es obligatorio'
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'El nombre debe tener al menos 2 caracteres'
-    }
-    
-    if (!formData.description.trim()) {
-      newErrors.description = 'La descripción es obligatoria'
-    } else if (formData.description.trim().length < 10) {
-      newErrors.description = 'La descripción debe tener al menos 10 caracteres'
-    }
-    
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  // Manejar envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault()
     
-    if (!validateForm()) {
-      return
+    // Validaciones
+    const newErrors = {}
+    if (!formData.name.trim()) newErrors.name = 'El nombre es obligatorio'
+    if (!formData.description.trim()) newErrors.description = 'La descripción es obligatoria'
+    
+    setErrors(newErrors)
+    
+    if (Object.keys(newErrors).length === 0) {
+      onSave(formData)
     }
-
-    // Crear objeto de lugar
-    const locationData = {
-      id: location?.id || Date.now() + Math.random(),
-      ...formData,
-      name: formData.name.trim(),
-      description: formData.description.trim(),
-      inhabitants: formData.inhabitants.trim(),
-      notes: formData.notes.trim(),
-      linkedItems: location?.linkedItems || {
-        npcs: [],
-        players: [],
-        quests: [],
-        objects: [],
-        notes: []
-      },
-      createdAt: location?.createdAt || new Date().toISOString().split('T')[0],
-      lastModified: new Date().toISOString().split('T')[0]
-    }
-
-    onSave(locationData)
   }
 
   return (
@@ -519,39 +468,41 @@ function LocationForm({ location, onSave, onClose }) {
       position: 'fixed',
       top: 0,
       left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.85)',
+      width: '100%',
+      height: '100%',
+      background: 'rgba(0, 0, 0, 0.8)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 1000,
-      padding: '1rem'
+      backdropFilter: 'blur(10px)'
     }}>
       <div style={{
         background: 'var(--glass-bg)',
-        backdropFilter: 'blur(20px)',
         border: '1px solid var(--glass-border)',
         borderRadius: '20px',
         padding: '2rem',
+        width: '90%',
         maxWidth: '600px',
-        width: '100%',
         maxHeight: '90vh',
         overflowY: 'auto'
       }}>
-        <h3 style={{ 
+        <h2 style={{ 
           color: 'white', 
-          fontSize: '1.5rem',
           marginBottom: '2rem',
           display: 'flex',
           alignItems: 'center',
           gap: '0.5rem'
         }}>
-          📍 {location ? 'Editar Lugar' : 'Nuevo Lugar'}
-        </h3>
+          {location ? '✏️ Editar Lugar' : '📍 Nuevo Lugar'}
+        </h2>
 
         <form onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gap: '1.5rem' }}>
+          <div style={{
+            display: 'grid',
+            gap: '1.5rem',
+            marginBottom: '2rem'
+          }}>
             {/* Nombre */}
             <div>
               <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
@@ -565,7 +516,7 @@ function LocationForm({ location, onSave, onClose }) {
                 placeholder="Ej: Taberna del Dragón Dorado"
                 className="input-field"
                 style={{
-                  border: errors.name ? '1px solid #ef4444' : undefined
+                  borderColor: errors.name ? '#ef4444' : undefined
                 }}
               />
               {errors.name && (
@@ -573,45 +524,6 @@ function LocationForm({ location, onSave, onClose }) {
                   {errors.name}
                 </p>
               )}
-            </div>
-
-            {/* Tipo e Importancia */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <div>
-                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                  Tipo
-                </label>
-                <select
-                  name="type"
-                  value={formData.type}
-                  onChange={handleChange}
-                  className="input-field"
-                >
-                  {typeOptions.map(type => (
-                    <option key={type} value={type}>
-                      {type}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                  Importancia
-                </label>
-                <select
-                  name="importance"
-                  value={formData.importance}
-                  onChange={handleChange}
-                  className="input-field"
-                >
-                  {importanceOptions.map(importance => (
-                    <option key={importance} value={importance}>
-                      {importance}
-                    </option>
-                  ))}
-                </select>
-              </div>
             </div>
 
             {/* Descripción */}
@@ -623,12 +535,12 @@ function LocationForm({ location, onSave, onClose }) {
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                placeholder="Describe el lugar, su atmósfera, características distintivas..."
+                placeholder="Describe el lugar: su apariencia, atmósfera, características especiales..."
                 className="input-field"
                 style={{ 
                   minHeight: '100px', 
                   resize: 'vertical',
-                  border: errors.description ? '1px solid #ef4444' : undefined
+                  borderColor: errors.description ? '#ef4444' : undefined
                 }}
               />
               {errors.description && (
@@ -636,6 +548,25 @@ function LocationForm({ location, onSave, onClose }) {
                   {errors.description}
                 </p>
               )}
+            </div>
+
+            {/* Importancia */}
+            <div>
+              <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+                Importancia en la campaña
+              </label>
+              <select
+                name="importance"
+                value={formData.importance}
+                onChange={handleChange}
+                className="input-field"
+              >
+                {importanceOptions.map(importance => (
+                  <option key={importance} value={importance}>
+                    {importance}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Habitantes */}

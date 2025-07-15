@@ -25,6 +25,7 @@ const tabs = [
 function CampaignManager({ campaign, onBackToSelector }) {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [currentCampaign, setCurrentCampaign] = useState(campaign)
+  const [selectedItemForNavigation, setSelectedItemForNavigation] = useState(null)
   
   const updateCampaign = (updates) => {
     console.log('Actualizando campaña:', updates)
@@ -35,10 +36,29 @@ function CampaignManager({ campaign, onBackToSelector }) {
   const connections = useConnections(currentCampaign, updateCampaign)
   const search = useSearch(currentCampaign)
 
+  // ✨ Función para navegar a un elemento conectado
+  const navigateToItem = (item, itemType) => {
+    console.log('Navegando a:', itemType, item.name || item.title)
+    
+    // Cambiar a la pestaña correcta
+    setActiveTab(itemType)
+    
+    // Seleccionar el elemento específico
+    setSelectedItemForNavigation({
+      item,
+      type: itemType,
+      timestamp: Date.now() // Para forzar re-render
+    })
+    
+    // Limpiar la selección después de un momento para permitir navegación múltiple
+    setTimeout(() => {
+      setSelectedItemForNavigation(null)
+    }, 100)
+  }
+
   // Función para manejar click en resultado de búsqueda
   const handleSearchItemClick = (item, type) => {
-    setActiveTab(type)
-    console.log('Navegando a:', type, item.name || item.title)
+    navigateToItem(item, type)
     search.closeSearch()
   }
 
@@ -73,63 +93,60 @@ function CampaignManager({ campaign, onBackToSelector }) {
                   className={`tab-clean ${activeTab === tab.id ? 'active' : ''}`}
                 >
                   <span>{tab.icon}</span>
-                  <span className="tab-text">{tab.name}</span>
+                  <span>{tab.name}</span>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* SECCIÓN 3: Buscador + Acciones */}
+          {/* SECCIÓN 3: Búsqueda y acciones */}
           <div className="nav-right">
-            {/* Buscador */}
-            <div className="search-clean">
-              <Search className="search-icon-clean" />
-              <input
-                type="text"
-                placeholder="Buscar..."
-                className="search-input-clean"
-                value={search.searchTerm}
-                onChange={(e) => search.handleSearchChange(e.target.value)}
-                onFocus={search.handleSearchFocus}
-                onBlur={search.handleSearchBlur}
-              />
-              
-              {search.showSearchDropdown && search.searchResults.length > 0 && (
-                <SearchDropdown
-                  searchTerm={search.searchTerm}
-                  results={search.searchResults}
-                  onItemClick={handleSearchItemClick}
-                  onClose={search.closeSearch}
+            <div className="search-container">
+              <div className="search-input-wrapper">
+                <input
+                  type="text"
+                  placeholder="Buscar..."
+                  value={search.searchTerm}
+                  onChange={(e) => search.setSearchTerm(e.target.value)}
+                  onFocus={() => search.setShowSearchDropdown(true)}
+                  className="search-input"
                 />
+                <Search size={16} className="search-icon" />
+              </div>
+              
+              {search.showSearchDropdown && (
+                <>
+                  <div 
+                    className="search-overlay"
+                    onClick={search.closeSearch}
+                  />
+                  <SearchDropdown
+                    searchTerm={search.searchTerm}
+                    results={search.searchResults}
+                    onItemClick={handleSearchItemClick}
+                    onClose={search.closeSearch}
+                  />
+                </>
               )}
             </div>
-
-            {/* Botón exportar */}
-            <button
-              className="export-btn-clean"
-              onClick={() => alert('Función de exportar - próximamente')}
-              title="Exportar campaña"
-            >
-              <Download size={14} />
-            </button>
           </div>
         </div>
       </nav>
 
       {/* Contenido principal */}
-      <div style={{
-        maxWidth: '1400px',
-        margin: '0 auto',
-        padding: '2rem 1rem',
-        minHeight: 'calc(100vh - 80px)'
+      <main style={{ 
+        padding: '2rem',
+        marginTop: '80px' // Para que no se superponga con la navegación fija
       }}>
         <TabContent 
           activeTab={activeTab} 
           campaign={currentCampaign} 
-          onTabChange={setActiveTab}
+          onTabChange={setActiveTab} 
           connections={connections}
+          onNavigateToItem={navigateToItem} // ✨ Pasar función de navegación
+          selectedItemForNavigation={selectedItemForNavigation} // ✨ Pasar elemento seleccionado
         />
-      </div>
+      </main>
 
       {/* Modal de conexiones */}
       {connections.showConnectionModal && connections.connectionSource && (
@@ -149,28 +166,46 @@ function CampaignManager({ campaign, onBackToSelector }) {
 }
 
 // Componente para renderizar el contenido de cada pestaña
-function TabContent({ activeTab, campaign, onTabChange, connections }) {
+function TabContent({ 
+  activeTab, 
+  campaign, 
+  onTabChange, 
+  connections, 
+  onNavigateToItem, 
+  selectedItemForNavigation 
+}) {
+  // Props comunes para todos los gestores
+  const commonProps = {
+    campaign,
+    connections: {
+      ...connections,
+      // ✨ Agregar función de navegación a connections
+      navigateToItem: onNavigateToItem
+    },
+    selectedItemForNavigation // ✨ Pasar elemento seleccionado para navegación
+  }
+
   switch (activeTab) {
     case 'dashboard':
       return <Dashboard campaign={campaign} onTabChange={onTabChange} />
     case 'locations':
-      return <LocationsManager campaign={campaign} connections={connections} />
+      return <LocationsManager {...commonProps} />
     case 'players':
-      return <PlayersManager campaign={campaign} connections={connections} />
+      return <PlayersManager {...commonProps} />
     case 'npcs':
-      return <NPCsManager campaign={campaign} connections={connections} />
+      return <NPCsManager {...commonProps} />
     case 'objects':
-      return <ObjectsManager campaign={campaign} connections={connections} />
+      return <ObjectsManager {...commonProps} />
     case 'quests':
-      return <QuestsManager campaign={campaign} connections={connections} />
+      return <QuestsManager {...commonProps} />
     case 'notes':
-      return <NotesManager campaign={campaign} connections={connections} />
+      return <NotesManager {...commonProps} />
     default:
       return <Dashboard campaign={campaign} onTabChange={onTabChange} />
   }
 }
 
-// ✨ Dashboard LIMPIO sin mensaje innecesario
+// ✨ Dashboard mejorado con navegación directa
 function Dashboard({ campaign, onTabChange }) {
   const getCount = (type) => {
     return campaign[type]?.length || 0
@@ -185,165 +220,120 @@ function Dashboard({ campaign, onTabChange }) {
         gap: '1.5rem',
         marginBottom: '3rem'
       }}>
-        <StatCard 
-          title="Lugares" 
-          value={getCount('locations')} 
-          icon="📍" 
+        <DashboardCard
+          title="Lugares"
+          count={getCount('locations')}
+          icon="📍"
           color="#3b82f6"
           onClick={() => onTabChange('locations')}
         />
-        <StatCard 
-          title="Jugadores" 
-          value={getCount('players')} 
-          icon="👥" 
+        <DashboardCard
+          title="Jugadores"
+          count={getCount('players')}
+          icon="👥"
           color="#10b981"
           onClick={() => onTabChange('players')}
         />
-        <StatCard 
-          title="NPCs" 
-          value={getCount('npcs')} 
-          icon="🧙" 
+        <DashboardCard
+          title="NPCs"
+          count={getCount('npcs')}
+          icon="🧙"
           color="#8b5cf6"
           onClick={() => onTabChange('npcs')}
         />
-        <StatCard 
-          title="Objetos" 
-          value={getCount('objects')} 
-          icon="📦" 
+        <DashboardCard
+          title="Objetos"
+          count={getCount('objects')}
+          icon="📦"
           color="#06b6d4"
           onClick={() => onTabChange('objects')}
         />
-        <StatCard 
-          title="Misiones" 
-          value={getCount('quests')} 
-          icon="📜" 
+        <DashboardCard
+          title="Misiones"
+          count={getCount('quests')}
+          icon="📜"
           color="#f59e0b"
           onClick={() => onTabChange('quests')}
         />
-        <StatCard 
-          title="Notas" 
-          value={getCount('notes')} 
-          icon="📝" 
-          color="#3b82f6"
+        <DashboardCard
+          title="Notas"
+          count={getCount('notes')}
+          icon="📝"
+          color="#ec4899"
           onClick={() => onTabChange('notes')}
         />
       </div>
 
-      {/* ✨ Información limpia del Dashboard */}
+      {/* Resumen de actividad reciente */}
       <div style={{
         background: 'var(--glass-bg)',
         border: '1px solid var(--glass-border)',
         borderRadius: '16px',
         padding: '2rem'
       }}>
-        <h2 style={{ 
-          color: 'white', 
-          fontSize: '1.5rem', 
+        <h3 style={{
+          color: 'white',
+          fontSize: '1.5rem',
           marginBottom: '1rem',
           display: 'flex',
           alignItems: 'center',
           gap: '0.5rem'
         }}>
-          ⚡ Bienvenido a {campaign.name}
-        </h2>
+          📊 Resumen de la Campaña
+        </h3>
         
-        <p style={{ 
-          color: 'var(--text-muted)', 
-          marginBottom: '1.5rem',
-          lineHeight: '1.6'
-        }}>
-          Desde aquí puedes gestionar todos los elementos de tu campaña. 
-          Usa las pestañas superiores para navegar entre diferentes secciones.
-        </p>
-
-        {/* ✨ Grid de acciones rápidas */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '1rem',
-          marginTop: '2rem'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gap: '1.5rem'
         }}>
-          <QuickActionCard
-            title="Crear Lugar"
-            description="Añade un nuevo lugar a tu mundo"
-            icon="📍"
-            color="#3b82f6"
-            onClick={() => onTabChange('locations')}
-          />
-          <QuickActionCard
-            title="Añadir NPC"
-            description="Crea un personaje para tu historia"
-            icon="🧙"
-            color="#8b5cf6"
-            onClick={() => onTabChange('npcs')}
-          />
-          <QuickActionCard
-            title="Nueva Misión"
-            description="Planifica la siguiente aventura"
-            icon="📜"
-            color="#f59e0b"
-            onClick={() => onTabChange('quests')}
-          />
-          <QuickActionCard
-            title="Tomar Notas"
-            description="Guarda ideas importantes"
-            icon="📝"
-            color="#3b82f6"
-            onClick={() => onTabChange('notes')}
-          />
+          <div>
+            <h4 style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+              📈 Estadísticas Generales
+            </h4>
+            <ul style={{ color: 'var(--text-muted)', lineHeight: 1.6 }}>
+              <li>Total de elementos: {getCount('locations') + getCount('players') + getCount('npcs') + getCount('objects') + getCount('quests') + getCount('notes')}</li>
+              <li>Campaña creada: {new Date(campaign.createdAt).toLocaleDateString()}</li>
+              <li>Última modificación: {new Date(campaign.lastModified).toLocaleDateString()}</li>
+            </ul>
+          </div>
+          
+          <div>
+            <h4 style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+              🎯 Acciones Rápidas
+            </h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <button
+                onClick={() => onTabChange('locations')}
+                className="btn-secondary"
+                style={{ justifyContent: 'flex-start' }}
+              >
+                📍 Gestionar Lugares
+              </button>
+              <button
+                onClick={() => onTabChange('quests')}
+                className="btn-secondary"
+                style={{ justifyContent: 'flex-start' }}
+              >
+                📜 Ver Misiones
+              </button>
+              <button
+                onClick={() => onTabChange('notes')}
+                className="btn-secondary"
+                style={{ justifyContent: 'flex-start' }}
+              >
+                📝 Revisar Notas
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-// ✨ Tarjeta de estadística mejorada
-function StatCard({ title, value, icon, color, onClick }) {
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        background: 'var(--glass-bg)',
-        border: '1px solid var(--glass-border)',
-        borderRadius: '16px',
-        padding: '1.5rem',
-        cursor: 'pointer',
-        transition: 'all 0.3s ease',
-        textAlign: 'center',
-        position: 'relative',
-        overflow: 'hidden'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-4px)'
-        e.currentTarget.style.boxShadow = `0 8px 25px ${color}30`
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)'
-        e.currentTarget.style.boxShadow = 'none'
-      }}
-    >
-      <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>{icon}</div>
-      <div style={{ 
-        fontSize: '2.5rem', 
-        fontWeight: 'bold', 
-        color, 
-        marginBottom: '0.5rem' 
-      }}>
-        {value}
-      </div>
-      <div style={{ 
-        color: 'var(--text-muted)', 
-        fontSize: '1rem', 
-        fontWeight: '500' 
-      }}>
-        {title}
-      </div>
-    </div>
-  )
-}
-
-// ✨ Componente nuevo: Tarjeta de acción rápida
-function QuickActionCard({ title, description, icon, color, onClick }) {
+// Componente para las tarjetas del dashboard
+function DashboardCard({ title, count, icon, color, onClick, description }) {
   return (
     <div
       onClick={onClick}
@@ -382,13 +372,23 @@ function QuickActionCard({ title, description, icon, color, onClick }) {
           {title}
         </h4>
       </div>
+      
+      <div style={{
+        fontSize: '2rem',
+        fontWeight: 'bold',
+        color: color,
+        marginBottom: '0.5rem'
+      }}>
+        {count}
+      </div>
+      
       <p style={{ 
         color: 'var(--text-muted)', 
         fontSize: '0.875rem',
         margin: 0,
         lineHeight: '1.4'
       }}>
-        {description}
+        {description || `${count === 1 ? 'elemento' : 'elementos'} en total`}
       </p>
     </div>
   )

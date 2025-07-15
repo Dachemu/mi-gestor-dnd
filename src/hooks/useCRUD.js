@@ -3,7 +3,7 @@ import { useState } from 'react'
 /**
  * Hook personalizado para manejar operaciones CRUD de manera uniforme
  * Elimina código duplicado entre todos los gestores
- * ✅ ACTUALIZADO con protección para linkedItems
+ * ✅ ACTUALIZADO sin JSX - solo lógica pura
  */
 export function useCRUD(initialData = [], itemName = 'elemento') {
   // Estados principales
@@ -11,6 +11,7 @@ export function useCRUD(initialData = [], itemName = 'elemento') {
   const [showForm, setShowForm] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
   const [selectedItem, setSelectedItem] = useState(null)
+  const [notification, setNotification] = useState(null)
 
   // ✅ Función para inicializar linkedItems si no existe
   const ensureLinkedItems = (item) => {
@@ -30,6 +31,12 @@ export function useCRUD(initialData = [], itemName = 'elemento') {
     return item
   }
 
+  // Función para mostrar notificaciones temporales
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type })
+    setTimeout(() => setNotification(null), 2000)
+  }
+
   // Crear nuevo elemento
   const handleCreate = (itemData) => {
     const newItem = ensureLinkedItems({
@@ -40,7 +47,7 @@ export function useCRUD(initialData = [], itemName = 'elemento') {
     
     setItems(prev => [...prev, newItem])
     setShowForm(false)
-    alert(`¡${itemName} "${newItem.name || newItem.title}" creado exitosamente! 🎉`)
+    showNotification(`${itemName} "${newItem.name || newItem.title}" creado exitosamente`)
     return newItem
   }
 
@@ -63,35 +70,47 @@ export function useCRUD(initialData = [], itemName = 'elemento') {
     
     setEditingItem(null)
     setShowForm(false)
-    alert(`¡${itemName} "${itemData.name || itemData.title}" actualizado! ✨`)
+    showNotification(`${itemName} "${itemData.name || itemData.title}" actualizado`)
     return updatedItem
   }
 
+  // Guardar (crear o editar)
+  const handleSave = (itemData) => {
+    if (editingItem) {
+      return handleEdit(itemData)
+    } else {
+      return handleCreate(itemData)
+    }
+  }
+
   // Eliminar elemento
-  const handleDelete = (itemId, itemDisplayName) => {
-    if (window.confirm(`¿Estás seguro de que quieres eliminar "${itemDisplayName}"?`)) {
-      setItems(prev => prev.filter(item => item.id !== itemId))
+  const handleDelete = (id, name) => {
+    if (window.confirm(`¿Estás seguro de que quieres eliminar "${name}"?`)) {
+      setItems(prev => prev.filter(item => item.id !== id))
       
-      // Cerrar panel de detalles si se elimina el elemento seleccionado
-      if (selectedItem?.id === itemId) {
+      // Si el elemento eliminado estaba seleccionado, deseleccionar
+      if (selectedItem?.id === id) {
         setSelectedItem(null)
       }
       
-      alert(`${itemName} "${itemDisplayName}" eliminado`)
-      return true
+      showNotification(`${itemName} "${name}" eliminado`)
     }
-    return false
   }
 
-  // Abrir formulario para editar
-  const openEditForm = (item) => {
-    setEditingItem(ensureLinkedItems(item))
-    setShowForm(true)
+  // Seleccionar elemento para ver detalles
+  const selectItem = (item) => {
+    setSelectedItem(item)
   }
 
   // Abrir formulario para crear
   const openCreateForm = () => {
     setEditingItem(null)
+    setShowForm(true)
+  }
+
+  // Abrir formulario para editar
+  const openEditForm = (item) => {
+    setEditingItem(item)
     setShowForm(true)
   }
 
@@ -101,23 +120,12 @@ export function useCRUD(initialData = [], itemName = 'elemento') {
     setEditingItem(null)
   }
 
-  // Seleccionar elemento (para panel de detalles)
-  const selectItem = (item) => {
-    setSelectedItem(ensureLinkedItems(item))
-  }
-
-  // Cerrar panel de detalles
+  // Cerrar detalles
   const closeDetails = () => {
     setSelectedItem(null)
   }
 
-  // Función para guardar (determina si es crear o editar)
-  const handleSave = (itemData) => {
-    return editingItem ? handleEdit(itemData) : handleCreate(itemData)
-  }
-
-  // Estados derivados
-  const isEditing = Boolean(editingItem)
+  // Estado vacío
   const isEmpty = items.length === 0
 
   return {
@@ -126,26 +134,21 @@ export function useCRUD(initialData = [], itemName = 'elemento') {
     showForm,
     editingItem,
     selectedItem,
-    isEditing,
     isEmpty,
-    
+    notification,
+
     // Acciones principales
     handleSave,
     handleDelete,
     selectItem,
-    
+
     // Acciones de formulario
     openCreateForm,
     openEditForm,
     closeForm,
-    
-    // Acciones de detalles
     closeDetails,
-    
-    // Setters directos (para casos especiales)
-    setItems,
-    setSelectedItem,
-    setShowForm,
-    setEditingItem
+
+    // Utilidades
+    showNotification
   }
 }

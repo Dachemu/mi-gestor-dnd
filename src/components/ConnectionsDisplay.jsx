@@ -1,72 +1,87 @@
 import React from 'react'
 
-// Configuración de tipos para mostrar conexiones
+// Configuración de tipos con iconos y colores
 const CONNECTION_TYPES = {
   locations: { name: 'Lugares', icon: '📍', color: '#3b82f6' },
   players: { name: 'Jugadores', icon: '👥', color: '#10b981' },
   npcs: { name: 'NPCs', icon: '🧙', color: '#8b5cf6' },
   quests: { name: 'Misiones', icon: '📜', color: '#f59e0b' },
   objects: { name: 'Objetos', icon: '📦', color: '#06b6d4' },
-  notes: { name: 'Notas', icon: '📝', color: '#3b82f6' }
+  notes: { name: 'Notas', icon: '📝', color: '#ec4899' }
 }
 
+/**
+ * Componente para mostrar y navegar entre conexiones de elementos
+ * ✨ NUEVO: Incluye navegación al hacer clic en elementos conectados
+ */
 function ConnectionsDisplay({ 
   item, 
-  itemType,
-  linkedItems, 
-  onRemoveConnection,
-  onOpenConnectionModal 
+  itemType, 
+  linkedItems = {}, 
+  onRemoveConnection, 
+  onOpenConnectionModal,
+  onNavigateToItem // ✨ NUEVA función para navegación
 }) {
-  
-  // ✅ Protección: verificar que linkedItems existe y es un objeto
-  const safeLinkedItems = linkedItems && typeof linkedItems === 'object' ? linkedItems : {}
-  
-  // Contar total de conexiones de forma segura
-  const totalConnections = Object.values(safeLinkedItems).reduce((total, items) => {
-    // ✅ Verificar que items sea un array
-    if (!Array.isArray(items)) return total
-    return total + items.length
+  // Contar total de conexiones
+  const totalConnections = Object.values(linkedItems).reduce((total, items) => {
+    return total + (Array.isArray(items) ? items.length : 0)
   }, 0)
 
+  // Si no hay conexiones, mostrar mensaje con botón para conectar
   if (totalConnections === 0) {
     return (
       <div style={{
         background: 'rgba(31, 41, 55, 0.3)',
         border: '1px solid rgba(139, 92, 246, 0.2)',
         borderRadius: '12px',
-        padding: '2rem',
+        padding: '1.5rem',
         textAlign: 'center'
       }}>
-        <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🔗</div>
-        <h4 style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '0.5rem' }}>
-          Sin conexiones
-        </h4>
-        <p style={{ color: 'var(--text-disabled)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
-          Este elemento no está conectado con otros elementos de la campaña.
+        <div style={{ fontSize: '2rem', marginBottom: '0.5rem', opacity: 0.6 }}>
+          🔗
+        </div>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>
+          Sin conexiones aún
         </p>
         <button
           onClick={() => onOpenConnectionModal(item, itemType)}
-          className="btn-primary"
-          style={{ fontSize: '0.9rem' }}
+          style={{
+            background: 'rgba(139, 92, 246, 0.2)',
+            border: '1px solid rgba(139, 92, 246, 0.3)',
+            borderRadius: '8px',
+            color: '#a78bfa',
+            padding: '0.5rem 1rem',
+            cursor: 'pointer',
+            fontSize: '0.9rem',
+            fontWeight: '600'
+          }}
         >
-          🔗 Crear conexiones
+          ➕ Conectar elementos
         </button>
       </div>
     )
   }
 
   return (
-    <div>
-      {/* Header con estadísticas */}
+    <div style={{
+      background: 'rgba(31, 41, 55, 0.3)',
+      border: '1px solid rgba(139, 92, 246, 0.2)',
+      borderRadius: '12px',
+      padding: '1.5rem'
+    }}>
+      {/* Header con título y botón para agregar conexiones */}
       <div style={{
         display: 'flex',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: '1.5rem'
+        justifyContent: 'space-between',
+        marginBottom: '1.5rem',
+        paddingBottom: '0.75rem',
+        borderBottom: '1px solid rgba(139, 92, 246, 0.1)'
       }}>
         <h4 style={{ 
           color: 'white', 
-          fontSize: '1.2rem', 
+          fontSize: '1.1rem', 
+          fontWeight: '600',
           margin: 0,
           display: 'flex',
           alignItems: 'center',
@@ -81,37 +96,32 @@ function ConnectionsDisplay({
             background: 'rgba(139, 92, 246, 0.2)',
             border: '1px solid rgba(139, 92, 246, 0.3)',
             borderRadius: '8px',
-            color: '#8b5cf6',
+            color: '#a78bfa',
             padding: '0.5rem 0.75rem',
             cursor: 'pointer',
             fontSize: '0.8rem',
-            fontWeight: '600',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.25rem'
+            fontWeight: '600'
           }}
         >
-          ✏️ Gestionar
+          ➕ Conectar
         </button>
       </div>
 
-      {/* Lista de conexiones por tipo */}
+      {/* Secciones por tipo de conexión */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        {Object.entries(safeLinkedItems).map(([connectionType, connectedItems]) => {
-          // ✅ Verificar que connectedItems sea un array y tenga elementos
-          if (!Array.isArray(connectedItems) || connectedItems.length === 0) return null
-
-          const config = CONNECTION_TYPES[connectionType]
-          // ✅ Verificar que config existe
-          if (!config) return null
+        {Object.entries(CONNECTION_TYPES).map(([type, config]) => {
+          const connectedItems = linkedItems[type] || []
           
+          if (connectedItems.length === 0) return null
+
           return (
             <ConnectionTypeSection
-              key={connectionType}
-              type={connectionType}
+              key={type}
+              type={type}
               config={config}
               items={connectedItems}
-              onRemove={(connectedItem) => onRemoveConnection(item, itemType, connectedItem, connectionType)}
+              onRemove={(connectedItem) => onRemoveConnection(item, itemType, connectedItem, type)}
+              onNavigate={(connectedItem) => onNavigateToItem && onNavigateToItem(connectedItem, type)}
             />
           )
         })}
@@ -121,7 +131,7 @@ function ConnectionsDisplay({
 }
 
 // Sección para mostrar conexiones de un tipo específico
-function ConnectionTypeSection({ type, config, items, onRemove }) {
+function ConnectionTypeSection({ type, config, items, onRemove, onNavigate }) {
   return (
     <div style={{
       background: 'rgba(31, 41, 55, 0.3)',
@@ -157,6 +167,7 @@ function ConnectionTypeSection({ type, config, items, onRemove }) {
             item={connectedItem}
             config={config}
             onRemove={() => onRemove(connectedItem)}
+            onNavigate={() => onNavigate(connectedItem)}
           />
         ))}
       </div>
@@ -164,8 +175,8 @@ function ConnectionTypeSection({ type, config, items, onRemove }) {
   )
 }
 
-// Item individual de conexión
-function ConnectionItem({ item, config, onRemove }) {
+// Item individual de conexión - ✨ MEJORADO con navegación
+function ConnectionItem({ item, config, onRemove, onNavigate }) {
   return (
     <div style={{
       background: 'rgba(31, 41, 55, 0.4)',
@@ -179,34 +190,45 @@ function ConnectionItem({ item, config, onRemove }) {
     }}>
       {/* Icono del elemento */}
       <span style={{ fontSize: '1.2rem', flexShrink: 0 }}>
-        {item.icon || config.icon}
+        {item.icon || item.avatar || config.icon}
       </span>
 
-      {/* Información del elemento */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <h6 style={{ 
+      {/* Información del elemento - ✨ CLICKEABLE para navegar */}
+      <div 
+        onClick={onNavigate}
+        style={{ 
+          flex: 1,
+          cursor: 'pointer',
+          transition: 'color 0.2s ease'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.color = config.color
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.color = 'white'
+        }}
+      >
+        <div style={{ 
           color: 'white', 
-          fontSize: '0.9rem', 
           fontWeight: '600',
-          margin: 0,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap'
+          fontSize: '0.9rem',
+          marginBottom: '0.25rem'
         }}>
           {item.name || item.title}
-        </h6>
-        
-        {/* Mostrar información adicional según el tipo */}
-        {renderItemDetails(item)}
+        </div>
+        <div style={{ 
+          color: 'var(--text-muted)', 
+          fontSize: '0.8rem'
+        }}>
+          {item.role || item.class || item.status || item.type || 'Ver detalles →'}
+        </div>
       </div>
 
       {/* Botón para eliminar conexión */}
       <button
         onClick={(e) => {
           e.stopPropagation()
-          if (window.confirm(`¿Desconectar "${item.name || item.title}"?`)) {
-            onRemove()
-          }
+          onRemove()
         }}
         style={{
           background: 'rgba(239, 68, 68, 0.2)',
@@ -215,135 +237,20 @@ function ConnectionItem({ item, config, onRemove }) {
           color: '#ef4444',
           padding: '0.25rem',
           cursor: 'pointer',
-          fontSize: '0.8rem',
-          flexShrink: 0,
-          opacity: 0.7,
-          transition: 'opacity 0.2s ease'
+          fontSize: '0.7rem',
+          width: '24px',
+          height: '24px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0
         }}
-        onMouseEnter={(e) => e.target.style.opacity = 1}
-        onMouseLeave={(e) => e.target.style.opacity = 0.7}
+        title="Eliminar conexión"
       >
-        🗑️
+        ✕
       </button>
     </div>
   )
-}
-
-// Renderizar detalles específicos según el tipo de elemento
-function renderItemDetails(item) {
-  // ✅ Protección: verificar que item existe
-  if (!item || typeof item !== 'object') return null
-
-  // Para NPCs, mostrar actitud
-  if (item.attitude) {
-    const attitudeColors = {
-      'Amistoso': '#10b981',
-      'Neutral': '#f59e0b',
-      'Hostil': '#ef4444'
-    }
-    
-    return (
-      <span style={{
-        background: `${attitudeColors[item.attitude] || '#6b7280'}20`,
-        color: attitudeColors[item.attitude] || '#6b7280',
-        padding: '0.125rem 0.375rem',
-        borderRadius: '8px',
-        fontSize: '0.7rem',
-        fontWeight: '600'
-      }}>
-        {item.attitude}
-      </span>
-    )
-  }
-
-  // Para misiones, mostrar estado
-  if (item.status) {
-    const statusColors = {
-      'Pendiente': '#f59e0b',
-      'En progreso': '#3b82f6',
-      'Completada': '#10b981'
-    }
-    
-    return (
-      <span style={{
-        background: `${statusColors[item.status] || '#6b7280'}20`,
-        color: statusColors[item.status] || '#6b7280',
-        padding: '0.125rem 0.375rem',
-        borderRadius: '8px',
-        fontSize: '0.7rem',
-        fontWeight: '600'
-      }}>
-        {item.status}
-      </span>
-    )
-  }
-
-  // Para lugares, mostrar tipo
-  if (item.type) {
-    return (
-      <span style={{
-        color: 'var(--text-muted)',
-        fontSize: '0.75rem'
-      }}>
-        {item.type}
-      </span>
-    )
-  }
-
-  // Para objetos, mostrar rareza
-  if (item.rarity) {
-    const rarityColors = {
-      'Común': '#6b7280',
-      'Poco común': '#10b981',
-      'Raro': '#3b82f6',
-      'Épico': '#8b5cf6',
-      'Legendario': '#f59e0b',
-      'Artefacto': '#ef4444'
-    }
-    
-    return (
-      <span style={{
-        background: `${rarityColors[item.rarity] || '#6b7280'}20`,
-        color: rarityColors[item.rarity] || '#6b7280',
-        padding: '0.125rem 0.375rem',
-        borderRadius: '8px',
-        fontSize: '0.7rem',
-        fontWeight: '600'
-      }}>
-        {item.rarity}
-      </span>
-    )
-  }
-
-  // Para notas, mostrar categoría
-  if (item.category) {
-    return (
-      <span style={{
-        color: 'var(--text-muted)',
-        fontSize: '0.75rem'
-      }}>
-        {item.category}
-      </span>
-    )
-  }
-
-  // Default: mostrar descripción truncada
-  if (item.description) {
-    return (
-      <p style={{ 
-        color: 'var(--text-muted)', 
-        fontSize: '0.75rem',
-        margin: '0.25rem 0 0 0',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap'
-      }}>
-        {item.description}
-      </p>
-    )
-  }
-
-  return null
 }
 
 export default ConnectionsDisplay

@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useCRUD } from './hooks/useCRUD'
 import ConnectionsDisplay from './components/ConnectionsDisplay'
 
-function PlayersManager({ campaign, connections }) {
+function PlayersManager({ campaign, connections, selectedItemForNavigation }) {
   // ✨ Hook CRUD usando datos de la campaña
   const {
     items: players,
@@ -16,11 +16,25 @@ function PlayersManager({ campaign, connections }) {
     openCreateForm,
     openEditForm,
     closeForm,
-    closeDetails
+    closeDetails,
+    NotificationComponent
   } = useCRUD(campaign.players || [], 'Jugador')
+
+  // ✨ Efecto para seleccionar automáticamente un jugador cuando se navega desde conexiones
+  useEffect(() => {
+    if (selectedItemForNavigation && selectedItemForNavigation.type === 'players') {
+      const playerToSelect = players.find(player => player.id === selectedItemForNavigation.item.id)
+      if (playerToSelect) {
+        selectPlayer(playerToSelect)
+      }
+    }
+  }, [selectedItemForNavigation, players, selectPlayer])
 
   return (
     <div className="fade-in">
+      {/* ✨ Componente de notificación */}
+      <NotificationComponent />
+
       {/* Header */}
       <div style={{ 
         display: 'flex', 
@@ -62,20 +76,27 @@ function PlayersManager({ campaign, connections }) {
           {isEmpty ? (
             <EmptyState onAddFirst={openCreateForm} />
           ) : (
-            <PlayersList 
-              players={players}
-              onEdit={openEditForm}
-              onDelete={handleDelete}
-              onSelect={selectPlayer}
-              selectedId={selectedPlayer?.id}
-              connections={connections}
-            />
+            <div style={{
+              display: 'grid',
+              gap: '1rem'
+            }}>
+              {players.map(player => (
+                <PlayerCard
+                  key={player.id}
+                  player={player}
+                  isSelected={selectedPlayer?.id === player.id}
+                  onClick={() => selectPlayer(player)}
+                  onEdit={() => openEditForm(player)}
+                  onDelete={() => handleDelete(player.id, player.name)}
+                />
+              ))}
+            </div>
           )}
         </div>
 
         {/* Panel de detalles */}
         {selectedPlayer && (
-          <PlayerDetails 
+          <PlayerDetails
             player={selectedPlayer}
             onClose={closeDetails}
             onEdit={() => openEditForm(selectedPlayer)}
@@ -86,7 +107,7 @@ function PlayersManager({ campaign, connections }) {
         )}
       </div>
 
-      {/* Formulario modal */}
+      {/* Modal de formulario */}
       {showForm && (
         <PlayerForm
           player={editingItem}
@@ -98,141 +119,162 @@ function PlayersManager({ campaign, connections }) {
   )
 }
 
-// Componente de estado vacío
+// Estado vacío
 function EmptyState({ onAddFirst }) {
   return (
-    <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
-      <div style={{ fontSize: '5rem', marginBottom: '1rem' }}>👥</div>
-      <h3 style={{ color: 'var(--text-muted)', fontSize: '1.5rem', marginBottom: '1rem' }}>
-        No hay jugadores creados
+    <div style={{
+      textAlign: 'center',
+      padding: '4rem 2rem',
+      color: 'var(--text-muted)'
+    }}>
+      <div style={{ fontSize: '4rem', marginBottom: '1rem', opacity: 0.5 }}>
+        👥
+      </div>
+      <h3 style={{ color: 'white', marginBottom: '1rem' }}>
+        No hay jugadores registrados aún
       </h3>
-      <p style={{ color: 'var(--text-disabled)', marginBottom: '2rem' }}>
-        Los jugadores son los protagonistas de tu historia. Añade sus personajes aquí.
+      <p style={{ marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem' }}>
+        Los jugadores son los protagonistas de tu historia. Añade información 
+        sobre sus personajes, clases, trasfondos y evolución en la campaña.
       </p>
       <button onClick={onAddFirst} className="btn-primary">
-        👥 Crear el primer jugador
+        👥 Añadir Primer Jugador
       </button>
     </div>
   )
 }
 
-// Lista de jugadores
-function PlayersList({ players, onEdit, onDelete, onSelect, selectedId, connections }) {
-  return (
-    <div style={{ display: 'grid', gap: '1rem' }}>
-      {players.map(player => (
-        <PlayerCard
-          key={player.id}
-          player={player}
-          onEdit={onEdit}
-          onDelete={onDelete}
-          onSelect={onSelect}
-          isSelected={selectedId === player.id}
-          connectionCount={connections?.getConnectionCount(player) || 0}
-        />
-      ))}
-    </div>
-  )
-}
-
-// Tarjeta individual de jugador
-function PlayerCard({ player, onEdit, onDelete, onSelect, isSelected, connectionCount }) {
-  const levelColor = player.level >= 10 ? '#8b5cf6' : player.level >= 5 ? '#10b981' : '#f59e0b'
+// Tarjeta de jugador
+function PlayerCard({ player, isSelected, onClick, onEdit, onDelete }) {
+  const getLevelColor = (level) => {
+    if (!level) return '#6b7280'
+    const levelNum = parseInt(level)
+    if (levelNum >= 15) return '#ff6b35' // Legendario
+    if (levelNum >= 10) return '#8b5cf6' // Épico
+    if (levelNum >= 5) return '#3b82f6'  // Veterano
+    return '#10b981' // Novato
+  }
 
   return (
     <div
-      onClick={() => onSelect(player)}
+      onClick={onClick}
       style={{
         background: isSelected 
-          ? 'rgba(139, 92, 246, 0.15)' 
-          : 'var(--glass-bg)',
-        border: `1px solid ${isSelected 
-          ? 'rgba(139, 92, 246, 0.4)' 
-          : 'var(--glass-border)'}`,
-        borderRadius: '16px',
+          ? 'rgba(139, 92, 246, 0.2)' 
+          : 'rgba(31, 41, 55, 0.5)',
+        border: isSelected 
+          ? '1px solid rgba(139, 92, 246, 0.5)' 
+          : '1px solid rgba(139, 92, 246, 0.1)',
+        borderRadius: '12px',
         padding: '1.5rem',
         cursor: 'pointer',
         transition: 'all 0.2s ease',
-        transform: isSelected ? 'translateY(-2px)' : 'none',
-        boxShadow: isSelected 
-          ? '0 8px 25px rgba(139, 92, 246, 0.2)' 
-          : '0 2px 8px rgba(0, 0, 0, 0.1)'
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1rem'
       }}
     >
-      {/* Header de la tarjeta */}
+      {/* Avatar */}
       <div style={{
+        fontSize: '2rem',
+        flexShrink: 0,
+        width: '50px',
+        height: '50px',
         display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        marginBottom: '1rem'
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(16, 185, 129, 0.2)',
+        borderRadius: '10px'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ fontSize: '2rem' }}>{player.avatar}</span>
-          <div>
-            <h3 style={{ 
-              color: 'white', 
-              fontSize: '1.25rem', 
-              fontWeight: 'bold',
-              margin: 0
-            }}>
-              {player.name}
-            </h3>
-            <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>
-              {player.class} • Jugador: {player.player}
-            </p>
-          </div>
-        </div>
+        {player.avatar || '⚔️'}
+      </div>
+
+      {/* Información principal */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <h4 style={{ 
+          color: 'white', 
+          margin: '0 0 0.25rem 0',
+          fontSize: '1.1rem',
+          fontWeight: '600'
+        }}>
+          {player.name}
+        </h4>
         
-        {/* Badges */}
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+        {/* Clase y raza */}
+        <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
+          {player.class && (
+            <p style={{ 
+              color: 'var(--text-muted)', 
+              margin: 0,
+              fontSize: '0.9rem'
+            }}>
+              🎭 {player.class}
+            </p>
+          )}
+          
+          {player.race && (
+            <p style={{ 
+              color: '#6b7280', 
+              margin: 0,
+              fontSize: '0.9rem'
+            }}>
+              🧬 {player.race}
+            </p>
+          )}
+        </div>
+
+        {/* Nivel */}
+        {player.level && (
           <span style={{
-            background: `${levelColor}20`,
-            color: levelColor,
+            display: 'inline-block',
+            marginBottom: '0.5rem',
             padding: '0.25rem 0.5rem',
-            borderRadius: '8px',
+            background: `${getLevelColor(player.level)}20`,
+            color: getLevelColor(player.level),
+            borderRadius: '6px',
             fontSize: '0.75rem',
             fontWeight: '600'
           }}>
-            Nivel {player.level}
+            ⭐ Nivel {player.level}
           </span>
-          {connectionCount > 0 && (
-            <span style={{
-              background: 'rgba(139, 92, 246, 0.2)',
-              color: '#a78bfa',
-              padding: '0.25rem 0.5rem',
-              borderRadius: '8px',
-              fontSize: '0.75rem',
-              fontWeight: '600'
-            }}>
-              🔗 {connectionCount}
-            </span>
-          )}
-        </div>
-      </div>
+        )}
 
-      {/* Descripción */}
-      <p style={{ 
-        color: 'var(--text-secondary)', 
-        marginBottom: '1rem',
-        lineHeight: '1.5',
-        display: '-webkit-box',
-        WebkitLineClamp: 2,
-        WebkitBoxOrient: 'vertical',
-        overflow: 'hidden'
-      }}>
-        {player.description}
-      </p>
+        {/* Player real */}
+        {player.playerName && (
+          <p style={{ 
+            color: '#6b7280', 
+            margin: '0.25rem 0 0 0',
+            fontSize: '0.8rem'
+          }}>
+            🎮 Jugado por: {player.playerName}
+          </p>
+        )}
+
+        {/* Trasfondo */}
+        {player.background && (
+          <p style={{ 
+            color: 'var(--text-muted)', 
+            margin: '0.25rem 0 0 0',
+            fontSize: '0.85rem',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}>
+            📜 {player.background}
+          </p>
+        )}
+      </div>
 
       {/* Acciones */}
       <div style={{ 
         display: 'flex', 
         gap: '0.5rem',
-        justifyContent: 'flex-end'
+        marginLeft: 'auto'
       }}>
         <button
           onClick={(e) => {
             e.stopPropagation()
-            onEdit(player)
+            onEdit()
           }}
           style={{
             background: 'rgba(139, 92, 246, 0.2)',
@@ -249,7 +291,7 @@ function PlayerCard({ player, onEdit, onDelete, onSelect, isSelected, connection
         <button
           onClick={(e) => {
             e.stopPropagation()
-            onDelete(player.id, player.name)
+            onDelete()
           }}
           style={{
             background: 'rgba(239, 68, 68, 0.2)',
@@ -273,89 +315,167 @@ function PlayerDetails({ player, onClose, onEdit, onDelete, connections, campaig
   // Obtener elementos conectados
   const linkedItems = connections?.getLinkedItems(player) || {}
 
+  const getLevelColor = (level) => {
+    if (!level) return '#6b7280'
+    const levelNum = parseInt(level)
+    if (levelNum >= 15) return '#ff6b35'
+    if (levelNum >= 10) return '#8b5cf6'
+    if (levelNum >= 5) return '#3b82f6'
+    return '#10b981'
+  }
+
   return (
     <div style={{
       background: 'var(--glass-bg)',
       border: '1px solid var(--glass-border)',
       borderRadius: '16px',
       padding: '2rem',
-      height: 'fit-content',
       position: 'sticky',
       top: '2rem',
       maxHeight: 'calc(100vh - 4rem)',
       overflowY: 'auto'
     }}>
       {/* Header */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
         alignItems: 'flex-start',
-        marginBottom: '1.5rem'
+        marginBottom: '2rem'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ fontSize: '3rem' }}>{player.avatar}</span>
+          <div style={{ fontSize: '3rem' }}>
+            {player.avatar || '⚔️'}
+          </div>
           <div>
-            <h3 style={{ 
-              color: 'white', 
-              fontSize: '1.5rem', 
-              fontWeight: 'bold',
-              margin: 0
-            }}>
+            <h3 style={{ color: 'white', margin: 0, fontSize: '1.5rem' }}>
               {player.name}
             </h3>
-            <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>
-              {player.class} Nivel {player.level}
-            </p>
+            {player.class && player.race && (
+              <p style={{ color: 'var(--text-muted)', margin: '0.25rem 0 0 0' }}>
+                {player.class} {player.race}
+              </p>
+            )}
+            {player.level && (
+              <span style={{
+                display: 'inline-block',
+                marginTop: '0.5rem',
+                padding: '0.5rem 1rem',
+                background: `${getLevelColor(player.level)}20`,
+                color: getLevelColor(player.level),
+                borderRadius: '8px',
+                fontSize: '0.9rem',
+                fontWeight: '600'
+              }}>
+                ⭐ Nivel {player.level}
+              </span>
+            )}
           </div>
         </div>
         <button
           onClick={onClose}
           style={{
-            background: 'rgba(107, 114, 128, 0.2)',
-            border: '1px solid rgba(107, 114, 128, 0.3)',
-            borderRadius: '6px',
-            color: '#9ca3af',
-            padding: '0.25rem 0.5rem',
-            cursor: 'pointer',
-            fontSize: '0.8rem'
+            background: 'rgba(239, 68, 68, 0.2)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '8px',
+            color: '#ef4444',
+            padding: '0.5rem',
+            cursor: 'pointer'
           }}
         >
           ✕
         </button>
       </div>
 
-      {/* Información del jugador */}
+      {/* Información básica */}
       <div style={{ marginBottom: '2rem' }}>
-        <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Jugador</h4>
-        <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-          {player.player}
-        </p>
+        {player.playerName && (
+          <div style={{ marginBottom: '1rem' }}>
+            <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Jugador real</h4>
+            <p style={{ color: 'var(--text-secondary)' }}>
+              🎮 {player.playerName}
+            </p>
+          </div>
+        )}
+
+        {player.background && (
+          <div style={{ marginBottom: '1rem' }}>
+            <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Trasfondo</h4>
+            <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+              {player.background}
+            </p>
+          </div>
+        )}
+
+        {player.description && (
+          <div style={{ marginBottom: '1rem' }}>
+            <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Descripción</h4>
+            <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+              {player.description}
+            </p>
+          </div>
+        )}
+
+        {(player.hitPoints || player.armorClass || player.speed) && (
+          <div style={{ marginBottom: '1rem' }}>
+            <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Estadísticas</h4>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))',
+              gap: '0.5rem'
+            }}>
+              {player.hitPoints && (
+                <div style={{
+                  background: 'rgba(239, 68, 68, 0.2)',
+                  color: '#ef4444',
+                  padding: '0.5rem',
+                  borderRadius: '8px',
+                  textAlign: 'center',
+                  fontSize: '0.8rem',
+                  fontWeight: '600'
+                }}>
+                  <div style={{ fontSize: '1.2rem' }}>❤️</div>
+                  <div>{player.hitPoints} HP</div>
+                </div>
+              )}
+              {player.armorClass && (
+                <div style={{
+                  background: 'rgba(59, 130, 246, 0.2)',
+                  color: '#3b82f6',
+                  padding: '0.5rem',
+                  borderRadius: '8px',
+                  textAlign: 'center',
+                  fontSize: '0.8rem',
+                  fontWeight: '600'
+                }}>
+                  <div style={{ fontSize: '1.2rem' }}>🛡️</div>
+                  <div>{player.armorClass} CA</div>
+                </div>
+              )}
+              {player.speed && (
+                <div style={{
+                  background: 'rgba(16, 185, 129, 0.2)',
+                  color: '#10b981',
+                  padding: '0.5rem',
+                  borderRadius: '8px',
+                  textAlign: 'center',
+                  fontSize: '0.8rem',
+                  fontWeight: '600'
+                }}>
+                  <div style={{ fontSize: '1.2rem' }}>💨</div>
+                  <div>{player.speed} pies</div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Descripción */}
-      <div style={{ marginBottom: '2rem' }}>
-        <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Descripción</h4>
-        <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-          {player.description}
-        </p>
-      </div>
-
-      {/* Trasfondo */}
-      {player.backstory && (
+      {/* Notas del DM */}
+      {player.notes && (
         <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Trasfondo</h4>
+          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Notas del DM</h4>
           <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-            {player.backstory}
-          </p>
-        </div>
-      )}
-
-      {/* Inventario */}
-      {player.inventory && (
-        <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Inventario</h4>
-          <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-            {player.inventory}
+            {player.notes}
           </p>
         </div>
       )}
@@ -369,6 +489,7 @@ function PlayerDetails({ player, onClose, onEdit, onDelete, connections, campaig
             linkedItems={linkedItems}
             onRemoveConnection={connections.removeConnection}
             onOpenConnectionModal={connections.openConnectionModal}
+            onNavigateToItem={connections.navigateToItem}
           />
         </div>
       )}
@@ -405,71 +526,56 @@ function PlayerDetails({ player, onClose, onEdit, onDelete, connections, campaig
 function PlayerForm({ player, onSave, onClose }) {
   const [formData, setFormData] = useState({
     name: player?.name || '',
-    player: player?.player || '',
+    playerName: player?.playerName || '',
     class: player?.class || '',
-    level: player?.level || 1,
+    race: player?.race || '',
+    level: player?.level || '1',
+    background: player?.background || '',
     description: player?.description || '',
-    backstory: player?.backstory || '',
-    inventory: player?.inventory || '',
+    hitPoints: player?.hitPoints || '',
+    armorClass: player?.armorClass || '',
+    speed: player?.speed || '',
+    notes: player?.notes || '',
     avatar: player?.avatar || '⚔️'
   })
 
   const [errors, setErrors] = useState({})
 
-  // Opciones para selects
+  // Opciones comunes para D&D 5e
   const classOptions = [
-    'Bárbaro', 'Bardo', 'Clérigo', 'Druida', 'Explorador', 'Guerrero',
-    'Hechicero', 'Mago', 'Monje', 'Paladín', 'Pícaro', 'Brujo'
+    'Bárbaro', 'Bardo', 'Brujo', 'Clérigo', 'Druida', 'Explorador',
+    'Guerrero', 'Hechicero', 'Mago', 'Monje', 'Paladín', 'Pícaro'
   ]
 
-  const avatarOptions = [
-    '⚔️', '🗡️', '🛡️', '🏹', '🪓', '🔮', '📚', '🎭', '🎵', '✨', '🔥', '⚡',
-    '🌟', '💫', '🌙', '☀️', '🌊', '🌲', '🗻', '💎', '👑', '🦸', '🦹', '🥷',
-    '🧙', '🧙‍♀️', '🧙‍♂️', '🧝', '🧝‍♀️', '🧝‍♂️', '🧚', '🧚‍♀️', '🧚‍♂️'
+  const raceOptions = [
+    'Humano', 'Elfo', 'Enano', 'Mediano', 'Dracónido', 'Gnomo',
+    'Semielfo', 'Semiorco', 'Tiefling', 'Aarakocra', 'Genasi', 'Otro'
   ]
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({ 
-      ...prev, 
-      [name]: name === 'level' ? parseInt(value) || 1 : value 
-    }))
+    setFormData(prev => ({ ...prev, [name]: value }))
     
-    // Limpiar error cuando el usuario empiece a escribir
-    if (errors[name]) {
+    // Limpiar error si el campo ahora tiene valor
+    if (errors[name] && value.trim()) {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
-  }
-
-  const validateForm = () => {
-    const newErrors = {}
-    
-    if (!formData.name.trim()) {
-      newErrors.name = 'El nombre del personaje es obligatorio'
-    }
-    
-    if (!formData.player.trim()) {
-      newErrors.player = 'El nombre del jugador es obligatorio'
-    }
-    
-    if (!formData.description.trim()) {
-      newErrors.description = 'La descripción es obligatoria'
-    }
-    
-    if (formData.level < 1 || formData.level > 20) {
-      newErrors.level = 'El nivel debe estar entre 1 y 20'
-    }
-    
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
     
-    if (!validateForm()) return
+    // Validaciones
+    const newErrors = {}
+    if (!formData.name.trim()) newErrors.name = 'El nombre del personaje es obligatorio'
+    if (!formData.class.trim()) newErrors.class = 'La clase es obligatoria'
+    if (!formData.race.trim()) newErrors.race = 'La raza es obligatoria'
     
-    onSave(formData)
+    setErrors(newErrors)
+    
+    if (Object.keys(newErrors).length === 0) {
+      onSave(formData)
+    }
   }
 
   return (
@@ -477,73 +583,57 @@ function PlayerForm({ player, onSave, onClose }) {
       position: 'fixed',
       top: 0,
       left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.85)',
+      width: '100%',
+      height: '100%',
+      background: 'rgba(0, 0, 0, 0.8)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 1000,
-      padding: '1rem'
+      backdropFilter: 'blur(10px)'
     }}>
       <div style={{
         background: 'var(--glass-bg)',
-        backdropFilter: 'blur(20px)',
         border: '1px solid var(--glass-border)',
         borderRadius: '20px',
         padding: '2rem',
-        maxWidth: '600px',
-        width: '100%',
+        width: '90%',
+        maxWidth: '700px',
         maxHeight: '90vh',
-        overflowY: 'auto',
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)'
+        overflowY: 'auto'
       }}>
-        {/* Header */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
+        <h2 style={{ 
+          color: 'white', 
+          marginBottom: '2rem',
+          display: 'flex',
           alignItems: 'center',
-          marginBottom: '2rem'
+          gap: '0.5rem'
         }}>
-          <h3 style={{ 
-            fontSize: '1.8rem',
-            fontWeight: 'bold',
-            color: 'white',
-            margin: 0
-          }}>
-            {player ? '✏️ Editar Jugador' : '➕ Nuevo Jugador'}
-          </h3>
-          <button onClick={onClose} style={{
-            background: 'rgba(107, 114, 128, 0.2)',
-            border: '1px solid rgba(107, 114, 128, 0.3)',
-            borderRadius: '6px',
-            color: '#9ca3af',
-            padding: '0.5rem',
-            cursor: 'pointer',
-            fontSize: '1rem'
-          }}>
-            ✕
-          </button>
-        </div>
+          {player ? '✏️ Editar Jugador' : '👥 Nuevo Jugador'}
+        </h2>
 
-        {/* Formulario */}
         <form onSubmit={handleSubmit}>
-          <div style={{ display: 'grid', gap: '1.5rem' }}>
-            
-            {/* Nombre del personaje y Avatar */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '1rem' }}>
+          <div style={{
+            display: 'grid',
+            gap: '1.5rem',
+            marginBottom: '2rem'
+          }}>
+            {/* Nombre del personaje y jugador real */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div>
                 <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                  Nombre del Personaje
+                  Nombre del personaje *
                 </label>
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Ej: Thorin Escudoférro"
+                  placeholder="Ej: Aragorn"
                   className="input-field"
-                  style={{ border: errors.name ? '1px solid #ef4444' : undefined }}
+                  style={{
+                    borderColor: errors.name ? '#ef4444' : undefined
+                  }}
                 />
                 {errors.name && (
                   <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
@@ -551,65 +641,78 @@ function PlayerForm({ player, onSave, onClose }) {
                   </p>
                 )}
               </div>
-              
+
               <div>
                 <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                  Avatar
+                  Jugador real
                 </label>
-                <select
-                  name="avatar"
-                  value={formData.avatar}
+                <input
+                  type="text"
+                  name="playerName"
+                  value={formData.playerName}
                   onChange={handleChange}
+                  placeholder="Nombre del jugador"
                   className="input-field"
-                  style={{ fontSize: '1.5rem', textAlign: 'center', width: '60px' }}
-                >
-                  {avatarOptions.map(avatar => (
-                    <option key={avatar} value={avatar}>{avatar}</option>
-                  ))}
-                </select>
+                />
               </div>
             </div>
 
-            {/* Jugador */}
-            <div>
-              <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                Nombre del Jugador
-              </label>
-              <input
-                type="text"
-                name="player"
-                value={formData.player}
-                onChange={handleChange}
-                placeholder="Ej: Carlos García"
-                className="input-field"
-                style={{ border: errors.player ? '1px solid #ef4444' : undefined }}
-              />
-              {errors.player && (
-                <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
-                  {errors.player}
-                </p>
-              )}
-            </div>
-
-            {/* Clase y Nivel */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '1rem' }}>
+            {/* Clase, raza y nivel */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 80px', gap: '1rem' }}>
               <div>
                 <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                  Clase
+                  Clase *
                 </label>
                 <select
                   name="class"
                   value={formData.class}
                   onChange={handleChange}
                   className="input-field"
+                  style={{
+                    borderColor: errors.class ? '#ef4444' : undefined
+                  }}
                 >
-                  <option value="">Selecciona una clase</option>
+                  <option value="">Seleccionar</option>
                   {classOptions.map(cls => (
-                    <option key={cls} value={cls}>{cls}</option>
+                    <option key={cls} value={cls}>
+                      {cls}
+                    </option>
                   ))}
                 </select>
+                {errors.class && (
+                  <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
+                    {errors.class}
+                  </p>
+                )}
               </div>
-              
+
+              <div>
+                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+                  Raza *
+                </label>
+                <select
+                  name="race"
+                  value={formData.race}
+                  onChange={handleChange}
+                  className="input-field"
+                  style={{
+                    borderColor: errors.race ? '#ef4444' : undefined
+                  }}
+                >
+                  <option value="">Seleccionar</option>
+                  {raceOptions.map(race => (
+                    <option key={race} value={race}>
+                      {race}
+                    </option>
+                  ))}
+                </select>
+                {errors.race && (
+                  <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
+                    {errors.race}
+                  </p>
+                )}
+              </div>
+
               <div>
                 <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
                   Nivel
@@ -622,42 +725,8 @@ function PlayerForm({ player, onSave, onClose }) {
                   min="1"
                   max="20"
                   className="input-field"
-                  style={{ 
-                    width: '80px', 
-                    textAlign: 'center',
-                    border: errors.level ? '1px solid #ef4444' : undefined
-                  }}
                 />
-                {errors.level && (
-                  <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
-                    {errors.level}
-                  </p>
-                )}
               </div>
-            </div>
-
-            {/* Descripción */}
-            <div>
-              <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                Descripción
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Describe la apariencia y personalidad del personaje..."
-                className="input-field"
-                style={{ 
-                  minHeight: '100px', 
-                  resize: 'vertical',
-                  border: errors.description ? '1px solid #ef4444' : undefined
-                }}
-              />
-              {errors.description && (
-                <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
-                  {errors.description}
-                </p>
-              )}
             </div>
 
             {/* Trasfondo */}
@@ -665,26 +734,89 @@ function PlayerForm({ player, onSave, onClose }) {
               <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
                 Trasfondo
               </label>
-              <textarea
-                name="backstory"
-                value={formData.backstory}
+              <input
+                type="text"
+                name="background"
+                value={formData.background}
                 onChange={handleChange}
-                placeholder="Historia personal del personaje, motivaciones, familia..."
+                placeholder="Ej: Noble, Forajido, Ermitaño..."
                 className="input-field"
-                style={{ minHeight: '80px', resize: 'vertical' }}
               />
             </div>
 
-            {/* Inventario */}
+            {/* Descripción */}
             <div>
               <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
-                Inventario
+                Descripción del personaje
               </label>
               <textarea
-                name="inventory"
-                value={formData.inventory}
+                name="description"
+                value={formData.description}
                 onChange={handleChange}
-                placeholder="Equipamiento, armas, objetos importantes..."
+                placeholder="Apariencia, personalidad, historia personal..."
+                className="input-field"
+                style={{ minHeight: '100px', resize: 'vertical' }}
+              />
+            </div>
+
+            {/* Estadísticas básicas */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+              <div>
+                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+                  Puntos de vida
+                </label>
+                <input
+                  type="number"
+                  name="hitPoints"
+                  value={formData.hitPoints}
+                  onChange={handleChange}
+                  placeholder="HP"
+                  className="input-field"
+                  min="1"
+                />
+              </div>
+
+              <div>
+                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+                  Clase de armadura
+                </label>
+                <input
+                  type="number"
+                  name="armorClass"
+                  value={formData.armorClass}
+                  onChange={handleChange}
+                  placeholder="CA"
+                  className="input-field"
+                  min="1"
+                />
+              </div>
+
+              <div>
+                <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+                  Velocidad (pies)
+                </label>
+                <input
+                  type="number"
+                  name="speed"
+                  value={formData.speed}
+                  onChange={handleChange}
+                  placeholder="30"
+                  className="input-field"
+                  min="0"
+                />
+              </div>
+            </div>
+
+            {/* Notas del DM */}
+            <div>
+              <label style={{ color: 'white', fontWeight: '600', marginBottom: '0.5rem', display: 'block' }}>
+                Notas del DM
+              </label>
+              <textarea
+                name="notes"
+                value={formData.notes}
+                onChange={handleChange}
+                placeholder="Secretos del personaje, conexiones con la trama, notas importantes..."
                 className="input-field"
                 style={{ minHeight: '80px', resize: 'vertical' }}
               />
