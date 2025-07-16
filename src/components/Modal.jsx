@@ -64,10 +64,10 @@ function Modal({
 
   // Determinar tamaños del modal con mejor responsividad
   const sizes = {
-    small: { width: 'min(95vw, 400px)', maxHeight: '90vh' },
-    medium: { width: 'min(95vw, 700px)', maxHeight: '90vh' },
-    large: { width: 'min(98vw, 1000px)', maxHeight: '95vh' },
-    xlarge: { width: 'min(98vw, 1200px)', maxHeight: '95vh' }
+    small: { width: 'min(95vw, 400px)', maxHeight: 'calc(100vh - 4rem)' },
+    medium: { width: 'min(95vw, 700px)', maxHeight: 'calc(100vh - 4rem)' },
+    large: { width: 'min(98vw, 1000px)', maxHeight: 'calc(100vh - 4rem)' },
+    xlarge: { width: 'min(98vw, 1200px)', maxHeight: 'calc(100vh - 4rem)' }
   }
 
   const modalSize = sizes[size] || sizes.medium
@@ -87,11 +87,11 @@ function Modal({
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 9999,
-        padding: 'clamp(0.5rem, 2vw, 2rem)',
+        padding: 'clamp(0.5rem, 2vw, 1rem)',
         overflowY: 'auto',
         animation: 'fadeIn 0.2s ease-out'
       }}
-      onClick={onClose}
+      onClick={(e) => e.stopPropagation()}
     >
       <div 
         style={{
@@ -135,20 +135,32 @@ function Modal({
             borderRadius: '20px 20px 0 0',
             position: 'relative'
           }}>
-            {title && (
-              <h2 style={{
-                fontSize: '1.75rem',
-                fontWeight: '700',
-                background: 'linear-gradient(135deg, #ffffff 0%, #a78bfa 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                margin: 0,
-                textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-              }}>
-                {title}
-              </h2>
-            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
+              {title && (
+                <h2 style={{
+                  fontSize: '1.75rem',
+                  fontWeight: '700',
+                  background: 'linear-gradient(135deg, #ffffff 0%, #a78bfa 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  margin: 0,
+                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                }}>
+                  {title}
+                </h2>
+              )}
+            </div>
+            
+            {/* Botones de acción compactos */}
+            <div id="modal-compact-actions" style={{
+              display: 'flex',
+              gap: '0.5rem',
+              alignItems: 'center'
+            }}>
+              {/* Los botones se inyectarán aquí dinámicamente */}
+            </div>
+            
             {showCloseButton && (
               <button
                 onClick={onClose}
@@ -162,7 +174,8 @@ function Modal({
                   transition: 'all 0.2s ease',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  marginLeft: '0.5rem'
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.backgroundColor = 'var(--bg-secondary)'
@@ -183,19 +196,17 @@ function Modal({
         <div 
           className="modal-content"
           style={{
-            padding: 'clamp(1.5rem, 3vw, 2.5rem)',
+            padding: 'clamp(1.5rem, 3vw, 2rem)',
             paddingBottom: 'clamp(2rem, 4vw, 3rem)',
             overflowY: 'auto',
             flex: 1,
-            maxHeight: 'calc(100vh - 8rem)',
+            minHeight: 0,
             background: 'rgba(15, 15, 25, 0.2)',
             scrollbarWidth: 'thin',
-            scrollbarColor: 'rgba(139, 92, 246, 0.3) transparent'
+            scrollbarColor: 'rgba(139, 92, 246, 0.3) transparent',
+            maxHeight: 'calc(100vh - 12rem)'
           }}>
           {children}
-          
-          {/* Espaciador invisible para asegurar scroll completo */}
-          <div style={{ height: '1rem', visibility: 'hidden' }} />
         </div>
       </div>
 
@@ -238,15 +249,27 @@ function Modal({
         @media (max-width: 768px) {
           .modal-container {
             align-items: flex-start !important;
-            padding: 1rem !important;
+            padding: 0.5rem !important;
             padding-top: 1rem !important;
+            padding-bottom: 2rem !important;
+          }
+          
+          .modal-content {
+            max-height: calc(100vh - 10rem) !important;
+            padding-bottom: 2rem !important;
           }
         }
         
         @media (max-width: 640px) {
           .modal-container {
-            padding: 0.5rem !important;
-            padding-top: 1rem !important;
+            padding: 0.25rem !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 2rem !important;
+          }
+          
+          .modal-content {
+            max-height: calc(100vh - 8rem) !important;
+            padding-bottom: 2rem !important;
           }
         }
       `}</style>

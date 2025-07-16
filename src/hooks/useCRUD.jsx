@@ -6,7 +6,7 @@ import React from 'react'
  * Elimina código duplicado entre todos los gestores
  * ✅ CORREGIDO: Ahora incluye el componente de notificación
  */
-export function useCRUD(initialData = [], itemName = 'elemento') {
+export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = null) {
   // Estados principales
   const [items, setItems] = useState(initialData)
   const [showForm, setShowForm] = useState(false)
@@ -95,6 +95,11 @@ export function useCRUD(initialData = [], itemName = 'elemento') {
 
   // Guardar (crear o editar)
   const handleSave = (itemData) => {
+    // Agregar icono fijo para notas si corresponde
+    if (entityConfig && entityConfig.fixedIcon) {
+      itemData = { ...itemData, icon: entityConfig.fixedIcon }
+    }
+    
     if (editingItem) {
       return handleEdit(itemData)
     } else {

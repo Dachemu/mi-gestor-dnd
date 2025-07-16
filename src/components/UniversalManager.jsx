@@ -42,7 +42,7 @@ function UniversalManager({
     closeForm,
     closeDetails,
     NotificationComponent
-  } = useCRUD(campaign[entityType] || [], config.name)
+  } = useCRUD(campaign[entityType] || [], config.name, config)
 
   // Estado para filtros (solo si la entidad los soporta)
   const [filters, setFilters] = useState({})
@@ -163,25 +163,6 @@ function UniversalManager({
         marginBottom: '2rem'
       }}>
         <div>
-          <h2 style={{ 
-            fontSize: '3rem',
-            fontWeight: '800',
-            background: 'linear-gradient(135deg, #ffffff 0%, #a78bfa 50%, #3b82f6 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '1rem',
-            margin: 0,
-            textShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-            filter: 'drop-shadow(0 2px 4px rgba(139, 92, 246, 0.3))'
-          }}>
-            <span style={{ fontSize: '3.5rem', filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5))' }}>
-              {config.icon}
-            </span> 
-            {config.pluralName}
-          </h2>
           <p style={{ 
             color: 'var(--text-muted)', 
             margin: '1rem 0 0 0',
@@ -189,10 +170,7 @@ function UniversalManager({
             fontWeight: '500',
             opacity: 0.9
           }}>
-            {config.description} de <span style={{ 
-              color: 'rgba(139, 92, 246, 0.8)', 
-              fontWeight: '600' 
-            }}>{campaign.name}</span>
+            {config.description}
           </p>
         </div>
         <button onClick={openCreateForm} className="btn-primary">

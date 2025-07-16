@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import ConnectionsDisplay from './ConnectionsDisplay'
 import DynamicForm from './DynamicForm'
+import { formatMarkdownToHtml } from '../utils/textFormatter'
 
 /**
  * Componente de detalles universal que reemplaza todos los *Details específicos
@@ -44,68 +45,6 @@ function UniversalDetails({
 
     switch (renderType) {
       case 'html':
-        // Procesar markdown y HTML básico con el mismo formato que el editor
-        const formatContent = (text) => {
-          if (!text) return ''
-          
-          let processed = text
-            .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #ffffff; font-weight: 700;">$1</strong>')
-            .replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, '<em style="color: #e5e7eb; font-style: italic;">$1</em>')
-            .replace(/<u>(.*?)<\/u>/g, '<u style="color: #ffffff; text-decoration: underline;">$1</u>')
-            
-          const lines = processed.split('\n')
-          const processedLines = []
-          let inList = false
-          let inOrderedList = false
-          
-          for (let i = 0; i < lines.length; i++) {
-            const line = lines[i]
-            
-            if (/^\s*[-*+]\s+(.+)$/.test(line)) {
-              if (!inList) {
-                processedLines.push('<ul style="margin: 1rem 0; padding-left: 1.5rem; color: var(--text-secondary);">')
-                inList = true
-              }
-              const content = line.replace(/^\s*[-*+]\s+/, '')
-              processedLines.push(`<li style="margin: 0.5rem 0;">${content}</li>`)
-            }
-            else if (/^\s*\d+\.\s+(.+)$/.test(line)) {
-              if (!inOrderedList) {
-                processedLines.push('<ol style="margin: 1rem 0; padding-left: 1.5rem; color: var(--text-secondary);">')
-                inOrderedList = true
-              }
-              const content = line.replace(/^\s*\d+\.\s+/, '')
-              processedLines.push(`<li style="margin: 0.5rem 0;">${content}</li>`)
-            }
-            else if (/^\s*>\s+(.+)$/.test(line)) {
-              const content = line.replace(/^\s*>\s+/, '')
-              processedLines.push(`<blockquote style="border-left: 3px solid #8b5cf6; padding-left: 1rem; margin: 1rem 0; color: var(--text-secondary); font-style: italic; background: rgba(139, 92, 246, 0.1); padding: 0.75rem 1rem; border-radius: 0 8px 8px 0;">${content}</blockquote>`)
-              inList = false
-              inOrderedList = false
-            }
-            else {
-              if (inList) {
-                processedLines.push('</ul>')
-                inList = false
-              }
-              if (inOrderedList) {
-                processedLines.push('</ol>')
-                inOrderedList = false
-              }
-              if (line.trim()) {
-                processedLines.push(line)
-              } else {
-                processedLines.push('<br>')
-              }
-            }
-          }
-          
-          if (inList) processedLines.push('</ul>')
-          if (inOrderedList) processedLines.push('</ol>')
-          
-          return processedLines.join('\n').replace(/\n/g, '<br>')
-        }
-
         return (
           <div 
             style={{ 
@@ -117,7 +56,7 @@ function UniversalDetails({
               border: '1px solid rgba(139, 92, 246, 0.1)',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
             }}
-            dangerouslySetInnerHTML={{ __html: formatContent(value) }}
+            dangerouslySetInnerHTML={{ __html: formatMarkdownToHtml(value) }}
           />
         )
 
@@ -390,6 +329,163 @@ function UniversalDetails({
     setIsEditing(true)
   }
 
+  // Función para inyectar botones compactos en el header del modal
+  const injectCompactButtons = () => {
+    const actionContainer = document.getElementById('modal-compact-actions')
+    const fallbackActions = document.getElementById('fallback-actions')
+    
+    if (!actionContainer) {
+      // Si no hay container compacto, mostrar botones fallback
+      if (fallbackActions) {
+        fallbackActions.style.display = 'flex'
+      }
+      return
+    }
+
+    // Ocultar botones fallback ya que usaremos los compactos
+    if (fallbackActions) {
+      fallbackActions.style.display = 'none'
+    }
+
+    // Limpiar contenido previo
+    actionContainer.innerHTML = ''
+
+    if (!isEditing) {
+      // Botón de editar compacto
+      const editButton = document.createElement('button')
+      editButton.innerHTML = '✏️'
+      editButton.title = 'Editar'
+      editButton.style.cssText = `
+        background: rgba(139, 92, 246, 0.2);
+        border: 1px solid rgba(139, 92, 246, 0.3);
+        border-radius: 6px;
+        color: #a78bfa;
+        padding: 0.5rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+      `
+      editButton.addEventListener('mouseenter', () => {
+        editButton.style.background = 'rgba(139, 92, 246, 0.3)'
+        editButton.style.borderColor = 'rgba(139, 92, 246, 0.5)'
+      })
+      editButton.addEventListener('mouseleave', () => {
+        editButton.style.background = 'rgba(139, 92, 246, 0.2)'
+        editButton.style.borderColor = 'rgba(139, 92, 246, 0.3)'
+      })
+      editButton.addEventListener('click', handleStartEdit)
+      actionContainer.appendChild(editButton)
+
+      // Botón de eliminar compacto
+      const deleteButton = document.createElement('button')
+      deleteButton.innerHTML = '🗑️'
+      deleteButton.title = 'Eliminar'
+      deleteButton.style.cssText = `
+        background: rgba(239, 68, 68, 0.2);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 6px;
+        color: #ef4444;
+        padding: 0.5rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+      `
+      deleteButton.addEventListener('mouseenter', () => {
+        deleteButton.style.background = 'rgba(239, 68, 68, 0.3)'
+        deleteButton.style.borderColor = 'rgba(239, 68, 68, 0.5)'
+      })
+      deleteButton.addEventListener('mouseleave', () => {
+        deleteButton.style.background = 'rgba(239, 68, 68, 0.2)'
+        deleteButton.style.borderColor = 'rgba(239, 68, 68, 0.3)'
+      })
+      deleteButton.addEventListener('click', onDelete)
+      actionContainer.appendChild(deleteButton)
+    } else {
+      // Botón de guardar compacto
+      const saveButton = document.createElement('button')
+      saveButton.innerHTML = '💾'
+      saveButton.title = 'Guardar'
+      saveButton.style.cssText = `
+        background: rgba(16, 185, 129, 0.2);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-radius: 6px;
+        color: #10b981;
+        padding: 0.5rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+      `
+      saveButton.addEventListener('mouseenter', () => {
+        saveButton.style.background = 'rgba(16, 185, 129, 0.3)'
+        saveButton.style.borderColor = 'rgba(16, 185, 129, 0.5)'
+      })
+      saveButton.addEventListener('mouseleave', () => {
+        saveButton.style.background = 'rgba(16, 185, 129, 0.2)'
+        saveButton.style.borderColor = 'rgba(16, 185, 129, 0.3)'
+      })
+      // Nota: El botón de guardar en modo edición será manejado por el formulario
+      actionContainer.appendChild(saveButton)
+
+      // Botón de cancelar compacto
+      const cancelButton = document.createElement('button')
+      cancelButton.innerHTML = '❌'
+      cancelButton.title = 'Cancelar'
+      cancelButton.style.cssText = `
+        background: rgba(156, 163, 175, 0.2);
+        border: 1px solid rgba(156, 163, 175, 0.3);
+        border-radius: 6px;
+        color: #9ca3af;
+        padding: 0.5rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+      `
+      cancelButton.addEventListener('mouseenter', () => {
+        cancelButton.style.background = 'rgba(156, 163, 175, 0.3)'
+        cancelButton.style.borderColor = 'rgba(156, 163, 175, 0.5)'
+      })
+      cancelButton.addEventListener('mouseleave', () => {
+        cancelButton.style.background = 'rgba(156, 163, 175, 0.2)'
+        cancelButton.style.borderColor = 'rgba(156, 163, 175, 0.3)'
+      })
+      cancelButton.addEventListener('click', handleCancelEdit)
+      actionContainer.appendChild(cancelButton)
+    }
+  }
+
+  // Efecto para inyectar botones cuando cambia el estado de edición
+  useEffect(() => {
+    injectCompactButtons()
+  }, [isEditing])
+
+  // Efecto para inyectar botones cuando se monta el componente
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      injectCompactButtons()
+    }, 100)
+    return () => clearTimeout(timer)
+  }, [])
+
   // Si está en modo edición, mostrar el formulario
   if (isEditing) {
     return (
@@ -432,8 +528,15 @@ function UniversalDetails({
         </div>
       )}
 
-      {/* Acciones */}
-      <div style={{ display: 'flex', gap: '0.75rem' }}>
+      {/* Acciones - Ocultas cuando hay botones compactos */}
+      <div 
+        id="fallback-actions"
+        style={{ 
+          display: 'flex', 
+          gap: '0.75rem',
+          marginTop: '1rem'
+        }}
+      >
         <button
           onClick={handleStartEdit}
           className="btn-primary"

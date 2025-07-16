@@ -134,10 +134,6 @@ function CampaignManager({ campaign, onBackToSelector }) {
               <ArrowLeft size={16} />
               {!isMobile && <span>Campañas</span>}
             </button>
-            
-            <h1 className="campaign-title-nav">
-              {currentCampaign.name}
-            </h1>
           </div>
 
           {/* Sección central - Pestañas (desktop) */}
@@ -486,7 +482,10 @@ function CampaignManager({ campaign, onBackToSelector }) {
         .campaign-content {
           padding: 2rem;
           margin-top: 80px;
-          min-height: calc(100vh - 80px);
+          height: calc(100vh - 80px);
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
         }
 
         /* Animaciones */
@@ -575,6 +574,7 @@ function CampaignManager({ campaign, onBackToSelector }) {
           .campaign-content {
             padding: 1rem;
             margin-top: 65px;
+            height: calc(100vh - 65px);
           }
         }
 
@@ -643,7 +643,7 @@ function TabContent({
 
   switch (activeTab) {
     case 'dashboard':
-      return <Dashboard campaign={campaign} onTabChange={onTabChange} />
+      return <Dashboard campaign={campaign} onTabChange={onTabChange} onNavigateToItem={onNavigateToItem} />
     case 'locations':
       return <LocationsManager {...commonProps} />
     case 'players':
@@ -657,7 +657,7 @@ function TabContent({
     case 'notes':
       return <NotesManager {...commonProps} />
     default:
-      return <Dashboard campaign={campaign} onTabChange={onTabChange} />
+      return <Dashboard campaign={campaign} onTabChange={onTabChange} onNavigateToItem={onNavigateToItem} />
   }
 }
 
@@ -824,7 +824,7 @@ const QuestStatusCard = React.memo(function QuestStatusCard({
 })
 
 // ✅ Dashboard mejorado con mejor rendimiento
-const Dashboard = React.memo(function Dashboard({ campaign, onTabChange }) {
+const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavigateToItem }) {
   const getCount = (type) => {
     return campaign[type]?.length || 0
   }
@@ -884,58 +884,168 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange }) {
       <div className="dashboard-header-compact">
         <div className="dashboard-breadcrumb">
           <span className="breadcrumb-icon">🏰</span>
-          <span className="breadcrumb-text">Dashboard</span>
+          <h1 className="campaign-title-dashboard">{campaign.name}</h1>
         </div>
         {campaign.description && (
           <p className="campaign-subtitle">"{campaign.description}"</p>
         )}
       </div>
 
-      {/* Grid de Secciones */}
-      <div className="dashboard-grid">
-        {sections.map(section => (
-          <DashboardCard
-            key={section.type}
-            title={section.title}
-            count={getCount(section.type)}
-            icon={section.icon}
-            color={section.color}
-            onClick={() => onTabChange(section.type)}
-            description={section.description}
-          />
-        ))}
-      </div>
+      {/* Layout Principal Mejorado */}
+      <div className="dashboard-main-layout">
+        {/* Sección Superior - Resumen General */}
+        <div className="dashboard-general-summary">
+          <div className="stats-overview">
+            <h3 className="section-title">📊 Resumen General</h3>
+            <div className="stats-grid">
+              {sections.map(section => (
+                <div
+                  key={section.type}
+                  className="stat-card"
+                  onClick={() => onTabChange(section.type)}
+                  style={{ '--card-color': section.color }}
+                >
+                  <div className="stat-icon">{section.icon}</div>
+                  <div className="stat-info">
+                    <div className="stat-count">{getCount(section.type)}</div>
+                    <div className="stat-label">{section.title}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
 
-      {/* Sección de Estado de Misiones */}
-      <div className="quests-status">
-        <h3 className="section-title">📊 Estado de Misiones</h3>
-        <div className="quests-grid">
-          <QuestStatusCard
-            title="En Progreso"
-            icon="⏳"
-            count={activeQuests.length}
-            quests={activeQuests}
-            className="active"
-            onQuestClick={(quest) => onTabChange('quests')}
-          />
+        {/* Sección Inferior - Detalle de Misiones */}
+        <div className="dashboard-quests-detail">
+          <h3 className="section-title">🎯 Estado de Misiones</h3>
           
-          <QuestStatusCard
-            title="Completadas"
-            icon="✅"
-            count={completedQuests.length}
-            quests={completedQuests}
-            className="completed"
-            onQuestClick={(quest) => onTabChange('quests')}
-          />
-          
-          <QuestStatusCard
-            title="Pendientes"
-            icon="⏸️"
-            count={pendingQuests.length}
-            quests={pendingQuests}
-            className="pending"
-            onQuestClick={(quest) => onTabChange('quests')}
-          />
+          {/* Resumen de estados */}
+          <div className="quest-status-summary">
+            <div className="quest-status-item active" onClick={() => onTabChange('quests')}>
+              <div className="quest-status-icon">⏳</div>
+              <div className="quest-status-info">
+                <div className="quest-status-count">{activeQuests.length}</div>
+                <div className="quest-status-label">En Progreso</div>
+              </div>
+            </div>
+            <div className="quest-status-item completed" onClick={() => onTabChange('quests')}>
+              <div className="quest-status-icon">✅</div>
+              <div className="quest-status-info">
+                <div className="quest-status-count">{completedQuests.length}</div>
+                <div className="quest-status-label">Completadas</div>
+              </div>
+            </div>
+            <div className="quest-status-item pending" onClick={() => onTabChange('quests')}>
+              <div className="quest-status-icon">⏸️</div>
+              <div className="quest-status-info">
+                <div className="quest-status-count">{pendingQuests.length}</div>
+                <div className="quest-status-label">Pendientes</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Columnas de misiones por estado */}
+          <div className="missions-by-state">
+            {/* Misiones En Progreso */}
+            <div className="mission-column">
+              <h4 className="mission-column-title">⏳ En Progreso ({activeQuests.length})</h4>
+              {activeQuests.length > 0 ? (
+                <div className="mission-list">
+                  {activeQuests.slice(0, 5).map((quest, index) => (
+                    <div 
+                      key={quest.id || index}
+                      className="mission-item"
+                      onClick={() => onNavigateToItem(quest, 'quests')}
+                    >
+                      <span className="mission-icon">{quest.icon || '📜'}</span>
+                      <div className="mission-info">
+                        <div className="mission-name">{quest.name || quest.title}</div>
+                        <div className="mission-priority">{quest.priority || 'Media'}</div>
+                      </div>
+                      <span className="mission-arrow">→</span>
+                    </div>
+                  ))}
+                  {activeQuests.length > 5 && (
+                    <div className="more-missions-link" onClick={() => onTabChange('quests')}>
+                      Ver todas ({activeQuests.length})
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="no-missions">
+                  <span className="no-missions-icon">🎭</span>
+                  <p>No hay misiones activas</p>
+                </div>
+              )}
+            </div>
+
+            {/* Misiones Completadas */}
+            <div className="mission-column">
+              <h4 className="mission-column-title">✅ Completadas ({completedQuests.length})</h4>
+              {completedQuests.length > 0 ? (
+                <div className="mission-list">
+                  {completedQuests.slice(0, 5).map((quest, index) => (
+                    <div 
+                      key={quest.id || index}
+                      className="mission-item completed"
+                      onClick={() => onNavigateToItem(quest, 'quests')}
+                    >
+                      <span className="mission-icon">{quest.icon || '📜'}</span>
+                      <div className="mission-info">
+                        <div className="mission-name">{quest.name || quest.title}</div>
+                        <div className="mission-reward">{quest.reward || 'Sin recompensa'}</div>
+                      </div>
+                      <span className="mission-arrow">→</span>
+                    </div>
+                  ))}
+                  {completedQuests.length > 5 && (
+                    <div className="more-missions-link" onClick={() => onTabChange('quests')}>
+                      Ver todas ({completedQuests.length})
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="no-missions">
+                  <span className="no-missions-icon">🏆</span>
+                  <p>No hay misiones completadas</p>
+                </div>
+              )}
+            </div>
+
+            {/* Misiones Pendientes */}
+            <div className="mission-column">
+              <h4 className="mission-column-title">⏸️ Pendientes ({pendingQuests.length})</h4>
+              {pendingQuests.length > 0 ? (
+                <div className="mission-list">
+                  {pendingQuests.slice(0, 5).map((quest, index) => (
+                    <div 
+                      key={quest.id || index}
+                      className="mission-item pending"
+                      onClick={() => onNavigateToItem(quest, 'quests')}
+                    >
+                      <span className="mission-icon">{quest.icon || '📜'}</span>
+                      <div className="mission-info">
+                        <div className="mission-name">{quest.name || quest.title}</div>
+                        <div className="mission-location">{quest.location || 'Sin ubicación'}</div>
+                      </div>
+                      <span className="mission-arrow">→</span>
+                    </div>
+                  ))}
+                  {pendingQuests.length > 5 && (
+                    <div className="more-missions-link" onClick={() => onTabChange('quests')}>
+                      Ver todas ({pendingQuests.length})
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="no-missions">
+                  <span className="no-missions-icon">📝</span>
+                  <p>No hay misiones pendientes</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -944,7 +1054,7 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange }) {
           max-width: 1400px;
           margin: 0 auto;
           padding: 2rem;
-          min-height: calc(100vh - 120px);
+          min-height: auto;
         }
 
         .dashboard-header-compact {
@@ -970,6 +1080,17 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange }) {
           font-size: 1.5rem;
           font-weight: 700;
           color: white;
+          background: linear-gradient(135deg, #8b5cf6, #ec4899);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .campaign-title-dashboard {
+          font-size: 1.8rem;
+          font-weight: 700;
+          color: white;
+          margin: 0;
           background: linear-gradient(135deg, #8b5cf6, #ec4899);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
@@ -1011,77 +1132,276 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange }) {
           letter-spacing: 1px;
         }
 
-        .dashboard-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        .dashboard-main-layout {
+          display: flex;
+          flex-direction: column;
           gap: 2rem;
-          margin-bottom: 3rem;
+          margin-top: 1rem;
         }
 
-        .recent-activity {
-          margin-top: 3rem;
+        .dashboard-general-summary {
+          width: 100%;
         }
 
-        .section-title {
+        .dashboard-quests-detail {
+          width: 100%;
+        }
+
+        .quest-status-summary {
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 2rem;
+        }
+
+        .quest-status-item {
+          flex: 1;
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 12px;
+          padding: 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          border: 1px solid transparent;
+        }
+
+        .quest-status-item:hover {
+          background: rgba(255, 255, 255, 0.1);
+          transform: translateY(-2px);
+        }
+
+        .quest-status-item.active {
+          border-color: rgba(245, 158, 11, 0.5);
+        }
+
+        .quest-status-item.completed {
+          border-color: rgba(16, 185, 129, 0.5);
+        }
+
+        .quest-status-item.pending {
+          border-color: rgba(107, 114, 128, 0.5);
+        }
+
+        .quest-status-icon {
+          font-size: 1.2rem;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(139, 92, 246, 0.2);
+          border-radius: 6px;
+        }
+
+        .quest-status-count {
           font-size: 1.5rem;
           font-weight: 700;
           color: white;
-          margin-bottom: 1.5rem;
+          margin-bottom: 0.25rem;
+        }
+
+        .quest-status-label {
+          font-size: 0.7rem;
+          color: #9ca3af;
+          font-weight: 500;
+        }
+
+        .missions-by-state {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 1.5rem;
+        }
+
+        .mission-column {
+          background: linear-gradient(135deg, rgba(31, 41, 55, 0.8), rgba(31, 41, 55, 0.4));
+          border-radius: 16px;
+          border: 1px solid rgba(139, 92, 246, 0.2);
+          padding: 1.5rem;
+          min-height: 300px;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .mission-column-title {
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: white;
+          margin-bottom: 1rem;
           display: flex;
           align-items: center;
           gap: 0.5rem;
         }
 
-        .activity-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 1.5rem;
+        .mission-list {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+          flex: 1;
         }
 
-        .activity-card {
+        .mission-item {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.75rem;
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          border: 1px solid transparent;
+        }
+
+        .mission-item:hover {
+          background: rgba(139, 92, 246, 0.15);
+          border-color: rgba(139, 92, 246, 0.3);
+          transform: translateX(2px);
+        }
+
+        .mission-item.completed {
+          opacity: 0.8;
+        }
+
+        .mission-item.pending {
+          opacity: 0.9;
+        }
+
+        .mission-icon {
+          font-size: 1rem;
+          flex-shrink: 0;
+        }
+
+        .mission-info {
+          flex: 1;
+        }
+
+        .mission-name {
+          color: white;
+          font-size: 0.9rem;
+          font-weight: 600;
+          margin-bottom: 0.25rem;
+        }
+
+        .mission-priority,
+        .mission-reward,
+        .mission-location {
+          color: #9ca3af;
+          font-size: 0.8rem;
+          line-height: 1.3;
+        }
+
+        .mission-arrow {
+          color: #9ca3af;
+          font-size: 0.8rem;
+          opacity: 0;
+          transition: opacity 0.2s ease;
+        }
+
+        .mission-item:hover .mission-arrow {
+          opacity: 1;
+        }
+
+        .more-missions-link {
+          text-align: center;
+          padding: 0.75rem;
+          color: #8b5cf6;
+          font-size: 0.9rem;
+          font-weight: 600;
+          cursor: pointer;
+          border-radius: 8px;
+          transition: all 0.2s ease;
+        }
+
+        .more-missions-link:hover {
+          background: rgba(139, 92, 246, 0.1);
+        }
+
+        .no-missions {
+          text-align: center;
+          padding: 2rem 1rem;
+          color: #9ca3af;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .no-missions-icon {
+          font-size: 2rem;
+          display: block;
+          margin-bottom: 1rem;
+        }
+
+        .section-title {
+          font-size: 1.2rem;
+          font-weight: 700;
+          color: white;
+          margin-bottom: 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .stats-overview {
+          background: linear-gradient(135deg, rgba(31, 41, 55, 0.8), rgba(31, 41, 55, 0.4));
+          border-radius: 16px;
+          border: 1px solid rgba(139, 92, 246, 0.2);
+          padding: 1.5rem;
+        }
+
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1rem;
+        }
+
+        .stat-card {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 12px;
+          padding: 1rem;
           display: flex;
           align-items: center;
           gap: 1rem;
-          padding: 1.5rem;
-          background: linear-gradient(135deg, rgba(31, 41, 55, 0.6), rgba(31, 41, 55, 0.3));
-          border-radius: 16px;
-          border: 1px solid rgba(139, 92, 246, 0.2);
+          cursor: pointer;
           transition: all 0.3s ease;
+          border: 1px solid transparent;
         }
 
-        .activity-card:hover {
+        .stat-card:hover {
+          background: rgba(255, 255, 255, 0.1);
+          border-color: var(--card-color);
           transform: translateY(-2px);
-          border-color: rgba(139, 92, 246, 0.4);
-          box-shadow: 0 8px 25px rgba(139, 92, 246, 0.1);
         }
 
-        .activity-icon {
-          font-size: 2rem;
-          width: 60px;
-          height: 60px;
+        .stat-icon {
+          font-size: 1.5rem;
+          width: 40px;
+          height: 40px;
           display: flex;
           align-items: center;
           justify-content: center;
           background: rgba(139, 92, 246, 0.2);
-          border-radius: 12px;
+          border-radius: 8px;
         }
 
-        .activity-content h4 {
-          color: white;
-          font-size: 1.1rem;
-          margin: 0 0 0.25rem 0;
-          font-weight: 600;
+        .stat-info {
+          flex: 1;
         }
 
-        .quests-status {
-          margin-top: 3rem;
+        .stat-count {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: var(--card-color);
+          margin-bottom: 0.25rem;
         }
 
-        .quests-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 1.5rem;
+        .stat-label {
+          font-size: 0.8rem;
+          color: #9ca3af;
+          font-weight: 500;
         }
+
 
         .quest-status-card {
           padding: 1.5rem;
@@ -1165,19 +1485,89 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange }) {
             flex-direction: column;
             align-items: flex-start;
             gap: 0.5rem;
+            margin-bottom: 1.5rem;
           }
 
-          .breadcrumb-text {
-            font-size: 1.3rem;
+          .stats-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
           }
-          
-          .dashboard-grid {
+
+          .stat-card {
+            padding: 0.75rem;
+            flex-direction: column;
+            text-align: center;
+            gap: 0.5rem;
+          }
+
+          .stat-icon {
+            width: 32px;
+            height: 32px;
+            font-size: 1.2rem;
+          }
+
+          .stat-count {
+            font-size: 1.2rem;
+          }
+
+          .stat-label {
+            font-size: 0.7rem;
+          }
+
+          .quest-status-summary {
+            flex-direction: column;
+            gap: 0.75rem;
+          }
+
+          .quest-status-item {
+            padding: 0.75rem;
+          }
+
+          .quest-status-count {
+            font-size: 1.2rem;
+          }
+
+          .quest-status-label {
+            font-size: 0.65rem;
+          }
+
+          .missions-by-state {
             grid-template-columns: 1fr;
             gap: 1rem;
           }
 
-          .activity-grid {
-            grid-template-columns: 1fr;
+          .mission-column {
+            padding: 1rem;
+            min-height: 200px;
+          }
+
+          .mission-item {
+            padding: 0.5rem;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+          }
+
+          .mission-info {
+            width: 100%;
+          }
+
+          .mission-name {
+            font-size: 0.85rem;
+          }
+
+          .mission-priority,
+          .mission-reward,
+          .mission-location {
+            font-size: 0.75rem;
+          }
+
+          .section-title {
+            font-size: 1.1rem;
+          }
+
+          .mission-column-title {
+            font-size: 1rem;
           }
         }
       `}</style>

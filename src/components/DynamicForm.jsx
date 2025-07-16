@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { validateEntity } from '../config/entityTypes.js'
 import RichTextEditor from './RichTextEditor'
-import EmojiSelector from './EmojiSelector'
+import IconSelector from './IconSelector'
 
 /**
  * Componente de formulario dinámico que genera formularios basado en esquemas
@@ -119,14 +119,15 @@ function DynamicForm({ entityType, config, item, onSave, onClose }) {
         )
 
       default:
-        // Campos especiales de icono/avatar usan EmojiSelector
+        // Campos especiales de icono/avatar usan IconSelector
         if (fieldName === 'icon' || fieldName === 'avatar') {
           return (
-            <EmojiSelector
+            <IconSelector
               name={fieldName}
               value={formData[fieldName] || ''}
               onChange={handleChange}
               entityType={entityType}
+              label={fieldConfig.label}
             />
           )
         }
@@ -159,14 +160,17 @@ function DynamicForm({ entityType, config, item, onSave, onClose }) {
 
           return (
             <div key={fieldName}>
-              <label style={{ 
-                color: 'white', 
-                fontWeight: '600', 
-                marginBottom: '0.5rem', 
-                display: 'block' 
-              }}>
-                {fieldConfig.label} {fieldConfig.required && '*'}
-              </label>
+              {/* No mostrar label para campos de icono/avatar ya que IconSelector lo incluye */}
+              {(fieldName !== 'icon' && fieldName !== 'avatar') && (
+                <label style={{ 
+                  color: 'white', 
+                  fontWeight: '600', 
+                  marginBottom: '0.5rem', 
+                  display: 'block' 
+                }}>
+                  {fieldConfig.label} {fieldConfig.required && '*'}
+                </label>
+              )}
               {renderField(fieldName, fieldConfig)}
               {errors[fieldName] && (
                 <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
@@ -223,8 +227,7 @@ function DynamicForm({ entityType, config, item, onSave, onClose }) {
           { fields: ['type', 'rarity'], columns: 2 },
           { fields: ['description'] },
           { fields: ['properties'] },
-          { fields: ['owner', 'location'], columns: 2 },
-          { fields: ['notes'] }
+          { fields: ['owner', 'location'], columns: 2 }
         )
         break
 

@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Bold, Italic, Underline, List, ListOrdered, Quote, Eye } from 'lucide-react'
+import { Bold, Italic, Underline, List, ListOrdered, Quote, Eye, Palette } from 'lucide-react'
+import { formatMarkdownToHtml } from '../utils/textFormatter'
 
 /**
- * Editor de texto enriquecido para campos de descripción y contenido
- * Incluye toolbar con opciones de formateo y vista previa
+ * Editor de texto enriquecido completamente reescrito
+ * Soluciona todos los problemas de cursor, formato y funcionalidad
  */
 function RichTextEditor({ 
   value = '', 
@@ -12,9 +13,13 @@ function RichTextEditor({
   minHeight = '200px',
   name 
 }) {
+  const [isPreviewMode, setIsPreviewMode] = useState(false)
+  const [showColorPicker, setShowColorPicker] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const textareaRef = useRef(null)
+  const colorPickerRef = useRef(null)
 
+  // Detectar móvil
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768)
@@ -24,57 +29,105 @@ function RichTextEditor({
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
+  // Cerrar color picker al hacer clic fuera
   useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'
-      textareaRef.current.style.height = Math.max(
+    const handleClickOutside = (event) => {
+      if (colorPickerRef.current && !colorPickerRef.current.contains(event.target)) {
+        setShowColorPicker(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Auto-resize del textarea
+  useEffect(() => {
+    if (textareaRef.current && !isPreviewMode) {
+      const textarea = textareaRef.current
+      textarea.style.height = 'auto'
+      textarea.style.height = Math.max(
         parseInt(minHeight), 
-        textareaRef.current.scrollHeight
+        textarea.scrollHeight
       ) + 'px'
     }
-  }, [value, minHeight])
+  }, [value, minHeight, isPreviewMode])
 
+  // Función mejorada para insertar texto
   const insertText = (before, after = '') => {
     const textarea = textareaRef.current
+    if (!textarea) return
+
     const start = textarea.selectionStart
     const end = textarea.selectionEnd
     const selectedText = value.substring(start, end)
     
     let newText
-    
+    let newCursorPos
+
     // Lógica especial para listas
-    if (before === '\n- ' || before === '\n1. ') {
+    if (before === '- ' || before === '1. ') {
       const lines = value.split('\n')
       const currentLineIndex = value.substring(0, start).split('\n').length - 1
       const currentLine = lines[currentLineIndex]
       
-      // Si ya estamos en una línea de lista, continuar la lista
-      if (/^\s*[-*+]\s/.test(currentLine) && before === '\n- ') {
-        newText = value.substring(0, end) + '\n- ' + value.substring(end)
-      } else if (/^\s*\d+\.\s/.test(currentLine) && before === '\n1. ') {
-        // Para listas numeradas, incrementar el número
-        const match = currentLine.match(/^\s*(\d+)\.\s/)
-        const nextNumber = match ? parseInt(match[1]) + 1 : 1
-        newText = value.substring(0, end) + `\n${nextNumber}. ` + value.substring(end)
+      // Si estamos al final de una línea existente, agregar nueva línea
+      if (currentLine && start === value.substring(0, start).lastIndexOf('\n') + currentLine.length + 1) {
+        if (before === '- ') {
+          newText = value.substring(0, start) + '\n- ' + value.substring(start)
+          newCursorPos = start + 3
+        } else {
+          const match = currentLine.match(/^\s*(\d+)\.\s/)
+          const nextNumber = match ? parseInt(match[1]) + 1 : 1
+          const listItem = `\n${nextNumber}. `
+          newText = value.substring(0, start) + listItem + value.substring(start)
+          newCursorPos = start + listItem.length
+        }
       } else {
-        newText = value.substring(0, start) + before + selectedText + after + value.substring(end)
+        // Insertar al principio de la línea actual
+        const lineStart = value.lastIndexOf('\n', start - 1) + 1
+        newText = value.substring(0, lineStart) + before + value.substring(lineStart)
+        newCursorPos = lineStart + before.length
       }
     } else {
+      // Formateo normal
       newText = value.substring(0, start) + before + selectedText + after + value.substring(end)
+      newCursorPos = start + before.length + selectedText.length + after.length
     }
     
+    // Actualizar valor
     onChange({ target: { name, value: newText } })
     
     // Restaurar posición del cursor
     setTimeout(() => {
       textarea.focus()
-      const newCursorPos = before === '\n- ' || before.startsWith('\n') && before.includes('.') 
-        ? start + before.length 
-        : start + before.length + selectedText.length
       textarea.setSelectionRange(newCursorPos, newCursorPos)
     }, 0)
   }
 
+  // Insertar color
+  const insertColor = (color) => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const selectedText = value.substring(start, end)
+    
+    if (selectedText) {
+      const coloredText = `<span style="color: ${color}">${selectedText}</span>`
+      const newText = value.substring(0, start) + coloredText + value.substring(end)
+      onChange({ target: { name, value: newText } })
+      
+      setTimeout(() => {
+        textarea.focus()
+        textarea.setSelectionRange(start + coloredText.length, start + coloredText.length)
+      }, 0)
+    }
+    
+    setShowColorPicker(false)
+  }
+
+  // Acciones de formato
   const formatActions = [
     {
       icon: Bold,
@@ -97,96 +150,40 @@ function RichTextEditor({
     {
       icon: List,
       label: 'Lista',
-      action: () => insertText('\n- ', ''),
+      action: () => insertText('- '),
       shortcut: 'Ctrl+L'
     },
     {
       icon: ListOrdered,
       label: 'Lista numerada',
-      action: () => insertText('\n1. ', ''),
+      action: () => insertText('1. '),
       shortcut: 'Ctrl+Shift+L'
     },
     {
       icon: Quote,
       label: 'Cita',
-      action: () => insertText('\n> ', ''),
+      action: () => insertText('> '),
       shortcut: 'Ctrl+Q'
     }
   ]
 
-  // Procesar texto para vista previa
-  const formatPreviewText = (text) => {
-    if (!text) return ''
-    
-    let processed = text
-      // Primero procesar negritas (doble asterisco)
-      .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #ffffff; font-weight: 700;">$1</strong>')
-      // Luego cursivas (asterisco simple, evitando conflicto con negritas ya procesadas)
-      .replace(/(?<!\*)\*([^*]+?)\*(?!\*)/g, '<em style="color: #e5e7eb; font-style: italic;">$1</em>')
-      // Subrayado
-      .replace(/<u>(.*?)<\/u>/g, '<u style="color: #ffffff; text-decoration: underline;">$1</u>')
-      
-    // Procesar listas con mejor formato
-    const lines = processed.split('\n')
-    const processedLines = []
-    let inList = false
-    let inOrderedList = false
-    
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i]
-      
-      // Lista no ordenada
-      if (/^\s*[-*+]\s+(.+)$/.test(line)) {
-        if (!inList) {
-          processedLines.push('<ul style="margin: 1rem 0; padding-left: 1.5rem; color: var(--text-secondary);">')
-          inList = true
-        }
-        const content = line.replace(/^\s*[-*+]\s+/, '')
-        processedLines.push(`<li style="margin: 0.5rem 0;">${content}</li>`)
-      }
-      // Lista ordenada
-      else if (/^\s*\d+\.\s+(.+)$/.test(line)) {
-        if (!inOrderedList) {
-          processedLines.push('<ol style="margin: 1rem 0; padding-left: 1.5rem; color: var(--text-secondary);">')
-          inOrderedList = true
-        }
-        const content = line.replace(/^\s*\d+\.\s+/, '')
-        processedLines.push(`<li style="margin: 0.5rem 0;">${content}</li>`)
-      }
-      // Citas
-      else if (/^\s*>\s+(.+)$/.test(line)) {
-        const content = line.replace(/^\s*>\s+/, '')
-        processedLines.push(`<blockquote style="border-left: 3px solid #8b5cf6; padding-left: 1rem; margin: 1rem 0; color: var(--text-secondary); font-style: italic; background: rgba(139, 92, 246, 0.1); padding: 0.75rem 1rem; border-radius: 0 8px 8px 0;">${content}</blockquote>`)
-        inList = false
-        inOrderedList = false
-      }
-      // Línea normal
-      else {
-        if (inList) {
-          processedLines.push('</ul>')
-          inList = false
-        }
-        if (inOrderedList) {
-          processedLines.push('</ol>')
-          inOrderedList = false
-        }
-        if (line.trim()) {
-          processedLines.push(line)
-        } else {
-          processedLines.push('<br>')
-        }
-      }
-    }
-    
-    // Cerrar listas abiertas
-    if (inList) processedLines.push('</ul>')
-    if (inOrderedList) processedLines.push('</ol>')
-    
-    return processedLines.join('\n').replace(/\n/g, '<br>')
-  }
+  // Colores disponibles
+  const colors = [
+    { name: 'Rojo', value: '#ef4444' },
+    { name: 'Naranja', value: '#f97316' },
+    { name: 'Amarillo', value: '#eab308' },
+    { name: 'Verde', value: '#22c55e' },
+    { name: 'Azul', value: '#3b82f6' },
+    { name: 'Púrpura', value: '#8b5cf6' },
+    { name: 'Rosa', value: '#ec4899' },
+    { name: 'Gris', value: '#6b7280' }
+  ]
 
+  // Formatear texto para vista previa usando utilidad compartida
+  const formatPreviewText = formatMarkdownToHtml
+
+  // Manejar atajos de teclado
   const handleKeyDown = (e) => {
-    // Atajos de teclado
     if (e.ctrlKey || e.metaKey) {
       switch (e.key) {
         case 'b':
@@ -204,19 +201,19 @@ function RichTextEditor({
         case 'l':
           e.preventDefault()
           if (e.shiftKey) {
-            insertText('\n1. ', '')
+            insertText('1. ')
           } else {
-            insertText('\n- ', '')
+            insertText('- ')
           }
           break
         case 'q':
           e.preventDefault()
-          insertText('\n> ', '')
+          insertText('> ')
           break
       }
     }
     
-    // Manejo de Enter para continuar listas
+    // Continuar lista al presionar Enter
     if (e.key === 'Enter') {
       const textarea = textareaRef.current
       const start = textarea.selectionStart
@@ -224,24 +221,19 @@ function RichTextEditor({
       const currentLineIndex = value.substring(0, start).split('\n').length - 1
       const currentLine = lines[currentLineIndex]
       
-      // Si estamos en una línea de lista no ordenada
-      if (/^\s*[-*+]\s/.test(currentLine)) {
+      // Lista no ordenada
+      if (/^-\s/.test(currentLine)) {
         e.preventDefault()
-        insertText('\n- ', '')
+        insertText('\n- ')
         return
       }
       
-      // Si estamos en una línea de lista ordenada
-      if (/^\s*\d+\.\s/.test(currentLine)) {
+      // Lista ordenada
+      if (/^\d+\.\s/.test(currentLine)) {
         e.preventDefault()
-        const match = currentLine.match(/^\s*(\d+)\.\s/)
+        const match = currentLine.match(/^(\d+)\.\s/)
         const nextNumber = match ? parseInt(match[1]) + 1 : 1
-        const newText = value.substring(0, start) + `\n${nextNumber}. ` + value.substring(start)
-        onChange({ target: { name, value: newText } })
-        setTimeout(() => {
-          textarea.focus()
-          textarea.setSelectionRange(start + `\n${nextNumber}. `.length, start + `\n${nextNumber}. `.length)
-        }, 0)
+        insertText(`\n${nextNumber}. `)
         return
       }
     }
@@ -254,7 +246,7 @@ function RichTextEditor({
       background: 'rgba(31, 41, 55, 0.6)',
       overflow: 'hidden'
     }}>
-      {/* Toolbar siempre visible */}
+      {/* Toolbar */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -299,38 +291,152 @@ function RichTextEditor({
               </button>
             )
           })}
+          
+          {/* Color picker */}
+          <div style={{ position: 'relative' }} ref={colorPickerRef}>
+            <button
+              type="button"
+              onClick={() => setShowColorPicker(!showColorPicker)}
+              title="Resaltar texto"
+              style={{
+                background: 'transparent',
+                border: '1px solid rgba(139, 92, 246, 0.3)',
+                borderRadius: '6px',
+                color: 'var(--text-secondary)',
+                padding: '0.5rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = 'rgba(139, 92, 246, 0.2)'
+                e.target.style.borderColor = 'rgba(139, 92, 246, 0.5)'
+                e.target.style.color = 'white'
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'transparent'
+                e.target.style.borderColor = 'rgba(139, 92, 246, 0.3)'
+                e.target.style.color = 'var(--text-secondary)'
+              }}
+            >
+              <Palette size={16} />
+            </button>
+            
+            {showColorPicker && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                marginTop: '0.5rem',
+                background: 'rgba(15, 15, 25, 0.98)',
+                border: '1px solid rgba(139, 92, 246, 0.3)',
+                borderRadius: '8px',
+                padding: '0.75rem',
+                zIndex: 1000,
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: '0.5rem',
+                backdropFilter: 'blur(20px)'
+              }}>
+                {colors.map((color, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => insertColor(color.value)}
+                    title={color.name}
+                    style={{
+                      width: '24px',
+                      height: '24px',
+                      background: color.value,
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = 'scale(1.1)'
+                      e.target.style.borderColor = 'white'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = 'scale(1)'
+                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)'
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-
-      {/* Content area - Vista unificada con formato en tiempo real */}
-      <div style={{ 
-        minHeight: minHeight,
-        position: 'relative'
-      }}>
-        <textarea
-          ref={textareaRef}
-          name={name}
-          value={value}
-          onChange={onChange}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder}
+        
+        {/* Preview toggle */}
+        <button
+          type="button"
+          onClick={() => setIsPreviewMode(!isPreviewMode)}
+          title={isPreviewMode ? 'Modo edición' : 'Vista previa'}
           style={{
-            width: '100%',
-            background: 'transparent',
-            border: 'none',
-            color: 'white',
-            fontSize: '0.95rem',
-            fontFamily: 'inherit',
-            padding: '1rem',
-            resize: 'none',
-            outline: 'none',
-            minHeight: `calc(${minHeight} - 1rem)`,
-            lineHeight: '1.6'
+            background: isPreviewMode ? 'rgba(139, 92, 246, 0.2)' : 'transparent',
+            border: '1px solid rgba(139, 92, 246, 0.3)',
+            borderRadius: '6px',
+            color: isPreviewMode ? 'white' : 'var(--text-secondary)',
+            padding: '0.5rem',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.2s ease'
           }}
-        />
+        >
+          <Eye size={16} />
+        </button>
       </div>
 
-      {/* Hints */}
+      {/* Content area */}
+      <div style={{ minHeight: minHeight }}>
+        {isPreviewMode ? (
+          // Vista previa
+          <div
+            style={{
+              padding: '1rem',
+              fontSize: '0.95rem',
+              lineHeight: '1.6',
+              color: 'white',
+              minHeight: `calc(${minHeight} - 2rem)`,
+              whiteSpace: 'pre-wrap',
+              wordWrap: 'break-word'
+            }}
+            dangerouslySetInnerHTML={{ 
+              __html: value ? formatPreviewText(value) : `<span style="color: #6b7280; font-style: italic;">${placeholder}</span>`
+            }}
+          />
+        ) : (
+          // Modo edición
+          <textarea
+            ref={textareaRef}
+            name={name}
+            value={value}
+            onChange={onChange}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder}
+            style={{
+              width: '100%',
+              background: 'transparent',
+              border: 'none',
+              color: 'white',
+              fontSize: '0.95rem',
+              fontFamily: 'inherit',
+              padding: '1rem',
+              resize: 'none',
+              outline: 'none',
+              minHeight: `calc(${minHeight} - 2rem)`,
+              lineHeight: '1.6'
+            }}
+          />
+        )}
+      </div>
+
+      {/* Footer */}
       <div style={{
         padding: '0.5rem 1rem',
         background: 'rgba(15, 15, 25, 0.5)',

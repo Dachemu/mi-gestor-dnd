@@ -69,7 +69,6 @@ export const ENTITY_SCHEMAS = {
     properties: { type: 'textarea', label: 'Propiedades mágicas', placeholder: 'Efectos mágicos, bonificaciones, habilidades especiales...' },
     owner: { type: 'text', label: 'Propietario', placeholder: '¿Quién lo posee?' },
     location: { type: 'text', label: 'Ubicación', placeholder: '¿Dónde se encuentra?' },
-    notes: { type: 'textarea', label: 'Notas adicionales', placeholder: 'Historia, leyendas, información adicional...' },
     icon: { type: 'text', label: 'Icono', defaultValue: '📦' }
   },
 
@@ -110,8 +109,7 @@ export const ENTITY_SCHEMAS = {
       defaultValue: 'General',
       options: ['General', 'Sesión', 'Trama', 'Personajes', 'Mundo', 'Reglas']
     },
-    content: { type: 'textarea', required: true, label: 'Contenido', placeholder: 'Escribe el contenido de tu nota aquí...', minHeight: '300px' },
-    icon: { type: 'text', label: 'Icono', defaultValue: '📝' }
+    content: { type: 'textarea', required: true, label: 'Contenido', placeholder: 'Escribe el contenido de tu nota aquí...', minHeight: '300px' }
   }
 }
 
@@ -220,10 +218,6 @@ export const ENTITY_CONFIGS = {
       {
         title: 'Ubicación',
         fields: ['owner', 'location']
-      },
-      {
-        title: 'Notas',
-        fields: ['notes']
       }
     ],
     colors: {
@@ -334,7 +328,8 @@ export const ENTITY_CONFIGS = {
         'Reglas': '#ef4444'
       }
     },
-    filters: ['category']
+    filters: ['category'],
+    fixedIcon: '📝'
   }
 }
 
