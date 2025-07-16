@@ -14,6 +14,7 @@ function RichTextEditor({
 }) {
   const [isToolbarVisible, setIsToolbarVisible] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
   const textareaRef = useRef(null)
 
   useEffect(() => {
@@ -206,138 +207,182 @@ function RichTextEditor({
       background: 'rgba(31, 41, 55, 0.6)',
       overflow: 'hidden'
     }}>
-      {/* Toolbar */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0.75rem 1rem',
-        background: 'rgba(31, 41, 55, 0.8)',
-        borderBottom: '1px solid rgba(139, 92, 246, 0.1)'
+      {/* Toolbar - only show when editing */}
+      {isEditing && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0.75rem 1rem',
+          background: 'rgba(31, 41, 55, 0.8)',
+          borderBottom: '1px solid rgba(139, 92, 246, 0.1)'
+        }}>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            {formatActions.map((action, index) => {
+              const IconComponent = action.icon
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={action.action}
+                  title={`${action.label} (${action.shortcut})`}
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid rgba(139, 92, 246, 0.3)',
+                    borderRadius: '6px',
+                    color: 'var(--text-secondary)',
+                    padding: '0.5rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = 'rgba(139, 92, 246, 0.2)'
+                    e.target.style.borderColor = 'rgba(139, 92, 246, 0.5)'
+                    e.target.style.color = 'white'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = 'transparent'
+                    e.target.style.borderColor = 'rgba(139, 92, 246, 0.3)'
+                    e.target.style.color = 'var(--text-secondary)'
+                  }}
+                >
+                  <IconComponent size={16} />
+                </button>
+              )
+            })}
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              style={{
+                background: 'rgba(16, 185, 129, 0.2)',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                borderRadius: '6px',
+                color: '#10b981',
+                padding: '0.5rem 1rem',
+                cursor: 'pointer',
+                fontSize: '0.8rem',
+                fontWeight: '500',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              ✓ Terminar
+            </button>
+            <div style={{
+              fontSize: '0.8rem',
+              color: 'var(--text-secondary)',
+              fontWeight: '500'
+            }}>
+              Editando
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Content area - shows either preview or editor */}
+      <div style={{ 
+        minHeight: minHeight,
+        position: 'relative'
       }}>
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          {formatActions.map((action, index) => {
-            const IconComponent = action.icon
-            return (
+        {isEditing ? (
+          /* Editor mode */
+          <div>
+            <div style={{
+              padding: '0.5rem 1rem',
+              background: 'rgba(15, 15, 25, 0.3)',
+              fontSize: '0.75rem',
+              color: 'var(--text-disabled)',
+              borderBottom: '1px solid rgba(139, 92, 246, 0.1)'
+            }}>
+              ✏️ Editor
+            </div>
+            <textarea
+              ref={textareaRef}
+              name={name}
+              value={value}
+              onChange={onChange}
+              onKeyDown={handleKeyDown}
+              onFocus={() => setIsToolbarVisible(true)}
+              onBlur={() => setIsToolbarVisible(false)}
+              placeholder={placeholder}
+              autoFocus
+              style={{
+                width: '100%',
+                background: 'transparent',
+                border: 'none',
+                color: 'white',
+                fontSize: '0.95rem',
+                fontFamily: 'inherit',
+                padding: '1rem',
+                resize: 'none',
+                outline: 'none',
+                minHeight: `calc(${minHeight} - 2rem)`,
+                lineHeight: '1.6'
+              }}
+            />
+          </div>
+        ) : (
+          /* Preview mode */
+          <div>
+            <div style={{
+              padding: '0.5rem 1rem',
+              background: 'rgba(15, 15, 25, 0.3)',
+              fontSize: '0.75rem',
+              color: 'var(--text-disabled)',
+              borderBottom: '1px solid rgba(139, 92, 246, 0.1)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <span>👁️ Vista final</span>
               <button
-                key={index}
                 type="button"
-                onClick={action.action}
-                title={`${action.label} (${action.shortcut})`}
+                onClick={() => setIsEditing(true)}
                 style={{
-                  background: 'transparent',
+                  background: 'rgba(139, 92, 246, 0.2)',
                   border: '1px solid rgba(139, 92, 246, 0.3)',
                   borderRadius: '6px',
-                  color: 'var(--text-secondary)',
-                  padding: '0.5rem',
+                  color: '#8b5cf6',
+                  padding: '0.25rem 0.75rem',
                   cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  fontSize: '0.75rem',
+                  fontWeight: '500',
                   transition: 'all 0.2s ease'
                 }}
-                onMouseEnter={(e) => {
-                  e.target.style.background = 'rgba(139, 92, 246, 0.2)'
-                  e.target.style.borderColor = 'rgba(139, 92, 246, 0.5)'
-                  e.target.style.color = 'white'
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.background = 'transparent'
-                  e.target.style.borderColor = 'rgba(139, 92, 246, 0.3)'
-                  e.target.style.color = 'var(--text-secondary)'
-                }}
               >
-                <IconComponent size={16} />
+                ✏️ Editar
               </button>
-            )
-          })}
-        </div>
-
-        <div style={{
-          fontSize: '0.8rem',
-          color: 'var(--text-secondary)',
-          fontWeight: '500'
-        }}>
-          Vista previa en tiempo real
-        </div>
-      </div>
-
-      {/* Editor with inline preview */}
-      <div style={{ 
-        display: 'flex', 
-        flexDirection: isMobile ? 'column' : 'row',
-        height: 'auto',
-        minHeight: minHeight
-      }}>
-        {/* Editor */}
-        <div style={{ 
-          flex: 1, 
-          borderRight: !isMobile ? '1px solid rgba(139, 92, 246, 0.1)' : 'none',
-          borderBottom: isMobile ? '1px solid rgba(139, 92, 246, 0.1)' : 'none'
-        }}>
-          <div style={{
-            padding: '0.5rem 1rem',
-            background: 'rgba(15, 15, 25, 0.3)',
-            fontSize: '0.75rem',
-            color: 'var(--text-disabled)',
-            borderBottom: '1px solid rgba(139, 92, 246, 0.1)'
-          }}>
-            ✏️ Editor
+            </div>
+            <div
+              onClick={() => setIsEditing(true)}
+              style={{
+                padding: '1rem',
+                minHeight: `calc(${minHeight} - 2rem)`,
+                color: 'var(--text-secondary)',
+                lineHeight: '1.6',
+                background: 'rgba(15, 15, 25, 0.2)',
+                fontSize: '0.95rem',
+                overflow: 'auto',
+                cursor: 'text',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = 'rgba(15, 15, 25, 0.3)'
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'rgba(15, 15, 25, 0.2)'
+              }}
+              dangerouslySetInnerHTML={{ 
+                __html: formatPreviewText(value) || '<em style="color: var(--text-disabled);">Haz clic para empezar a escribir...</em>' 
+              }}
+            />
           </div>
-          <textarea
-            ref={textareaRef}
-            name={name}
-            value={value}
-            onChange={onChange}
-            onKeyDown={handleKeyDown}
-            onFocus={() => setIsToolbarVisible(true)}
-            onBlur={() => setIsToolbarVisible(false)}
-            placeholder={placeholder}
-            style={{
-              width: '100%',
-              background: 'transparent',
-              border: 'none',
-              color: 'white',
-              fontSize: '0.95rem',
-              fontFamily: 'inherit',
-              padding: '1rem',
-              resize: 'none',
-              outline: 'none',
-              minHeight: isMobile ? '120px' : `calc(${minHeight} - 2rem)`,
-              lineHeight: '1.6'
-            }}
-          />
-        </div>
-
-        {/* Preview */}
-        <div style={{ 
-          flex: 1,
-          minHeight: isMobile ? '120px' : 'auto'
-        }}>
-          <div style={{
-            padding: '0.5rem 1rem',
-            background: 'rgba(15, 15, 25, 0.3)',
-            fontSize: '0.75rem',
-            color: 'var(--text-disabled)',
-            borderBottom: '1px solid rgba(139, 92, 246, 0.1)'
-          }}>
-            👁️ Vista previa
-          </div>
-          <div
-            style={{
-              padding: '1rem',
-              minHeight: isMobile ? '120px' : `calc(${minHeight} - 2rem)`,
-              color: 'var(--text-secondary)',
-              lineHeight: '1.6',
-              background: 'rgba(15, 15, 25, 0.2)',
-              fontSize: '0.95rem',
-              overflow: 'auto'
-            }}
-            dangerouslySetInnerHTML={{ 
-              __html: formatPreviewText(value) || '<em style="color: var(--text-disabled);">Vista previa aparecerá aquí...</em>' 
-            }}
-          />
-        </div>
+        )}
       </div>
 
       {/* Hints */}
@@ -352,7 +397,10 @@ function RichTextEditor({
         alignItems: 'center'
       }}>
         <span>
-          Usa **negrita**, *cursiva*, listas y más. Atajos: Ctrl+B, Ctrl+I, Ctrl+L
+          {isEditing 
+            ? 'Usa **negrita**, *cursiva*, listas y más. Atajos: Ctrl+B, Ctrl+I, Ctrl+L'
+            : 'Haz clic en el contenido o botón "Editar" para modificar'
+          }
         </span>
         <span>
           {value.length} caracteres

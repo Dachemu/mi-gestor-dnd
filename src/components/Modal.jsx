@@ -62,18 +62,19 @@ function Modal({
 
   if (!isOpen) return null
 
-  // Determinar tamaños del modal
+  // Determinar tamaños del modal con mejor responsividad
   const sizes = {
-    small: { width: '400px', maxHeight: '80vh' },
-    medium: { width: '600px', maxHeight: '85vh' },
-    large: { width: '800px', maxHeight: '90vh' },
-    xlarge: { width: '1000px', maxHeight: '95vh' }
+    small: { width: 'min(90vw, 400px)', maxHeight: '85vh' },
+    medium: { width: 'min(85vw, 700px)', maxHeight: '85vh' },
+    large: { width: 'min(90vw, 1000px)', maxHeight: '90vh' },
+    xlarge: { width: 'min(95vw, 1200px)', maxHeight: '90vh' }
   }
 
   const modalSize = sizes[size] || sizes.medium
 
   return (
     <div 
+      className="modal-container"
       style={{
         position: 'fixed',
         top: 0,
@@ -86,7 +87,7 @@ function Modal({
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 9999,
-        padding: '2rem',
+        padding: 'clamp(0.5rem, 2vw, 2rem)',
         overflowY: 'auto',
         animation: 'fadeIn 0.2s ease-out'
       }}
@@ -179,18 +180,22 @@ function Modal({
         )}
 
         {/* Contenido del modal */}
-        <div style={{
-          padding: '2.5rem',
-          paddingBottom: '3rem',
-          overflowY: 'auto',
-          flex: 1,
-          maxHeight: '100%',
-          background: 'rgba(15, 15, 25, 0.2)'
-        }}>
+        <div 
+          className="modal-content"
+          style={{
+            padding: 'clamp(1.5rem, 3vw, 2.5rem)',
+            paddingBottom: 'clamp(2rem, 4vw, 3rem)',
+            overflowY: 'auto',
+            flex: 1,
+            maxHeight: 'calc(100vh - 8rem)',
+            background: 'rgba(15, 15, 25, 0.2)',
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'rgba(139, 92, 246, 0.3) transparent'
+          }}>
           {children}
           
           {/* Espaciador invisible para asegurar scroll completo */}
-          <div style={{ height: '2rem', visibility: 'hidden' }} />
+          <div style={{ height: '1rem', visibility: 'hidden' }} />
         </div>
       </div>
 
@@ -208,6 +213,32 @@ function Modal({
           to { 
             opacity: 1; 
             transform: scale(1) translateY(0); 
+          }
+        }
+
+        /* Scrollbar personalizada para Webkit */
+        .modal-content::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        .modal-content::-webkit-scrollbar-track {
+          background: rgba(15, 15, 25, 0.5);
+          border-radius: 3px;
+        }
+        
+        .modal-content::-webkit-scrollbar-thumb {
+          background: rgba(139, 92, 246, 0.3);
+          border-radius: 3px;
+        }
+        
+        .modal-content::-webkit-scrollbar-thumb:hover {
+          background: rgba(139, 92, 246, 0.5);
+        }
+
+        @media (max-width: 768px) {
+          .modal-container {
+            align-items: flex-start !important;
+            padding-top: 2rem !important;
           }
         }
       `}</style>

@@ -264,13 +264,14 @@ function CompactList({
       <style jsx>{`
         .responsive-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-          gap: clamp(0.75rem, 2vw, 1.5rem);
+          grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+          gap: clamp(1rem, 2.5vw, 2rem);
           padding: clamp(0.5rem, 1.5vw, 1rem) 0;
           width: 100%;
           max-width: 100%;
           overflow: hidden;
           justify-content: center;
+          align-items: start;
         }
 
         .compact-card:hover {
@@ -301,15 +302,30 @@ function CompactList({
           opacity: 1;
         }
         
+        @media (min-width: 1600px) {
+          .responsive-grid {
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2.5rem;
+          }
+        }
+
+        @media (max-width: 1400px) {
+          .responsive-grid {
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr));
+            gap: clamp(1rem, 2vw, 1.75rem);
+          }
+        }
+
         @media (max-width: 1200px) {
           .responsive-grid {
-            grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+            gap: clamp(0.875rem, 1.75vw, 1.5rem);
           }
         }
 
         @media (max-width: 1024px) {
           .responsive-grid {
-            grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
             gap: clamp(0.75rem, 1.5vw, 1.25rem);
           }
           
@@ -318,10 +334,21 @@ function CompactList({
           }
         }
         
+        @media (max-width: 900px) {
+          .responsive-grid {
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+            gap: clamp(0.75rem, 1.5vw, 1rem);
+          }
+          
+          .compact-card {
+            padding: 1.5rem !important;
+          }
+        }
+
         @media (max-width: 768px) {
           .responsive-grid {
-            grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-            gap: clamp(0.5rem, 1.25vw, 1rem);
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+            gap: clamp(0.625rem, 1.25vw, 0.875rem);
           }
           
           .compact-card {
@@ -335,7 +362,7 @@ function CompactList({
         
         @media (max-width: 640px) {
           .responsive-grid {
-            grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr));
             gap: 0.75rem;
             padding: 0.5rem 0;
           }
