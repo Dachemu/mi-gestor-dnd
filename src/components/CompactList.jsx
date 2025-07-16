@@ -55,13 +55,7 @@ function CompactList({
   }
 
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 380px), 1fr))',
-      gap: 'clamp(1rem, 2.5vw, 2rem)',
-      padding: 'clamp(0.5rem, 2vw, 1.5rem) 0',
-      justifyContent: 'center'
-    }}>
+    <div className="responsive-grid">
       {items.map(item => {
         const connectionCount = getConnectionCount ? getConnectionCount(item) : 0
         
@@ -268,6 +262,17 @@ function CompactList({
       })}
 
       <style jsx>{`
+        .responsive-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+          gap: clamp(0.75rem, 2vw, 1.5rem);
+          padding: clamp(0.5rem, 1.5vw, 1rem) 0;
+          width: 100%;
+          max-width: 100%;
+          overflow: hidden;
+          justify-content: center;
+        }
+
         .compact-card:hover {
           transform: translateY(-8px) scale(1.02);
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(139, 92, 246, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -296,7 +301,29 @@ function CompactList({
           opacity: 1;
         }
         
+        @media (max-width: 1200px) {
+          .responsive-grid {
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+          }
+        }
+
+        @media (max-width: 1024px) {
+          .responsive-grid {
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+            gap: clamp(0.75rem, 1.5vw, 1.25rem);
+          }
+          
+          .compact-card {
+            padding: 1.5rem !important;
+          }
+        }
+        
         @media (max-width: 768px) {
+          .responsive-grid {
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+            gap: clamp(0.5rem, 1.25vw, 1rem);
+          }
+          
           .compact-card {
             padding: 1.25rem !important;
           }
@@ -306,17 +333,49 @@ function CompactList({
           }
         }
         
-        @media (max-width: 480px) {
+        @media (max-width: 640px) {
+          .responsive-grid {
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+          }
+          
           .compact-card {
             padding: 1rem !important;
+            margin: 0 !important;
           }
           
           .compact-card h3 {
             font-size: 1.1rem !important;
           }
+        }
+        
+        @media (max-width: 480px) {
+          .responsive-grid {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+          }
+          
+          .compact-card {
+            padding: 0.875rem !important;
+          }
+          
+          .compact-card h3 {
+            font-size: 1rem !important;
+          }
           
           .action-button {
             padding: 0.5rem !important;
+          }
+        }
+        
+        @media (max-width: 360px) {
+          .compact-card {
+            padding: 0.75rem !important;
+          }
+          
+          .compact-card h3 {
+            font-size: 0.95rem !important;
           }
         }
       `}</style>

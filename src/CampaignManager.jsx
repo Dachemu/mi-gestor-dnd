@@ -509,7 +509,7 @@ function CampaignManager({ campaign, onBackToSelector }) {
         /* Responsive */
         @media (max-width: 1200px) {
           .search-input {
-            width: 220px;
+            width: 200px;
           }
         }
 
@@ -521,7 +521,7 @@ function CampaignManager({ campaign, onBackToSelector }) {
 
           .campaign-title-nav {
             font-size: 1.2rem;
-            max-width: 200px;
+            max-width: 180px;
           }
 
           .tab-button {
@@ -530,7 +530,7 @@ function CampaignManager({ campaign, onBackToSelector }) {
           }
 
           .search-input {
-            width: 180px;
+            width: 160px;
             font-size: 0.85rem;
           }
         }
@@ -548,9 +548,13 @@ function CampaignManager({ campaign, onBackToSelector }) {
             display: none;
           }
 
+          .nav-container {
+            padding: 0 0.75rem;
+          }
+
           .campaign-title-nav {
             font-size: 1.1rem;
-            max-width: 150px;
+            max-width: 120px;
           }
 
           .btn-back {
@@ -558,7 +562,7 @@ function CampaignManager({ campaign, onBackToSelector }) {
           }
 
           .search-input {
-            width: 140px;
+            width: 120px;
             padding: 0.5rem 0.75rem 0.5rem 2rem;
             font-size: 0.8rem;
           }
@@ -576,17 +580,39 @@ function CampaignManager({ campaign, onBackToSelector }) {
 
         @media (max-width: 480px) {
           .nav-container {
-            padding: 0 0.75rem;
-            gap: 0.5rem;
+            padding: 0 0.5rem;
+            gap: 0.25rem;
+          }
+
+          .nav-left {
+            flex: 1;
+            min-width: 0;
+          }
+
+          .nav-right {
+            flex-shrink: 0;
           }
 
           .campaign-title-nav {
-            font-size: 1rem;
-            max-width: 100px;
+            font-size: 0.9rem;
+            max-width: 80px;
           }
 
           .search-input {
-            width: 100px;
+            width: 90px;
+            padding: 0.4rem 0.5rem 0.4rem 1.75rem;
+            font-size: 0.75rem;
+          }
+
+          .search-icon {
+            width: 12px;
+            height: 12px;
+            left: 0.5rem;
+          }
+
+          .btn-back {
+            padding: 0.3rem 0.5rem;
+            font-size: 0.8rem;
           }
         }
       `}</style>
@@ -634,6 +660,146 @@ function TabContent({
       return <Dashboard campaign={campaign} onTabChange={onTabChange} />
   }
 }
+
+// ✅ Componente para las tarjetas de estado de misiones
+const QuestStatusCard = React.memo(function QuestStatusCard({ 
+  title, 
+  icon, 
+  count, 
+  quests, 
+  className, 
+  onQuestClick 
+}) {
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  return (
+    <>
+      <div 
+        className={`quest-status-card ${className}`}
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <div className="quest-status-header">
+          <span className="quest-status-icon">{icon}</span>
+          <h4>{title}</h4>
+        </div>
+        <div className="quest-count">{count}</div>
+        <p>Misiones {title.toLowerCase()}</p>
+        
+        {count > 0 && (
+          <div className="expand-indicator">
+            {isExpanded ? '▼' : '▶'} Ver misiones
+          </div>
+        )}
+        
+        {isExpanded && count > 0 && (
+          <div className="quest-list" onClick={(e) => e.stopPropagation()}>
+            {quests.slice(0, 5).map((quest, index) => (
+              <div 
+                key={quest.id || index}
+                className="quest-item"
+                onClick={() => onQuestClick(quest)}
+              >
+                <span className="quest-name">{quest.name || quest.title}</span>
+                <span className="quest-arrow">→</span>
+              </div>
+            ))}
+            {quests.length > 5 && (
+              <div className="quest-item more-quests" onClick={() => onQuestClick()}>
+                <span className="quest-name">Ver todas ({quests.length})</span>
+                <span className="quest-arrow">→</span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <style jsx>{`
+        .quest-status-card {
+          cursor: pointer;
+          user-select: none;
+        }
+
+        .expand-indicator {
+          margin-top: 1rem;
+          font-size: 0.8rem;
+          color: #9ca3af;
+          font-weight: 500;
+          opacity: 0.7;
+          transition: all 0.2s ease;
+        }
+
+        .quest-status-card:hover .expand-indicator {
+          opacity: 1;
+          color: #e5e7eb;
+        }
+
+        .quest-list {
+          margin-top: 1rem;
+          padding-top: 1rem;
+          border-top: 1px solid rgba(139, 92, 246, 0.2);
+          animation: slideDown 0.2s ease-out;
+        }
+
+        .quest-item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.5rem 0.75rem;
+          margin: 0.25rem 0;
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          font-size: 0.85rem;
+        }
+
+        .quest-item:hover {
+          background: rgba(139, 92, 246, 0.2);
+          transform: translateX(4px);
+        }
+
+        .quest-name {
+          color: #e5e7eb;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 180px;
+        }
+
+        .quest-arrow {
+          color: #9ca3af;
+          font-size: 0.8rem;
+          opacity: 0;
+          transition: opacity 0.2s ease;
+        }
+
+        .quest-item:hover .quest-arrow {
+          opacity: 1;
+        }
+
+        .more-quests {
+          font-weight: 600;
+          color: #8b5cf6;
+        }
+
+        .more-quests .quest-name {
+          color: #8b5cf6;
+        }
+
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+    </>
+  )
+})
 
 // ✅ Dashboard mejorado con mejor rendimiento
 const Dashboard = React.memo(function Dashboard({ campaign, onTabChange }) {
@@ -692,14 +858,15 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange }) {
 
   return (
     <div className="dashboard-container fade-in">
-      {/* Header del Dashboard */}
-      <div className="dashboard-header">
-        <div className="campaign-overview">
-          <h1 className="campaign-title">🏰 {campaign.name}</h1>
-          {campaign.description && (
-            <p className="campaign-description">"{campaign.description}"</p>
-          )}
+      {/* Header del Dashboard - Compact version */}
+      <div className="dashboard-header-compact">
+        <div className="dashboard-breadcrumb">
+          <span className="breadcrumb-icon">🏰</span>
+          <span className="breadcrumb-text">Dashboard</span>
         </div>
+        {campaign.description && (
+          <p className="campaign-subtitle">"{campaign.description}"</p>
+        )}
       </div>
 
       {/* Grid de Secciones */}
@@ -721,32 +888,32 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange }) {
       <div className="quests-status">
         <h3 className="section-title">📊 Estado de Misiones</h3>
         <div className="quests-grid">
-          <div className="quest-status-card active">
-            <div className="quest-status-header">
-              <span className="quest-status-icon">⏳</span>
-              <h4>En Progreso</h4>
-            </div>
-            <div className="quest-count">{activeQuests.length}</div>
-            <p>Misiones activas</p>
-          </div>
+          <QuestStatusCard
+            title="En Progreso"
+            icon="⏳"
+            count={activeQuests.length}
+            quests={activeQuests}
+            className="active"
+            onQuestClick={(quest) => onTabChange('quests')}
+          />
           
-          <div className="quest-status-card completed">
-            <div className="quest-status-header">
-              <span className="quest-status-icon">✅</span>
-              <h4>Completadas</h4>
-            </div>
-            <div className="quest-count">{completedQuests.length}</div>
-            <p>Misiones finalizadas</p>
-          </div>
+          <QuestStatusCard
+            title="Completadas"
+            icon="✅"
+            count={completedQuests.length}
+            quests={completedQuests}
+            className="completed"
+            onQuestClick={(quest) => onTabChange('quests')}
+          />
           
-          <div className="quest-status-card pending">
-            <div className="quest-status-header">
-              <span className="quest-status-icon">⏸️</span>
-              <h4>Pendientes</h4>
-            </div>
-            <div className="quest-count">{pendingQuests.length}</div>
-            <p>Misiones por comenzar</p>
-          </div>
+          <QuestStatusCard
+            title="Pendientes"
+            icon="⏸️"
+            count={pendingQuests.length}
+            quests={pendingQuests}
+            className="pending"
+            onQuestClick={(quest) => onTabChange('quests')}
+          />
         </div>
       </div>
 
@@ -758,30 +925,41 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange }) {
           min-height: calc(100vh - 120px);
         }
 
-        .dashboard-header {
-          margin-bottom: 3rem;
-          padding: 2rem;
-          background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.05));
-          border-radius: 20px;
-          border: 1px solid rgba(139, 92, 246, 0.2);
-          text-align: center;
+        .dashboard-header-compact {
+          margin-bottom: 2rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 1rem;
         }
 
-        .campaign-title {
-          font-size: 2.5rem;
-          font-weight: 800;
-          margin: 0 0 0.5rem 0;
-          background: linear-gradient(135deg, #ffffff, #e5e7eb);
+        .dashboard-breadcrumb {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+
+        .breadcrumb-icon {
+          font-size: 1.5rem;
+        }
+
+        .breadcrumb-text {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: white;
+          background: linear-gradient(135deg, #8b5cf6, #ec4899);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
         }
 
-        .campaign-description {
+        .campaign-subtitle {
           color: var(--text-muted);
-          font-size: 1.1rem;
+          font-size: 0.95rem;
           font-style: italic;
           margin: 0;
+          opacity: 0.8;
         }
 
         .stat-highlight {
@@ -961,14 +1139,14 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange }) {
             padding: 1rem;
           }
           
-          .dashboard-header {
-            grid-template-columns: 1fr;
-            text-align: center;
-            gap: 1rem;
+          .dashboard-header-compact {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
           }
 
-          .campaign-title {
-            font-size: 2rem;
+          .breadcrumb-text {
+            font-size: 1.3rem;
           }
           
           .dashboard-grid {

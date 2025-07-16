@@ -12,9 +12,18 @@ function RichTextEditor({
   minHeight = '200px',
   name 
 }) {
-  const [showPreview, setShowPreview] = useState(false)
   const [isToolbarVisible, setIsToolbarVisible] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const textareaRef = useRef(null)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -244,57 +253,37 @@ function RichTextEditor({
           })}
         </div>
 
-        <button
-          type="button"
-          onClick={() => setShowPreview(!showPreview)}
-          style={{
-            background: showPreview ? 'rgba(139, 92, 246, 0.3)' : 'transparent',
-            border: '1px solid rgba(139, 92, 246, 0.3)',
-            borderRadius: '6px',
-            color: showPreview ? 'white' : 'var(--text-secondary)',
-            padding: '0.5rem 0.75rem',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            fontSize: '0.8rem',
-            fontWeight: '500',
-            transition: 'all 0.2s ease'
-          }}
-          onMouseEnter={(e) => {
-            if (!showPreview) {
-              e.target.style.background = 'rgba(139, 92, 246, 0.2)'
-              e.target.style.color = 'white'
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!showPreview) {
-              e.target.style.background = 'transparent'
-              e.target.style.color = 'var(--text-secondary)'
-            }
-          }}
-        >
-          <Eye size={14} />
-          Vista previa
-        </button>
+        <div style={{
+          fontSize: '0.8rem',
+          color: 'var(--text-secondary)',
+          fontWeight: '500'
+        }}>
+          Vista previa en tiempo real
+        </div>
       </div>
 
-      {/* Editor / Preview */}
-      <div style={{ position: 'relative' }}>
-        {showPreview ? (
-          <div
-            style={{
-              padding: '1rem',
-              minHeight: minHeight,
-              color: 'var(--text-secondary)',
-              lineHeight: '1.6',
-              background: 'rgba(15, 15, 25, 0.5)'
-            }}
-            dangerouslySetInnerHTML={{ 
-              __html: formatPreviewText(value) || '<em style="color: var(--text-disabled)">Vista previa aparecerá aquí...</em>' 
-            }}
-          />
-        ) : (
+      {/* Editor with inline preview */}
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: isMobile ? 'column' : 'row',
+        height: 'auto',
+        minHeight: minHeight
+      }}>
+        {/* Editor */}
+        <div style={{ 
+          flex: 1, 
+          borderRight: !isMobile ? '1px solid rgba(139, 92, 246, 0.1)' : 'none',
+          borderBottom: isMobile ? '1px solid rgba(139, 92, 246, 0.1)' : 'none'
+        }}>
+          <div style={{
+            padding: '0.5rem 1rem',
+            background: 'rgba(15, 15, 25, 0.3)',
+            fontSize: '0.75rem',
+            color: 'var(--text-disabled)',
+            borderBottom: '1px solid rgba(139, 92, 246, 0.1)'
+          }}>
+            ✏️ Editor
+          </div>
           <textarea
             ref={textareaRef}
             name={name}
@@ -309,16 +298,46 @@ function RichTextEditor({
               background: 'transparent',
               border: 'none',
               color: 'white',
-              fontSize: '1rem',
+              fontSize: '0.95rem',
               fontFamily: 'inherit',
               padding: '1rem',
               resize: 'none',
               outline: 'none',
-              minHeight: minHeight,
+              minHeight: isMobile ? '120px' : `calc(${minHeight} - 2rem)`,
               lineHeight: '1.6'
             }}
           />
-        )}
+        </div>
+
+        {/* Preview */}
+        <div style={{ 
+          flex: 1,
+          minHeight: isMobile ? '120px' : 'auto'
+        }}>
+          <div style={{
+            padding: '0.5rem 1rem',
+            background: 'rgba(15, 15, 25, 0.3)',
+            fontSize: '0.75rem',
+            color: 'var(--text-disabled)',
+            borderBottom: '1px solid rgba(139, 92, 246, 0.1)'
+          }}>
+            👁️ Vista previa
+          </div>
+          <div
+            style={{
+              padding: '1rem',
+              minHeight: isMobile ? '120px' : `calc(${minHeight} - 2rem)`,
+              color: 'var(--text-secondary)',
+              lineHeight: '1.6',
+              background: 'rgba(15, 15, 25, 0.2)',
+              fontSize: '0.95rem',
+              overflow: 'auto'
+            }}
+            dangerouslySetInnerHTML={{ 
+              __html: formatPreviewText(value) || '<em style="color: var(--text-disabled);">Vista previa aparecerá aquí...</em>' 
+            }}
+          />
+        </div>
       </div>
 
       {/* Hints */}
