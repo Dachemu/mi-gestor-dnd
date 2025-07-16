@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { validateEntity } from '../config/entityTypes.js'
+import RichTextEditor from './RichTextEditor'
 
 /**
  * Componente de formulario dinámico que genera formularios basado en esquemas
@@ -95,15 +96,12 @@ function DynamicForm({ entityType, config, item, onSave, onClose }) {
 
       case 'textarea':
         return (
-          <textarea
+          <RichTextEditor
+            name={fieldName}
+            value={formData[fieldName] || ''}
+            onChange={handleChange}
             placeholder={fieldConfig.placeholder}
-            style={{
-              ...baseProps.style,
-              minHeight: fieldConfig.minHeight || '100px',
-              resize: 'vertical',
-              fontFamily: 'inherit'
-            }}
-            {...baseProps}
+            minHeight={fieldConfig.minHeight || '200px'}
           />
         )
 

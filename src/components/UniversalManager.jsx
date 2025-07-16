@@ -116,19 +116,25 @@ function UniversalManager({
                     key={value}
                     onClick={() => setFilters(prev => ({ ...prev, [filterKey]: value }))}
                     style={{
-                      padding: '0.5rem 1rem',
-                      borderRadius: '8px',
-                      border: 'none',
+                      padding: '0.75rem 1.5rem',
+                      borderRadius: '12px',
+                      border: filters[filterKey] === value || (!filters[filterKey] && value === 'Todas')
+                        ? '1px solid rgba(139, 92, 246, 0.5)'
+                        : '1px solid rgba(139, 92, 246, 0.2)',
                       background: filters[filterKey] === value || (!filters[filterKey] && value === 'Todas')
-                        ? 'rgba(139, 92, 246, 0.3)' 
+                        ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(139, 92, 246, 0.1))' 
                         : 'rgba(31, 41, 55, 0.5)',
                       color: filters[filterKey] === value || (!filters[filterKey] && value === 'Todas')
-                        ? '#a78bfa' 
+                        ? '#ffffff' 
                         : 'var(--text-muted)',
                       cursor: 'pointer',
-                      transition: 'all 0.2s ease',
+                      transition: 'all 0.3s ease',
                       fontSize: '0.9rem',
-                      fontWeight: '500'
+                      fontWeight: '600',
+                      boxShadow: filters[filterKey] === value || (!filters[filterKey] && value === 'Todas')
+                        ? '0 4px 12px rgba(139, 92, 246, 0.3)'
+                        : 'none',
+                      backdropFilter: 'blur(10px)'
                     }}
                   >
                     {value} {value !== 'Todas' && `(${items.filter(i => i[filterKey] === value).length})`}
@@ -158,18 +164,35 @@ function UniversalManager({
       }}>
         <div>
           <h2 style={{ 
-            fontSize: '2.5rem',
-            fontWeight: 'bold',
-            color: 'white',
+            fontSize: '3rem',
+            fontWeight: '800',
+            background: 'linear-gradient(135deg, #ffffff 0%, #a78bfa 50%, #3b82f6 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
             display: 'flex',
             alignItems: 'center',
-            gap: '0.75rem',
-            margin: 0
+            gap: '1rem',
+            margin: 0,
+            textShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+            filter: 'drop-shadow(0 2px 4px rgba(139, 92, 246, 0.3))'
           }}>
-            {config.icon} {config.pluralName}
+            <span style={{ fontSize: '3.5rem', filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5))' }}>
+              {config.icon}
+            </span> 
+            {config.pluralName}
           </h2>
-          <p style={{ color: 'var(--text-muted)', margin: '0.5rem 0 0 0' }}>
-            {config.description} de {campaign.name}
+          <p style={{ 
+            color: 'var(--text-muted)', 
+            margin: '1rem 0 0 0',
+            fontSize: '1.1rem',
+            fontWeight: '500',
+            opacity: 0.9
+          }}>
+            {config.description} de <span style={{ 
+              color: 'rgba(139, 92, 246, 0.8)', 
+              fontWeight: '600' 
+            }}>{campaign.name}</span>
           </p>
         </div>
         <button onClick={openCreateForm} className="btn-primary">
@@ -267,7 +290,15 @@ function UniversalManager({
             entityType={entityType}
             config={config}
             onClose={closeDetails}
-            onEdit={() => openEditForm(selectedItem)}
+            onEdit={(updatedItem) => {
+              if (updatedItem && updatedItem.id) {
+                // Si se recibió un item actualizado, guardar directamente
+                handleSave(updatedItem)
+              } else {
+                // Si no hay datos, abrir el formulario de edición modal (fallback)
+                openEditForm(selectedItem)
+              }
+            }}
             onDelete={() => handleDelete(selectedItem.id, selectedItem.name || selectedItem.title)}
             connections={connections}
             campaign={campaign}

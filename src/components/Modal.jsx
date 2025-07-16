@@ -85,7 +85,7 @@ function Modal({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 1000,
+        zIndex: 9999,
         padding: '2rem',
         overflowY: 'auto',
         animation: 'fadeIn 0.2s ease-out'
@@ -94,36 +94,56 @@ function Modal({
     >
       <div 
         style={{
-          backgroundColor: 'var(--bg-secondary)',
-          borderRadius: '12px',
-          border: '1px solid var(--border-color)',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)',
+          background: 'linear-gradient(135deg, rgba(15, 15, 25, 0.98) 0%, rgba(26, 26, 46, 0.95) 100%)',
+          borderRadius: '20px',
+          border: '1px solid rgba(139, 92, 246, 0.3)',
+          boxShadow: '0 32px 64px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
           width: '100%',
           maxWidth: modalSize.width,
           maxHeight: modalSize.maxHeight,
           display: 'flex',
           flexDirection: 'column',
-          animation: 'slideInScale 0.3s ease-out'
+          animation: 'slideInScale 0.3s ease-out',
+          backdropFilter: 'blur(25px)',
+          WebkitBackdropFilter: 'blur(25px)',
+          position: 'relative',
+          overflow: 'hidden'
         }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Gradiente decorativo superior */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '3px',
+          background: 'linear-gradient(90deg, #8b5cf6, #3b82f6, #10b981, #f59e0b, #ec4899)',
+          borderRadius: '20px 20px 0 0'
+        }} />
+        
         {/* Header del modal */}
         {(title || showCloseButton) && (
           <div style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '1.5rem 2rem',
-            borderBottom: '1px solid var(--border-color)',
-            backgroundColor: 'var(--bg-primary)',
-            borderRadius: '12px 12px 0 0'
+            padding: '2rem 2.5rem',
+            borderBottom: '1px solid rgba(139, 92, 246, 0.2)',
+            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)',
+            borderRadius: '20px 20px 0 0',
+            position: 'relative'
           }}>
             {title && (
               <h2 style={{
-                fontSize: '1.5rem',
-                fontWeight: '600',
-                color: 'white',
-                margin: 0
+                fontSize: '1.75rem',
+                fontWeight: '700',
+                background: 'linear-gradient(135deg, #ffffff 0%, #a78bfa 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                margin: 0,
+                textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
               }}>
                 {title}
               </h2>
@@ -160,11 +180,12 @@ function Modal({
 
         {/* Contenido del modal */}
         <div style={{
-          padding: '2rem',
-          paddingBottom: '3rem', // Extra padding para asegurar que los botones sean visibles
+          padding: '2.5rem',
+          paddingBottom: '3rem',
           overflowY: 'auto',
           flex: 1,
-          maxHeight: '100%'
+          maxHeight: '100%',
+          background: 'rgba(15, 15, 25, 0.2)'
         }}>
           {children}
           
