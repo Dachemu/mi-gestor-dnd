@@ -394,57 +394,6 @@ function UniversalDetails({
   if (isEditing) {
     return (
       <div>
-        {/* Header en modo edición */}
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'space-between',
-          marginBottom: '2rem',
-          padding: '1rem',
-          background: 'rgba(139, 92, 246, 0.1)',
-          borderRadius: '12px',
-          border: '1px solid rgba(139, 92, 246, 0.2)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ fontSize: '2rem' }}>
-              {item.icon || item.avatar || config.icon}
-            </div>
-            <div>
-              <h3 style={{ 
-                color: 'white', 
-                margin: 0, 
-                fontSize: '1.25rem',
-                fontWeight: '600'
-              }}>
-                ✏️ Editando: {item.name || item.title}
-              </h3>
-              <p style={{ 
-                color: 'var(--text-muted)', 
-                margin: '0.25rem 0 0 0',
-                fontSize: '0.9rem'
-              }}>
-                Realiza los cambios necesarios y guarda
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={handleCancelEdit}
-            style={{
-              background: 'rgba(239, 68, 68, 0.2)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              borderRadius: '8px',
-              color: '#ef4444',
-              padding: '0.5rem 1rem',
-              cursor: 'pointer',
-              fontSize: '0.9rem',
-              fontWeight: '500',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            ❌ Cancelar
-          </button>
-        </div>
-
         {/* Formulario de edición */}
         <DynamicForm
           entityType={entityType}

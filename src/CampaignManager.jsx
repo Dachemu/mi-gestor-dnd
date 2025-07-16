@@ -670,92 +670,106 @@ const QuestStatusCard = React.memo(function QuestStatusCard({
   className, 
   onQuestClick 
 }) {
-  const [isExpanded, setIsExpanded] = useState(false)
-
   return (
     <>
-      <div 
-        className={`quest-status-card ${className}`}
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
+      <div className={`quest-status-card ${className}`}>
         <div className="quest-status-header">
           <span className="quest-status-icon">{icon}</span>
           <h4>{title}</h4>
+          <span className="quest-count-badge">{count}</span>
         </div>
-        <div className="quest-count">{count}</div>
-        <p>Misiones {title.toLowerCase()}</p>
         
-        {count > 0 && (
-          <div className="expand-indicator">
-            {isExpanded ? '▼' : '▶'} Ver misiones
-          </div>
-        )}
-        
-        {isExpanded && count > 0 && (
-          <div className="quest-list" onClick={(e) => e.stopPropagation()}>
+        {count > 0 ? (
+          <div className="quest-list">
             {quests.slice(0, 5).map((quest, index) => (
               <div 
                 key={quest.id || index}
                 className="quest-item"
                 onClick={() => onQuestClick(quest)}
               >
+                <span className="quest-icon">{quest.icon || '📜'}</span>
                 <span className="quest-name">{quest.name || quest.title}</span>
                 <span className="quest-arrow">→</span>
               </div>
             ))}
             {quests.length > 5 && (
               <div className="quest-item more-quests" onClick={() => onQuestClick()}>
+                <span className="quest-icon">⋯</span>
                 <span className="quest-name">Ver todas ({quests.length})</span>
                 <span className="quest-arrow">→</span>
               </div>
             )}
+          </div>
+        ) : (
+          <div className="no-quests">
+            <span>No hay misiones {title.toLowerCase()}</span>
           </div>
         )}
       </div>
 
       <style jsx>{`
         .quest-status-card {
-          cursor: pointer;
+          cursor: default;
           user-select: none;
+          min-height: 250px;
+          display: flex;
+          flex-direction: column;
         }
 
-        .expand-indicator {
-          margin-top: 1rem;
+        .quest-status-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 1rem;
+          padding-bottom: 0.75rem;
+          border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .quest-status-header h4 {
+          flex: 1;
+          margin: 0 0.5rem;
+        }
+
+        .quest-count-badge {
+          background: rgba(255, 255, 255, 0.1);
+          color: white;
+          padding: 0.25rem 0.5rem;
+          border-radius: 6px;
           font-size: 0.8rem;
-          color: #9ca3af;
-          font-weight: 500;
-          opacity: 0.7;
-          transition: all 0.2s ease;
-        }
-
-        .quest-status-card:hover .expand-indicator {
-          opacity: 1;
-          color: #e5e7eb;
+          font-weight: 600;
+          min-width: 24px;
+          text-align: center;
         }
 
         .quest-list {
-          margin-top: 1rem;
-          padding-top: 1rem;
-          border-top: 1px solid rgba(139, 92, 246, 0.2);
-          animation: slideDown 0.2s ease-out;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
         }
 
         .quest-item {
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          padding: 0.5rem 0.75rem;
-          margin: 0.25rem 0;
+          gap: 0.75rem;
+          padding: 0.75rem;
           background: rgba(255, 255, 255, 0.05);
-          border-radius: 6px;
+          border-radius: 8px;
           cursor: pointer;
           transition: all 0.2s ease;
-          font-size: 0.85rem;
+          font-size: 0.9rem;
+          border: 1px solid transparent;
         }
 
         .quest-item:hover {
-          background: rgba(139, 92, 246, 0.2);
-          transform: translateX(4px);
+          background: rgba(139, 92, 246, 0.15);
+          border-color: rgba(139, 92, 246, 0.3);
+          transform: translateX(2px);
+        }
+
+        .quest-icon {
+          font-size: 1rem;
+          flex-shrink: 0;
         }
 
         .quest-name {
@@ -763,7 +777,8 @@ const QuestStatusCard = React.memo(function QuestStatusCard({
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-          max-width: 180px;
+          flex: 1;
+          font-weight: 500;
         }
 
         .quest-arrow {
@@ -771,6 +786,7 @@ const QuestStatusCard = React.memo(function QuestStatusCard({
           font-size: 0.8rem;
           opacity: 0;
           transition: opacity 0.2s ease;
+          flex-shrink: 0;
         }
 
         .quest-item:hover .quest-arrow {
@@ -780,21 +796,27 @@ const QuestStatusCard = React.memo(function QuestStatusCard({
         .more-quests {
           font-weight: 600;
           color: #8b5cf6;
+          border-color: rgba(139, 92, 246, 0.3);
         }
 
         .more-quests .quest-name {
           color: #8b5cf6;
         }
 
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+        .more-quests:hover {
+          background: rgba(139, 92, 246, 0.2);
+        }
+
+        .no-quests {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--text-muted);
+          font-style: italic;
+          font-size: 0.9rem;
+          text-align: center;
+          padding: 2rem 1rem;
         }
       `}</style>
     </>
@@ -1062,17 +1084,18 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange }) {
         }
 
         .quest-status-card {
-          padding: 2rem;
+          padding: 1.5rem;
           background: linear-gradient(135deg, rgba(31, 41, 55, 0.8), rgba(31, 41, 55, 0.4));
-          border-radius: 20px;
+          border-radius: 16px;
           border: 1px solid rgba(139, 92, 246, 0.2);
-          text-align: center;
           transition: all 0.3s ease;
+          backdrop-filter: blur(10px);
         }
 
         .quest-status-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+          border-color: rgba(139, 92, 246, 0.3);
         }
 
         .quest-status-card.active {
@@ -1109,23 +1132,22 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange }) {
           font-weight: 600;
         }
 
-        .quest-count {
-          font-size: 3rem;
-          font-weight: 900;
-          color: white;
-          margin-bottom: 0.5rem;
-        }
-
-        .quest-status-card.active .quest-count {
+        .quest-status-card.active .quest-count-badge {
+          background: rgba(245, 158, 11, 0.2);
           color: #f59e0b;
+          border: 1px solid rgba(245, 158, 11, 0.3);
         }
 
-        .quest-status-card.completed .quest-count {
+        .quest-status-card.completed .quest-count-badge {
+          background: rgba(16, 185, 129, 0.2);
           color: #10b981;
+          border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
-        .quest-status-card.pending .quest-count {
-          color: #6b7280;
+        .quest-status-card.pending .quest-count-badge {
+          background: rgba(107, 114, 128, 0.2);
+          color: #9ca3af;
+          border: 1px solid rgba(107, 114, 128, 0.3);
         }
 
         .quest-status-card p {

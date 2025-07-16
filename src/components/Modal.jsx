@@ -64,10 +64,10 @@ function Modal({
 
   // Determinar tamaños del modal con mejor responsividad
   const sizes = {
-    small: { width: 'min(90vw, 400px)', maxHeight: '85vh' },
-    medium: { width: 'min(85vw, 700px)', maxHeight: '85vh' },
-    large: { width: 'min(90vw, 1000px)', maxHeight: '90vh' },
-    xlarge: { width: 'min(95vw, 1200px)', maxHeight: '90vh' }
+    small: { width: 'min(95vw, 400px)', maxHeight: '90vh' },
+    medium: { width: 'min(95vw, 700px)', maxHeight: '90vh' },
+    large: { width: 'min(98vw, 1000px)', maxHeight: '95vh' },
+    xlarge: { width: 'min(98vw, 1200px)', maxHeight: '95vh' }
   }
 
   const modalSize = sizes[size] || sizes.medium
@@ -238,7 +238,15 @@ function Modal({
         @media (max-width: 768px) {
           .modal-container {
             align-items: flex-start !important;
-            padding-top: 2rem !important;
+            padding: 1rem !important;
+            padding-top: 1rem !important;
+          }
+        }
+        
+        @media (max-width: 640px) {
+          .modal-container {
+            padding: 0.5rem !important;
+            padding-top: 1rem !important;
           }
         }
       `}</style>

@@ -20,7 +20,8 @@
       "Bash(npm update:*)",
       "Bash(npm install:*)",
       "Bash(timeout 8 npm run dev -- --port 3002)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

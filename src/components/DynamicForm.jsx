@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { validateEntity } from '../config/entityTypes.js'
 import RichTextEditor from './RichTextEditor'
+import EmojiSelector from './EmojiSelector'
 
 /**
  * Componente de formulario dinámico que genera formularios basado en esquemas
@@ -118,6 +119,18 @@ function DynamicForm({ entityType, config, item, onSave, onClose }) {
         )
 
       default:
+        // Campos especiales de icono/avatar usan EmojiSelector
+        if (fieldName === 'icon' || fieldName === 'avatar') {
+          return (
+            <EmojiSelector
+              name={fieldName}
+              value={formData[fieldName] || ''}
+              onChange={handleChange}
+              entityType={entityType}
+            />
+          )
+        }
+        
         return (
           <input
             type="text"
@@ -184,6 +197,7 @@ function DynamicForm({ entityType, config, item, onSave, onClose }) {
           { fields: ['name', 'playerName'], columns: 2 },
           { fields: ['class', 'race', 'level'], columns: 3 },
           { fields: ['background'] },
+          { fields: ['avatar'], columns: 1 },
           { fields: ['description'] },
           { fields: ['hitPoints', 'armorClass', 'speed'], columns: 3 },
           { fields: ['notes'] }
@@ -193,6 +207,7 @@ function DynamicForm({ entityType, config, item, onSave, onClose }) {
       case 'quests':
         groups.push(
           { fields: ['name'] },
+          { fields: ['icon'] },
           { fields: ['description'] },
           { fields: ['status', 'priority'], columns: 2 },
           { fields: ['location'] },
@@ -204,6 +219,7 @@ function DynamicForm({ entityType, config, item, onSave, onClose }) {
       case 'objects':
         groups.push(
           { fields: ['name'] },
+          { fields: ['icon'] },
           { fields: ['type', 'rarity'], columns: 2 },
           { fields: ['description'] },
           { fields: ['properties'] },
@@ -215,6 +231,7 @@ function DynamicForm({ entityType, config, item, onSave, onClose }) {
       case 'npcs':
         groups.push(
           { fields: ['name'] },
+          { fields: ['icon'] },
           { fields: ['role'] },
           { fields: ['description'] },
           { fields: ['location'] },
@@ -226,6 +243,7 @@ function DynamicForm({ entityType, config, item, onSave, onClose }) {
       case 'locations':
         groups.push(
           { fields: ['name'] },
+          { fields: ['icon'] },
           { fields: ['description'] },
           { fields: ['importance'] },
           { fields: ['inhabitants'] },
@@ -236,6 +254,7 @@ function DynamicForm({ entityType, config, item, onSave, onClose }) {
       case 'notes':
         groups.push(
           { fields: ['title', 'category'], columns: 2 },
+          { fields: ['icon'] },
           { fields: ['content'] }
         )
         break
