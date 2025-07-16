@@ -7,3 +7,13 @@ dist/
 .env.production
 .DS_Store
 Thumbs.db
+
+# Claude IDE settings (local only)
+.claude/settings.local.json
+
+# Package lock changes from npm operations
+package-lock.json
+
+# Vite dev cache and build artifacts
+node_modules/.vite/
+node_modules/.package-lock.json
