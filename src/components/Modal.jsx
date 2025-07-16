@@ -62,18 +62,19 @@ function Modal({
 
   if (!isOpen) return null
 
-  // Determinar tamaños del modal
+  // Determinar tamaños del modal con mejor responsividad
   const sizes = {
-    small: { width: '400px', maxHeight: '80vh' },
-    medium: { width: '600px', maxHeight: '85vh' },
-    large: { width: '800px', maxHeight: '90vh' },
-    xlarge: { width: '1000px', maxHeight: '95vh' }
+    small: { width: 'min(95vw, 400px)', maxHeight: 'calc(100vh - 4rem)' },
+    medium: { width: 'min(95vw, 700px)', maxHeight: 'calc(100vh - 4rem)' },
+    large: { width: 'min(98vw, 1000px)', maxHeight: 'calc(100vh - 4rem)' },
+    xlarge: { width: 'min(98vw, 1200px)', maxHeight: 'calc(100vh - 4rem)' }
   }
 
   const modalSize = sizes[size] || sizes.medium
 
   return (
     <div 
+      className="modal-container"
       style={{
         position: 'fixed',
         top: 0,
@@ -85,49 +86,81 @@ function Modal({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 1000,
-        padding: '2rem',
+        zIndex: 9999,
+        padding: 'clamp(0.5rem, 2vw, 1rem)',
         overflowY: 'auto',
         animation: 'fadeIn 0.2s ease-out'
       }}
-      onClick={onClose}
+      onClick={(e) => e.stopPropagation()}
     >
       <div 
         style={{
-          backgroundColor: 'var(--bg-secondary)',
-          borderRadius: '12px',
-          border: '1px solid var(--border-color)',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8)',
+          background: 'linear-gradient(135deg, rgba(15, 15, 25, 0.98) 0%, rgba(26, 26, 46, 0.95) 100%)',
+          borderRadius: '20px',
+          border: '1px solid rgba(139, 92, 246, 0.3)',
+          boxShadow: '0 32px 64px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
           width: '100%',
           maxWidth: modalSize.width,
           maxHeight: modalSize.maxHeight,
           display: 'flex',
           flexDirection: 'column',
-          animation: 'slideInScale 0.3s ease-out'
+          animation: 'slideInScale 0.3s ease-out',
+          backdropFilter: 'blur(25px)',
+          WebkitBackdropFilter: 'blur(25px)',
+          position: 'relative',
+          overflow: 'hidden'
         }}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Gradiente decorativo superior */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '3px',
+          background: 'linear-gradient(90deg, #8b5cf6, #3b82f6, #10b981, #f59e0b, #ec4899)',
+          borderRadius: '20px 20px 0 0'
+        }} />
+        
         {/* Header del modal */}
         {(title || showCloseButton) && (
           <div style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '1.5rem 2rem',
-            borderBottom: '1px solid var(--border-color)',
-            backgroundColor: 'var(--bg-primary)',
-            borderRadius: '12px 12px 0 0'
+            padding: '2rem 2.5rem',
+            borderBottom: '1px solid rgba(139, 92, 246, 0.2)',
+            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)',
+            borderRadius: '20px 20px 0 0',
+            position: 'relative'
           }}>
-            {title && (
-              <h2 style={{
-                fontSize: '1.5rem',
-                fontWeight: '600',
-                color: 'white',
-                margin: 0
-              }}>
-                {title}
-              </h2>
-            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
+              {title && (
+                <h2 style={{
+                  fontSize: '1.75rem',
+                  fontWeight: '700',
+                  background: 'linear-gradient(135deg, #ffffff 0%, #a78bfa 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  margin: 0,
+                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                }}>
+                  {title}
+                </h2>
+              )}
+            </div>
+            
+            {/* Botones de acción compactos */}
+            <div id="modal-compact-actions" style={{
+              display: 'flex',
+              gap: '0.5rem',
+              alignItems: 'center'
+            }}>
+              {/* Los botones se inyectarán aquí dinámicamente */}
+            </div>
+            
             {showCloseButton && (
               <button
                 onClick={onClose}
@@ -141,7 +174,8 @@ function Modal({
                   transition: 'all 0.2s ease',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  marginLeft: '0.5rem'
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.backgroundColor = 'var(--bg-secondary)'
@@ -159,17 +193,20 @@ function Modal({
         )}
 
         {/* Contenido del modal */}
-        <div style={{
-          padding: '2rem',
-          paddingBottom: '3rem', // Extra padding para asegurar que los botones sean visibles
-          overflowY: 'auto',
-          flex: 1,
-          maxHeight: '100%'
-        }}>
+        <div 
+          className="modal-content"
+          style={{
+            padding: 'clamp(1.5rem, 3vw, 2rem)',
+            paddingBottom: 'clamp(2rem, 4vw, 3rem)',
+            overflowY: 'auto',
+            flex: 1,
+            minHeight: 0,
+            background: 'rgba(15, 15, 25, 0.2)',
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'rgba(139, 92, 246, 0.3) transparent',
+            maxHeight: 'calc(100vh - 12rem)'
+          }}>
           {children}
-          
-          {/* Espaciador invisible para asegurar scroll completo */}
-          <div style={{ height: '2rem', visibility: 'hidden' }} />
         </div>
       </div>
 
@@ -187,6 +224,52 @@ function Modal({
           to { 
             opacity: 1; 
             transform: scale(1) translateY(0); 
+          }
+        }
+
+        /* Scrollbar personalizada para Webkit */
+        .modal-content::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        .modal-content::-webkit-scrollbar-track {
+          background: rgba(15, 15, 25, 0.5);
+          border-radius: 3px;
+        }
+        
+        .modal-content::-webkit-scrollbar-thumb {
+          background: rgba(139, 92, 246, 0.3);
+          border-radius: 3px;
+        }
+        
+        .modal-content::-webkit-scrollbar-thumb:hover {
+          background: rgba(139, 92, 246, 0.5);
+        }
+
+        @media (max-width: 768px) {
+          .modal-container {
+            align-items: flex-start !important;
+            padding: 0.5rem !important;
+            padding-top: 1rem !important;
+            padding-bottom: 2rem !important;
+          }
+          
+          .modal-content {
+            max-height: calc(100vh - 10rem) !important;
+            padding-bottom: 2rem !important;
+          }
+        }
+        
+        @media (max-width: 640px) {
+          .modal-container {
+            padding: 0.25rem !important;
+            padding-top: 0.5rem !important;
+            padding-bottom: 2rem !important;
+          }
+          
+          .modal-content {
+            max-height: calc(100vh - 8rem) !important;
+            padding-bottom: 2rem !important;
           }
         }
       `}</style>

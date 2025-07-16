@@ -55,13 +55,7 @@ function CompactList({
   }
 
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 380px), 1fr))',
-      gap: 'clamp(1rem, 2.5vw, 2rem)',
-      padding: 'clamp(0.5rem, 2vw, 1.5rem) 0',
-      justifyContent: 'center'
-    }}>
+    <div className="responsive-grid">
       {items.map(item => {
         const connectionCount = getConnectionCount ? getConnectionCount(item) : 0
         
@@ -69,16 +63,17 @@ function CompactList({
           <div
             key={item.id}
             style={{
-              background: 'linear-gradient(135deg, var(--bg-secondary) 0%, rgba(26, 26, 46, 0.8) 100%)',
-              border: '1px solid rgba(139, 92, 246, 0.2)',
-              borderRadius: '16px',
-              padding: '1.75rem',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              background: 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(26, 26, 46, 0.9) 100%)',
+              border: '1px solid rgba(139, 92, 246, 0.25)',
+              borderRadius: '20px',
+              padding: '2rem',
+              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
               cursor: 'pointer',
               position: 'relative',
               overflow: 'hidden',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05)',
-              backdropFilter: 'blur(10px)'
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)'
             }}
             className="compact-card"
             onClick={() => onSelectItem(item)}
@@ -89,19 +84,41 @@ function CompactList({
               top: 0,
               left: 0,
               right: 0,
-              height: '4px',
-              background: 'linear-gradient(90deg, #8b5cf6, #3b82f6, #10b981, #f59e0b)',
-              borderRadius: '16px 16px 0 0'
+              height: '3px',
+              background: 'linear-gradient(90deg, #8b5cf6, #3b82f6, #10b981, #f59e0b, #ec4899)',
+              borderRadius: '20px 20px 0 0'
+            }} />
+            
+            {/* Efecto de brillo sutil */}
+            <div style={{
+              position: 'absolute',
+              top: '3px',
+              left: '1rem',
+              right: '1rem',
+              height: '1px',
+              background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)',
+              borderRadius: '1px'
             }} />
             
             {/* Icono del elemento */}
             <div style={{
-              fontSize: '2.5rem',
-              marginBottom: '1rem',
+              fontSize: '3rem',
+              marginBottom: '1.5rem',
               textAlign: 'center',
-              filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))'
+              filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5))',
+              position: 'relative'
             }}>
-              {item.icon || '📝'}
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'radial-gradient(circle, rgba(139, 92, 246, 0.2), transparent)',
+                borderRadius: '50%',
+                filter: 'blur(10px)',
+                transform: 'scale(1.5)'
+              }} />
+              <span style={{ position: 'relative', zIndex: 1 }}>
+                {item.icon || '📝'}
+              </span>
             </div>
             
             {/* Nombre/Título */}
@@ -245,10 +262,22 @@ function CompactList({
       })}
 
       <style jsx>{`
+        .responsive-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+          gap: clamp(1rem, 2.5vw, 2rem);
+          padding: clamp(0.5rem, 1.5vw, 1rem) 0;
+          width: 100%;
+          max-width: 100%;
+          overflow: hidden;
+          justify-content: center;
+          align-items: start;
+        }
+
         .compact-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(139, 92, 246, 0.5);
-          border-color: rgba(139, 92, 246, 0.6);
+          transform: translateY(-8px) scale(1.02);
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(139, 92, 246, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+          border-color: rgba(139, 92, 246, 0.8);
         }
         
         .action-button:hover {
@@ -273,7 +302,55 @@ function CompactList({
           opacity: 1;
         }
         
+        @media (min-width: 1600px) {
+          .responsive-grid {
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2.5rem;
+          }
+        }
+
+        @media (max-width: 1400px) {
+          .responsive-grid {
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr));
+            gap: clamp(1rem, 2vw, 1.75rem);
+          }
+        }
+
+        @media (max-width: 1200px) {
+          .responsive-grid {
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+            gap: clamp(0.875rem, 1.75vw, 1.5rem);
+          }
+        }
+
+        @media (max-width: 1024px) {
+          .responsive-grid {
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+            gap: clamp(0.75rem, 1.5vw, 1.25rem);
+          }
+          
+          .compact-card {
+            padding: 1.5rem !important;
+          }
+        }
+        
+        @media (max-width: 900px) {
+          .responsive-grid {
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+            gap: clamp(0.75rem, 1.5vw, 1rem);
+          }
+          
+          .compact-card {
+            padding: 1.5rem !important;
+          }
+        }
+
         @media (max-width: 768px) {
+          .responsive-grid {
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+            gap: clamp(0.625rem, 1.25vw, 0.875rem);
+          }
+          
           .compact-card {
             padding: 1.25rem !important;
           }
@@ -283,17 +360,49 @@ function CompactList({
           }
         }
         
-        @media (max-width: 480px) {
+        @media (max-width: 640px) {
+          .responsive-grid {
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr));
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+          }
+          
           .compact-card {
             padding: 1rem !important;
+            margin: 0 !important;
           }
           
           .compact-card h3 {
             font-size: 1.1rem !important;
           }
+        }
+        
+        @media (max-width: 480px) {
+          .responsive-grid {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+          }
+          
+          .compact-card {
+            padding: 0.875rem !important;
+          }
+          
+          .compact-card h3 {
+            font-size: 1rem !important;
+          }
           
           .action-button {
             padding: 0.5rem !important;
+          }
+        }
+        
+        @media (max-width: 360px) {
+          .compact-card {
+            padding: 0.75rem !important;
+          }
+          
+          .compact-card h3 {
+            font-size: 0.95rem !important;
           }
         }
       `}</style>
