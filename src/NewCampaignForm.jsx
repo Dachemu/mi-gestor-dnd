@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { generateId } from './services/storage'
 
 function NewCampaignForm({ onClose, onCreateCampaign }) {
   // Estado del formulario
@@ -51,7 +52,7 @@ function NewCampaignForm({ onClose, onCreateCampaign }) {
 
     // Crear objeto de nueva campaña
     const newCampaign = {
-      id: Date.now(), // ID temporal - después usaremos algo mejor
+      id: generateId(),
       name: formData.name.trim(),
       description: formData.description.trim() || 'Una nueva aventura épica te espera...',
       createdAt: new Date().toISOString().split('T')[0], // Solo la fecha

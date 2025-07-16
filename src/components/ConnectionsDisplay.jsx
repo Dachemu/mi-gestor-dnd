@@ -253,4 +253,4 @@ function ConnectionItem({ item, config, onRemove, onNavigate }) {
   )
 }
 
-export default ConnectionsDisplay
+export default React.memo(ConnectionsDisplay)

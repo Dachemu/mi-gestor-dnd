@@ -287,4 +287,4 @@ function UniversalManager({
   )
 }
 
-export default UniversalManager
+export default React.memo(UniversalManager)

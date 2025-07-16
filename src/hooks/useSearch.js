@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useDebounce } from '../utils/debounce'
 
 /**
  * Hook personalizado para manejar la funcionalidad de búsqueda
@@ -7,15 +8,18 @@ import { useState, useMemo } from 'react'
 export function useSearch(campaign) {
   const [searchTerm, setSearchTerm] = useState('')
   const [showSearchDropdown, setShowSearchDropdown] = useState(false)
+  
+  // Debounce del término de búsqueda para optimizar rendimiento
+  const debouncedSearchTerm = useDebounce(searchTerm, 300)
 
   // Función que realiza la búsqueda en todos los elementos
   const searchResults = useMemo(() => {
-    if (!searchTerm || searchTerm.length < 2) {
+    if (!debouncedSearchTerm || debouncedSearchTerm.length < 2) {
       return []
     }
 
     const results = []
-    const searchLower = searchTerm.toLowerCase()
+    const searchLower = debouncedSearchTerm.toLowerCase()
 
     // Buscar en lugares
     if (campaign.locations) {
@@ -101,7 +105,7 @@ export function useSearch(campaign) {
 
     // Limitar resultados a los primeros 10 para mejor performance
     return results.slice(0, 10)
-  }, [campaign, searchTerm])
+  }, [campaign, debouncedSearchTerm])
 
   // Funciones para manejar la búsqueda
   const handleSearchChange = (value) => {

@@ -410,4 +410,4 @@ function CompactList({
   )
 }
 
-export default CompactList
+export default React.memo(CompactList)

@@ -318,4 +318,4 @@ function DynamicForm({ entityType, config, item, onSave, onClose }) {
   )
 }
 
-export default DynamicForm
+export default React.memo(DynamicForm)

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Upload, Download, Trash2 } from 'lucide-react'
+import { loadCampaigns, saveCampaigns, generateId } from './services/storage'
+import { useNotification } from './hooks/useNotification'
 
 // Datos iniciales mínimos para nuevas campañas
 const INITIAL_CAMPAIGN_DATA = {
@@ -56,29 +58,7 @@ const INITIAL_CAMPAIGN_DATA = {
   ]
 }
 
-// 🎯 FUNCIONES DE PERSISTENCIA
-const loadCampaigns = () => {
-  try {
-    const saved = localStorage.getItem('dnd-campaigns');
-    if (saved) {
-      return JSON.parse(saved);
-    }
-    return [];
-  } catch (error) {
-    console.error('Error al cargar campañas:', error);
-    return [];
-  }
-};
-
-const saveCampaigns = (campaigns) => {
-  try {
-    localStorage.setItem('dnd-campaigns', JSON.stringify(campaigns));
-    return true;
-  } catch (error) {
-    console.error('Error al guardar campañas:', error);
-    return false;
-  }
-};
+// 🎯 FUNCIONES DE PERSISTENCIA - Ahora usando servicio centralizado
 
 const exportCampaign = (campaign) => {
   try {
@@ -116,7 +96,7 @@ const importCampaign = (file) => {
         // Generar nuevo ID para evitar conflictos
         const newCampaign = {
           ...campaignData,
-          id: Date.now() + Math.random(),
+          id: generateId(),
           createdAt: new Date().toISOString().split('T')[0],
           lastModified: new Date().toISOString().split('T')[0]
         };
@@ -140,7 +120,9 @@ function CampaignSelector({ onSelectCampaign }) {
   const [campaigns, setCampaigns] = useState([])
   const [showNewCampaignForm, setShowNewCampaignForm] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [notification, setNotification] = useState(null)
+  
+  // Hook de notificaciones
+  const { showNotification, NotificationComponent } = useNotification()
 
   // 🎯 Cargar campañas al iniciar
   useEffect(() => {
@@ -150,11 +132,7 @@ function CampaignSelector({ onSelectCampaign }) {
     setIsLoading(false)
   }, [])
 
-  // Función para mostrar notificaciones temporales
-  const showNotification = (message, type = 'success') => {
-    setNotification({ message, type })
-    setTimeout(() => setNotification(null), 3000)
-  }
+  // Función de notificaciones ahora viene del hook centralizado
 
   // 🎯 Función para crear nueva campaña
   const handleCreateCampaign = (newCampaignBasic) => {
@@ -168,24 +146,24 @@ function CampaignSelector({ onSelectCampaign }) {
       // Generar IDs únicos
       locations: INITIAL_CAMPAIGN_DATA.locations.map(loc => ({ 
         ...loc, 
-        id: Date.now() + Math.random(),
+        id: generateId(),
         createdAt: new Date().toISOString().split('T')[0]
       })),
       npcs: INITIAL_CAMPAIGN_DATA.npcs.map(npc => ({ 
         ...npc, 
-        id: Date.now() + Math.random() + 0.1,
+        id: generateId(),
         createdAt: new Date().toISOString().split('T')[0]
       })),
       players: [], // Empezar sin jugadores
       quests: INITIAL_CAMPAIGN_DATA.quests.map(quest => ({ 
         ...quest, 
-        id: Date.now() + Math.random() + 0.2,
+        id: generateId(),
         createdAt: new Date().toISOString().split('T')[0]
       })),
       objects: [], // Empezar sin objetos
       notes: INITIAL_CAMPAIGN_DATA.notes.map(note => ({ 
         ...note, 
-        id: Date.now() + Math.random() + 0.3,
+        id: generateId(),
         createdAt: new Date().toISOString().split('T')[0]
       }))
     }
@@ -263,26 +241,7 @@ function CampaignSelector({ onSelectCampaign }) {
     <div className="gradient-bg">
       <div className="app-container">
         {/* Notificación */}
-        {notification && (
-          <div style={{
-            position: 'fixed',
-            top: '2rem',
-            right: '2rem',
-            background: notification.type === 'error' 
-              ? 'rgba(239, 68, 68, 0.9)' 
-              : 'rgba(16, 185, 129, 0.9)',
-            color: 'white',
-            padding: '1rem 1.5rem',
-            borderRadius: '10px',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
-            zIndex: 1000,
-            backdropFilter: 'blur(10px)',
-            fontSize: '0.9rem',
-            fontWeight: '600'
-          }}>
-            {notification.message}
-          </div>
-        )}
+        <NotificationComponent />
 
         {/* Título principal */}
         <h1 className="main-title fade-in">
@@ -526,7 +485,7 @@ function NewCampaignForm({ onClose, onCreateCampaign }) {
     if (!formData.name.trim()) return
 
     const newCampaign = {
-      id: Date.now() + Math.random(),
+      id: generateId(),
       name: formData.name,
       description: formData.description,
       createdAt: new Date().toISOString().split('T')[0],

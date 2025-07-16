@@ -122,12 +122,8 @@ export const importCampaign = (file) => {
           lastModified: new Date().toISOString()
         };
         
-        // Guardar la campaña importada
-        if (saveCampaign(newCampaign)) {
-          resolve(newCampaign);
-        } else {
-          reject(new Error('Error al guardar campaña importada'));
-        }
+        // Retornar la campaña importada sin guardar
+        resolve(newCampaign);
       } catch (error) {
         reject(new Error('Error al procesar archivo: ' + error.message));
       }

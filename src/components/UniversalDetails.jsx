@@ -563,4 +563,4 @@ function UniversalDetails({
   )
 }
 
-export default UniversalDetails
+export default React.memo(UniversalDetails)

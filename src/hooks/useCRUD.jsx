@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import React from 'react'
+import { generateId } from '../services/storage'
+import { useNotification } from './useNotification'
 
 /**
  * Hook personalizado para manejar operaciones CRUD de manera uniforme
@@ -12,7 +14,9 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
   const [showForm, setShowForm] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
   const [selectedItem, setSelectedItem] = useState(null)
-  const [notification, setNotification] = useState(null)
+  
+  // Hook de notificaciones
+  const { showNotification, NotificationComponent } = useNotification()
 
   // ✅ Sincronizar con datos externos cuando cambien
   useEffect(() => {
@@ -50,17 +54,13 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
     return item
   }
 
-  // Función para mostrar notificaciones temporales
-  const showNotification = (message, type = 'success') => {
-    setNotification({ message, type })
-    setTimeout(() => setNotification(null), 3000)
-  }
+  // Función de notificaciones ahora viene del hook centralizado
 
   // Crear nuevo elemento
   const handleCreate = (itemData) => {
     const newItem = ensureLinkedItems({
       ...itemData,
-      id: Date.now(),
+      id: generateId(),
       createdAt: new Date().toISOString().split('T')[0]
     })
     
@@ -152,33 +152,7 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
   // Estado vacío
   const isEmpty = items.length === 0
 
-  // ✅ COMPONENTE DE NOTIFICACIÓN
-  const NotificationComponent = () => {
-    if (!notification) return null
-
-    return (
-      <div style={{
-        position: 'fixed',
-        top: '2rem',
-        right: '2rem',
-        background: notification.type === 'error' 
-          ? 'rgba(239, 68, 68, 0.9)' 
-          : 'rgba(16, 185, 129, 0.9)',
-        color: 'white',
-        padding: '1rem 1.5rem',
-        borderRadius: '10px',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
-        zIndex: 1000,
-        backdropFilter: 'blur(10px)',
-        fontSize: '0.9rem',
-        fontWeight: '600',
-        maxWidth: '400px',
-        animation: 'slideInRight 0.3s ease-out'
-      }}>
-        {notification.message}
-      </div>
-    )
-  }
+  // ✅ COMPONENTE DE NOTIFICACIÓN ahora viene del hook centralizado
 
   return {
     // Estados
@@ -187,7 +161,6 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
     editingItem,
     selectedItem,
     isEmpty,
-    notification,
 
     // Acciones principales
     handleSave,
