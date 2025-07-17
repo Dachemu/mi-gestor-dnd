@@ -464,7 +464,7 @@ function RichTextEditor({
         alignItems: 'center'
       }}>
         <span>
-          Usa **negrita**, *cursiva*, listas con - o 1., citas con >. Atajos: Ctrl+B, Ctrl+I, Ctrl+L
+          Usa **negrita**, *cursiva*, listas con - o 1., citas con &gt;. Atajos: Ctrl+B, Ctrl+I, Ctrl+L
         </span>
         <span>
           {value.length} caracteres
