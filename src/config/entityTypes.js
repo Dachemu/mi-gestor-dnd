@@ -7,12 +7,12 @@
 export const ENTITY_SCHEMAS = {
   players: {
     name: { type: 'text', required: true, label: 'Nombre del personaje', placeholder: 'Ej: Aragorn' },
-    playerName: { type: 'text', label: 'Jugador real', placeholder: 'Nombre del jugador' },
+    player: { type: 'text', label: 'Jugador real', placeholder: 'Nombre del jugador' },
     class: { 
       type: 'select', 
       required: true, 
       label: 'Clase',
-      options: ['Bárbaro', 'Bardo', 'Brujo', 'Clérigo', 'Druida', 'Explorador', 'Guerrero', 'Hechicero', 'Mago', 'Monje', 'Paladín', 'Pícaro']
+      options: ['Bárbaro', 'Bardo', 'Brujo', 'Clérigo', 'Druida', 'Explorador', 'Guerrero', 'Hechicero', 'Mago', 'Monje', 'Paladín', 'Pícaro', 'Artificiero']
     },
     race: { 
       type: 'select', 
@@ -23,16 +23,16 @@ export const ENTITY_SCHEMAS = {
     level: { type: 'number', label: 'Nivel', min: 1, max: 20, defaultValue: '1' },
     background: { type: 'text', label: 'Trasfondo', placeholder: 'Ej: Noble, Forajido, Ermitaño...' },
     description: { type: 'textarea', label: 'Descripción del personaje', placeholder: 'Apariencia, personalidad, historia personal...' },
+    backstory: { type: 'richtext', label: 'Historia del personaje', placeholder: 'Historia completa del personaje, conexiones con la trama, motivaciones...' },
     hitPoints: { type: 'number', label: 'Puntos de vida', placeholder: 'HP', min: 1 },
     armorClass: { type: 'number', label: 'Clase de armadura', placeholder: 'CA', min: 1 },
     speed: { type: 'number', label: 'Velocidad (pies)', placeholder: '30', min: 0 },
-    notes: { type: 'textarea', label: 'Notas del DM', placeholder: 'Secretos del personaje, conexiones con la trama, notas importantes...' },
     avatar: { type: 'text', label: 'Avatar', defaultValue: '⚔️' },
     icon: { type: 'text', label: 'Icono', defaultValue: '⚔️' }
   },
 
   quests: {
-    name: { type: 'text', required: true, label: 'Nombre de la misión', placeholder: 'Ej: Recuperar el Amuleto Perdido' },
+    title: { type: 'text', required: true, label: 'Título de la misión', placeholder: 'Ej: Recuperar el Amuleto Perdido' },
     description: { type: 'textarea', required: true, label: 'Descripción', placeholder: 'Describe la misión: objetivos, contexto, lo que deben hacer los jugadores...' },
     status: { 
       type: 'select', 
@@ -44,11 +44,11 @@ export const ENTITY_SCHEMAS = {
       type: 'select', 
       label: 'Prioridad', 
       defaultValue: 'Media',
-      options: ['Alta', 'Media', 'Baja']
+      options: ['Crítica', 'Alta', 'Media', 'Baja']
     },
     location: { type: 'text', label: 'Ubicación', placeholder: '¿Dónde tiene lugar esta misión?' },
     reward: { type: 'text', label: 'Recompensa', placeholder: 'Ej: 1000 monedas de oro + Espada mágica' },
-    notes: { type: 'textarea', label: 'Notas del DM', placeholder: 'Pistas, secretos, información adicional para el DM...' },
+    detailedDescription: { type: 'richtext', label: 'Descripción detallada', placeholder: 'Información adicional, pistas, secretos, detalles para el DM...' },
     icon: { type: 'text', label: 'Icono', defaultValue: '📜' }
   },
 
@@ -57,7 +57,7 @@ export const ENTITY_SCHEMAS = {
     type: { 
       type: 'select', 
       label: 'Tipo',
-      options: ['Arma', 'Armadura', 'Escudo', 'Poción', 'Pergamino', 'Anillo', 'Amuleto', 'Joya', 'Gema', 'Herramienta', 'Instrumento', 'Libro', 'Mapa', 'Llave', 'Reliquia', 'Artefacto', 'Componente', 'Material', 'Tesoro', 'Otro']
+      options: ['Arma', 'Armadura', 'Escudo', 'Poción', 'Pergamino', 'Anillo', 'Amuleto', 'Joya', 'Gema', 'Herramienta', 'Instrumento', 'Libro', 'Mapa', 'Llave', 'Reliquia', 'Artefacto', 'Componente', 'Material', 'Tesoro', 'Símbolo Sagrado', 'Linterna', 'Otro']
     },
     rarity: { 
       type: 'select', 
@@ -66,7 +66,7 @@ export const ENTITY_SCHEMAS = {
       options: ['Común', 'Poco común', 'Raro', 'Épico', 'Legendario']
     },
     description: { type: 'textarea', required: true, label: 'Descripción', placeholder: 'Apariencia, historia, características especiales...' },
-    properties: { type: 'textarea', label: 'Propiedades mágicas', placeholder: 'Efectos mágicos, bonificaciones, habilidades especiales...' },
+    detailedDescription: { type: 'richtext', label: 'Descripción detallada', placeholder: 'Información adicional, historia detallada, propiedades mágicas...' },
     owner: { type: 'text', label: 'Propietario', placeholder: '¿Quién lo posee?' },
     location: { type: 'text', label: 'Ubicación', placeholder: '¿Dónde se encuentra?' },
     icon: { type: 'text', label: 'Icono', defaultValue: '📦' }
@@ -83,21 +83,26 @@ export const ENTITY_SCHEMAS = {
       defaultValue: 'Neutral',
       options: ['Amistoso', 'Neutral', 'Hostil', 'Desconfiado', 'Servicial']
     },
-    notes: { type: 'textarea', label: 'Notas del DM', placeholder: 'Secretos, motivaciones, conexiones con otros personajes...' },
+    detailedDescription: { type: 'richtext', label: 'Descripción detallada', placeholder: 'Información adicional, secretos, motivaciones, conexiones con otros personajes...' },
     icon: { type: 'text', label: 'Icono', defaultValue: '👤' }
   },
 
   locations: {
     name: { type: 'text', required: true, label: 'Nombre del lugar', placeholder: 'Ej: Taberna del Dragón Dorado' },
+    type: { 
+      type: 'select', 
+      label: 'Tipo de lugar',
+      options: ['Ciudad', 'Pueblo', 'Taberna', 'Castillo', 'Fortaleza', 'Torre', 'Cueva', 'Mazmorra', 'Bosque', 'Montaña', 'Templo', 'Universidad', 'Mercado', 'Puerto', 'Ruinas', 'Otro']
+    },
     description: { type: 'textarea', required: true, label: 'Descripción', placeholder: 'Describe el lugar: su apariencia, atmósfera, características especiales...' },
     importance: { 
       type: 'select', 
       label: 'Importancia en la campaña', 
       defaultValue: 'Media',
-      options: ['Alta', 'Media', 'Baja']
+      options: ['Crítica', 'Alta', 'Media', 'Baja']
     },
     inhabitants: { type: 'text', label: 'Habitantes', placeholder: '¿Quién vive o frecuenta este lugar?' },
-    notes: { type: 'textarea', label: 'Notas del DM', placeholder: 'Secretos, hooks para aventuras, detalles importantes...' },
+    detailedDescription: { type: 'richtext', label: 'Descripción detallada', placeholder: 'Información adicional, secretos, detalles específicos para el DM...' },
     icon: { type: 'text', label: 'Icono', defaultValue: '🏛️' }
   },
 
@@ -109,7 +114,8 @@ export const ENTITY_SCHEMAS = {
       defaultValue: 'General',
       options: ['General', 'Sesión', 'Trama', 'Personajes', 'Mundo', 'Reglas']
     },
-    content: { type: 'textarea', required: true, label: 'Contenido', placeholder: 'Escribe el contenido de tu nota aquí...', minHeight: '300px' }
+    content: { type: 'richtext', required: true, label: 'Contenido', placeholder: 'Escribe el contenido de tu nota aquí...', minHeight: '300px' },
+    modifiedAt: { type: 'datetime', label: 'Fecha de modificación', readOnly: true }
   }
 }
 
@@ -133,7 +139,7 @@ export const ENTITY_CONFIGS = {
     detailSections: [
       {
         title: 'Información básica',
-        fields: ['playerName', 'class', 'race', 'level', 'background', 'description']
+        fields: ['player', 'class', 'race', 'level', 'background', 'description']
       },
       {
         title: 'Estadísticas',
@@ -141,8 +147,9 @@ export const ENTITY_CONFIGS = {
         render: 'stats'
       },
       {
-        title: 'Notas del DM',
-        fields: ['notes']
+        title: 'Historia del personaje',
+        fields: ['backstory'],
+        render: 'html'
       }
     ],
     colors: {
@@ -167,7 +174,7 @@ export const ENTITY_CONFIGS = {
     description: 'Las aventuras y objetivos',
     schema: ENTITY_SCHEMAS.quests,
     displayFields: {
-      primary: 'name',
+      primary: 'title',
       secondary: ['status', 'priority'],
       description: 'description'
     },
@@ -177,8 +184,9 @@ export const ENTITY_CONFIGS = {
         fields: ['description', 'location', 'reward']
       },
       {
-        title: 'Notas del DM',
-        fields: ['notes']
+        title: 'Descripción detallada',
+        fields: ['detailedDescription'],
+        render: 'html'
       }
     ],
     colors: {
@@ -189,6 +197,7 @@ export const ENTITY_CONFIGS = {
         'Fallida': '#ef4444'
       },
       priority: {
+        'Crítica': '#ff0000',
         'Alta': '#ef4444',
         'Media': '#f59e0b',
         'Baja': '#10b981'
@@ -213,11 +222,12 @@ export const ENTITY_CONFIGS = {
     detailSections: [
       {
         title: 'Información básica',
-        fields: ['description', 'properties']
+        fields: ['description', 'owner', 'location']
       },
       {
-        title: 'Ubicación',
-        fields: ['owner', 'location']
+        title: 'Descripción detallada',
+        fields: ['detailedDescription'],
+        render: 'html'
       }
     ],
     colors: {
@@ -251,8 +261,9 @@ export const ENTITY_CONFIGS = {
         fields: ['description', 'location', 'attitude']
       },
       {
-        title: 'Notas del DM',
-        fields: ['notes']
+        title: 'Descripción detallada',
+        fields: ['detailedDescription'],
+        render: 'html'
       }
     ],
     colors: {
@@ -275,21 +286,23 @@ export const ENTITY_CONFIGS = {
     schema: ENTITY_SCHEMAS.locations,
     displayFields: {
       primary: 'name',
-      secondary: ['importance'],
+      secondary: ['type', 'importance'],
       description: 'description'
     },
     detailSections: [
       {
         title: 'Información básica',
-        fields: ['description', 'inhabitants']
+        fields: ['description', 'type', 'inhabitants']
       },
       {
-        title: 'Notas del DM',
-        fields: ['notes']
+        title: 'Descripción detallada',
+        fields: ['detailedDescription'],
+        render: 'html'
       }
     ],
     colors: {
       importance: {
+        'Crítica': '#ff0000',
         'Alta': '#ef4444',
         'Media': '#f59e0b',
         'Baja': '#10b981'
