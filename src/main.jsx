@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom/client'
-import Particles from './Particles'
-import CampaignSelector from './CampaignSelector'
-import CampaignManager from './CampaignManager' // Lo crearemos después
+import BackgroundParticles from './components/BackgroundParticles'
+import CampaignSelector from './pages/CampaignSelector'
+import CampaignDashboard from './pages/CampaignDashboard'
 import './App.css'
 
 function App() {
@@ -24,7 +24,7 @@ function App() {
 
   return (
     <>
-      <Particles />
+      <BackgroundParticles />
       
       {/* Mostrar componente según la vista actual */}
       {currentView === 'selector' && (
@@ -32,7 +32,7 @@ function App() {
       )}
       
       {currentView === 'campaign' && selectedCampaign && (
-        <CampaignManager 
+        <CampaignDashboard 
           campaign={selectedCampaign} 
           onBackToSelector={goToSelector}
         />

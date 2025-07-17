@@ -1,16 +1,16 @@
 import React from 'react'
-import UniversalManager from './components/UniversalManager'
+import UniversalManager from '../components/EntityManager'
 
 /**
- * QuestsManager optimizado usando UniversalManager
- * Antes: ~499 líneas de código
+ * ObjectsManager optimizado usando UniversalManager
+ * Antes: ~513 líneas de código
  * Después: ~15 líneas de código
  * Reducción: ~97% del código específico
  */
-function QuestsManager({ campaign, connections, selectedItemForNavigation, updateCampaign }) {
+function ObjectsManager({ campaign, connections, selectedItemForNavigation, updateCampaign }) {
   return (
     <UniversalManager
-      entityType="quests"
+      entityType="objects"
       campaign={campaign}
       connections={connections}
       selectedItemForNavigation={selectedItemForNavigation}
@@ -19,4 +19,4 @@ function QuestsManager({ campaign, connections, selectedItemForNavigation, updat
   )
 }
 
-export default QuestsManager
+export default ObjectsManager

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Upload, Download, Trash2 } from 'lucide-react'
-import { loadCampaigns, saveCampaigns, generateId } from './services/storage'
-import { useNotification } from './hooks/useNotification'
+import { loadCampaigns, saveCampaigns, generateId } from '../services/storage'
+import { useNotification } from '../hooks/useNotification.jsx'
 
 // Datos iniciales mínimos para nuevas campañas
 const INITIAL_CAMPAIGN_DATA = {

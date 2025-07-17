@@ -116,7 +116,7 @@ function UniversalManager({
                     key={value}
                     onClick={() => setFilters(prev => ({ ...prev, [filterKey]: value }))}
                     style={{
-                      padding: '0.75rem 1.5rem',
+                      padding: 'clamp(0.5rem, 2vw, 0.75rem) clamp(1rem, 3vw, 1.5rem)',
                       borderRadius: '12px',
                       border: filters[filterKey] === value || (!filters[filterKey] && value === 'Todas')
                         ? '1px solid rgba(139, 92, 246, 0.5)'
@@ -129,7 +129,7 @@ function UniversalManager({
                         : 'var(--text-muted)',
                       cursor: 'pointer',
                       transition: 'all 0.3s ease',
-                      fontSize: '0.9rem',
+                      fontSize: 'clamp(0.8rem, 2vw, 0.9rem)',
                       fontWeight: '600',
                       boxShadow: filters[filterKey] === value || (!filters[filterKey] && value === 'Todas')
                         ? '0 4px 12px rgba(139, 92, 246, 0.3)'
@@ -160,13 +160,15 @@ function UniversalManager({
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'center',
-        marginBottom: '2rem'
+        marginBottom: '2rem',
+        flexWrap: 'wrap',
+        gap: '1rem'
       }}>
         <div>
           <p style={{ 
             color: 'var(--text-muted)', 
             margin: '1rem 0 0 0',
-            fontSize: '1.1rem',
+            fontSize: 'clamp(0.9rem, 2.5vw, 1.1rem)',
             fontWeight: '500',
             opacity: 0.9
           }}>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import React from 'react'
 import { generateId } from '../services/storage'
-import { useNotification } from './useNotification'
+import { useNotification } from './useNotification.jsx'
 
 /**
  * Hook personalizado para manejar operaciones CRUD de manera uniforme

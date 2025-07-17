@@ -11,6 +11,7 @@ function RichTextEditor({
   onChange, 
   placeholder = 'Escribe aquí...', 
   minHeight = '200px',
+  maxHeight = '400px',
   name 
 }) {
   const [isPreviewMode, setIsPreviewMode] = useState(false)
@@ -40,17 +41,25 @@ function RichTextEditor({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Auto-resize del textarea
+  // Auto-resize del textarea con límite máximo
   useEffect(() => {
     if (textareaRef.current && !isPreviewMode) {
       const textarea = textareaRef.current
       textarea.style.height = 'auto'
-      textarea.style.height = Math.max(
-        parseInt(minHeight), 
-        textarea.scrollHeight
-      ) + 'px'
+      const newHeight = Math.min(
+        Math.max(parseInt(minHeight), textarea.scrollHeight),
+        parseInt(maxHeight)
+      )
+      textarea.style.height = newHeight + 'px'
+      
+      // Habilitar scroll si excede la altura máxima
+      if (textarea.scrollHeight > parseInt(maxHeight)) {
+        textarea.style.overflowY = 'auto'
+      } else {
+        textarea.style.overflowY = 'hidden'
+      }
     }
-  }, [value, minHeight, isPreviewMode])
+  }, [value, minHeight, maxHeight, isPreviewMode])
 
   // Función mejorada para insertar texto
   const insertText = (before, after = '') => {
@@ -393,7 +402,11 @@ function RichTextEditor({
       </div>
 
       {/* Content area */}
-      <div style={{ minHeight: minHeight }}>
+      <div style={{ 
+        minHeight: minHeight,
+        maxHeight: maxHeight,
+        overflowY: 'auto'
+      }}>
         {isPreviewMode ? (
           // Vista previa
           <div
@@ -403,6 +416,8 @@ function RichTextEditor({
               lineHeight: '1.6',
               color: 'white',
               minHeight: `calc(${minHeight} - 2rem)`,
+              maxHeight: `calc(${maxHeight} - 2rem)`,
+              overflowY: 'auto',
               whiteSpace: 'pre-wrap',
               wordWrap: 'break-word'
             }}
@@ -430,6 +445,7 @@ function RichTextEditor({
               resize: 'none',
               outline: 'none',
               minHeight: `calc(${minHeight} - 2rem)`,
+              maxHeight: `calc(${maxHeight} - 2rem)`,
               lineHeight: '1.6'
             }}
           />

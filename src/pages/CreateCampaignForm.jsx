@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { generateId } from './services/storage'
-import Modal from './components/Modal'
+import { generateId } from '../services/storage'
+import Modal from '../components/Modal'
 
-function NewCampaignForm({ onClose, onCreateCampaign }) {
+function CreateCampaignForm({ onClose, onCreateCampaign }) {
   // Estado del formulario
   const [formData, setFormData] = useState({
     name: '',
@@ -107,9 +107,9 @@ function NewCampaignForm({ onClose, onCreateCampaign }) {
                 background: 'rgba(31, 41, 55, 0.5)',
                 border: `1px solid ${errors.name ? '#ef4444' : 'rgba(139, 92, 246, 0.2)'}`,
                 borderRadius: '10px',
-                padding: '0.75rem 1rem',
+                padding: 'clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 2vw, 1rem)',
                 color: 'white',
-                fontSize: '1rem',
+                fontSize: 'clamp(0.9rem, 2.5vw, 1rem)',
                 outline: 'none',
                 transition: 'all 0.2s ease'
               }}
@@ -159,9 +159,9 @@ function NewCampaignForm({ onClose, onCreateCampaign }) {
                 background: 'rgba(31, 41, 55, 0.5)',
                 border: '1px solid rgba(139, 92, 246, 0.2)',
                 borderRadius: '10px',
-                padding: '0.75rem 1rem',
+                padding: 'clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 2vw, 1rem)',
                 color: 'white',
-                fontSize: '1rem',
+                fontSize: 'clamp(0.9rem, 2.5vw, 1rem)',
                 outline: 'none',
                 resize: 'vertical',
                 fontFamily: 'inherit',
@@ -181,8 +181,9 @@ function NewCampaignForm({ onClose, onCreateCampaign }) {
           {/* Botones */}
           <div style={{ 
             display: 'flex', 
-            gap: '1rem',
-            justifyContent: 'flex-end'
+            gap: 'clamp(0.5rem, 2vw, 1rem)',
+            justifyContent: 'flex-end',
+            flexWrap: 'wrap'
           }}>
             <button
               type="button"
@@ -190,7 +191,7 @@ function NewCampaignForm({ onClose, onCreateCampaign }) {
               style={{
                 background: 'transparent',
                 color: 'var(--text-secondary)',
-                padding: '0.75rem 1.5rem',
+                padding: 'clamp(0.5rem, 2vw, 0.75rem) clamp(1rem, 3vw, 1.5rem)',
                 borderRadius: '10px',
                 fontWeight: '500',
                 border: '1px solid rgba(139, 92, 246, 0.3)',
@@ -217,4 +218,4 @@ function NewCampaignForm({ onClose, onCreateCampaign }) {
   )
 }
 
-export default NewCampaignForm
+export default CreateCampaignForm

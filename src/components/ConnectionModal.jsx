@@ -108,7 +108,7 @@ function ConnectionModal({
         {/* Tabs de categorías */}
         <div style={{
           display: 'flex',
-          gap: '0.5rem',
+          gap: 'clamp(0.25rem, 1vw, 0.5rem)',
           marginBottom: '1.5rem',
           flexWrap: 'wrap'
         }}>
@@ -122,7 +122,7 @@ function ConnectionModal({
                 key={type}
                 onClick={() => setActiveTab(type)}
                 style={{
-                  padding: '0.75rem 1rem',
+                  padding: 'clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 2vw, 1rem)',
                   borderRadius: '10px',
                   border: 'none',
                   background: activeTab === type 
@@ -136,7 +136,7 @@ function ConnectionModal({
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.5rem',
-                  fontSize: '0.9rem',
+                  fontSize: 'clamp(0.8rem, 2vw, 0.9rem)',
                   fontWeight: '500'
                 }}
               >

@@ -1,5 +1,5 @@
 import React from 'react'
-import UniversalManager from './components/UniversalManager'
+import UniversalManager from '../components/EntityManager'
 
 /**
  * NotesManager optimizado usando UniversalManager
