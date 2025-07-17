@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import Modal from './Modal'
 
 // Configuración de tipos disponibles para conexiones
 const CONNECTION_TYPES = {
@@ -83,69 +84,25 @@ function ConnectionModal({
   if (!sourceItem) return null
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.85)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      padding: '1rem'
-    }}>
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={`🔗 Conectar "${sourceItem.name || sourceItem.title}"`}
+      size="large"
+    >
       <div style={{
-        background: 'var(--glass-bg)',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid var(--glass-border)',
-        borderRadius: '20px',
-        padding: '2rem',
-        maxWidth: '900px',
-        width: '100%',
-        maxHeight: '90vh',
+        maxHeight: '70vh',
         overflow: 'auto'
       }}>
-        {/* Header */}
+        {/* Descripción */}
         <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
           marginBottom: '2rem',
           borderBottom: '1px solid var(--glass-border)',
           paddingBottom: '1rem'
         }}>
-          <div>
-            <h3 style={{ 
-              fontSize: '1.8rem', 
-              fontWeight: 'bold', 
-              color: 'white', 
-              margin: 0,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem'
-            }}>
-              🔗 Conectar "{sourceItem.name || sourceItem.title}"
-            </h3>
-            <p style={{ color: 'var(--text-muted)', margin: '0.5rem 0 0 0' }}>
-              Selecciona elementos para conectar con este {CONNECTION_TYPES[sourceType]?.name.toLowerCase().slice(0, -1)}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'rgba(107, 114, 128, 0.2)',
-              border: '1px solid rgba(107, 114, 128, 0.3)',
-              borderRadius: '6px',
-              color: '#9ca3af',
-              padding: '0.5rem',
-              cursor: 'pointer',
-              fontSize: '1.2rem'
-            }}
-          >
-            ✕
-          </button>
+          <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '1rem' }}>
+            Selecciona elementos para conectar con este {CONNECTION_TYPES[sourceType]?.name.toLowerCase().slice(0, -1)}
+          </p>
         </div>
 
         {/* Tabs de categorías */}
@@ -224,15 +181,9 @@ function ConnectionModal({
           <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
             Total de conexiones: {Object.values(selectedItems).reduce((total, items) => total + items.length, 0)}
           </div>
-          <button
-            onClick={onClose}
-            className="btn-primary"
-          >
-            ✅ Finalizar
-          </button>
         </div>
       </div>
-    </div>
+    </Modal>
   )
 }
 

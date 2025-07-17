@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { generateId } from './services/storage'
+import Modal from './components/Modal'
 
 function NewCampaignForm({ onClose, onCreateCampaign }) {
   // Estado del formulario
@@ -73,61 +74,12 @@ function NewCampaignForm({ onClose, onCreateCampaign }) {
   }
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.85)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      padding: '1rem'
-    }}>
-      <div style={{
-        background: 'var(--glass-bg)',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid var(--glass-border)',
-        borderRadius: '20px',
-        padding: '2rem',
-        maxWidth: '500px',
-        width: '100%',
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)'
-      }}>
-        {/* Header del modal */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          marginBottom: '2rem'
-        }}>
-          <h3 style={{ 
-            fontSize: '1.8rem',
-            fontWeight: 'bold',
-            color: 'white',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem'
-          }}>
-            ✨ Nueva Campaña
-          </h3>
-          <button 
-            onClick={onClose}
-            style={{
-              background: 'rgba(239, 68, 68, 0.2)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              borderRadius: '8px',
-              color: '#ef4444',
-              padding: '0.5rem',
-              cursor: 'pointer',
-              fontSize: '1.2rem'
-            }}
-          >
-            ✕
-          </button>
-        </div>
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title="✨ Nueva Campaña"
+      size="medium"
+    >
 
         {/* Formulario */}
         <form onSubmit={handleSubmit}>
@@ -261,8 +213,7 @@ function NewCampaignForm({ onClose, onCreateCampaign }) {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   )
 }
 

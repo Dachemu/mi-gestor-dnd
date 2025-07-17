@@ -62,12 +62,24 @@ function Modal({
 
   if (!isOpen) return null
 
-  // Determinar tamaños del modal con mejor responsividad
+  // Determinar tamaños del modal con mejor responsividad y viewport dinámico
   const sizes = {
-    small: { width: 'min(95vw, 400px)', maxHeight: 'calc(100% - 4rem)' },
-    medium: { width: 'min(95vw, 700px)', maxHeight: 'calc(100% - 4rem)' },
-    large: { width: 'min(98vw, 1000px)', maxHeight: 'calc(100% - 4rem)' },
-    xlarge: { width: 'min(98vw, 1200px)', maxHeight: 'calc(100% - 4rem)' }
+    small: { 
+      width: 'min(95vw, 400px)', 
+      maxHeight: 'min(90vh, 90dvh, calc(100vh - 2rem))' 
+    },
+    medium: { 
+      width: 'min(95vw, 700px)', 
+      maxHeight: 'min(90vh, 90dvh, calc(100vh - 2rem))' 
+    },
+    large: { 
+      width: 'min(98vw, 1000px)', 
+      maxHeight: 'min(92vh, 92dvh, calc(100vh - 2rem))' 
+    },
+    xlarge: { 
+      width: 'min(98vw, 1200px)', 
+      maxHeight: 'min(95vh, 95dvh, calc(100vh - 2rem))' 
+    }
   }
 
   const modalSize = sizes[size] || sizes.medium
@@ -80,7 +92,8 @@ function Modal({
         top: 0,
         left: 0,
         width: '100%',
-        height: '100%',
+        height: '100vh',
+        minHeight: '100dvh',
         backgroundColor: 'rgba(0, 0, 0, 0.75)',
         backdropFilter: 'blur(6px)',
         display: 'flex',
@@ -248,28 +261,39 @@ function Modal({
 
         @media (max-width: 768px) {
           .modal-container {
-            align-items: flex-start !important;
-            padding: 0.5rem !important;
-            padding-top: 1rem !important;
-            padding-bottom: 2rem !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: clamp(0.25rem, 1vw, 0.75rem) !important;
+            padding-top: max(0.5rem, env(safe-area-inset-top)) !important;
+            padding-bottom: max(0.5rem, env(safe-area-inset-bottom)) !important;
           }
           
           .modal-content {
-            max-height: calc(100% - 10rem) !important;
-            padding-bottom: 2rem !important;
+            max-height: min(85vh, 85dvh, calc(100vh - 4rem)) !important;
+            padding-bottom: 1.5rem !important;
           }
         }
         
         @media (max-width: 640px) {
           .modal-container {
+            align-items: center !important;
+            justify-content: center !important;
             padding: 0.25rem !important;
-            padding-top: 0.5rem !important;
-            padding-bottom: 2rem !important;
+            padding-top: max(0.5rem, env(safe-area-inset-top)) !important;
+            padding-bottom: max(0.5rem, env(safe-area-inset-bottom)) !important;
           }
           
           .modal-content {
-            max-height: calc(100% - 8rem) !important;
-            padding-bottom: 2rem !important;
+            max-height: min(90vh, 90dvh, calc(100vh - 2rem)) !important;
+            padding-bottom: 1.5rem !important;
+          }
+        }
+        
+        /* Soporte para notch/safe areas en iOS */
+        @supports (height: 100dvh) {
+          .modal-container {
+            height: 100dvh !important;
+            min-height: 100dvh !important;
           }
         }
       `}</style>
