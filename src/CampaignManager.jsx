@@ -252,22 +252,23 @@ function CampaignManager({ campaign, onBackToSelector }) {
 
       <style jsx>{`
         .campaign-manager {
-          min-height: 100vh;
+          height: 100vh;
           background: var(--bg-dark);
+          overflow-x: hidden;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
         }
 
         /* Navegación */
         .campaign-nav {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
           background: rgba(15, 15, 25, 0.95);
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
           border-bottom: 1px solid rgba(139, 92, 246, 0.2);
           z-index: 100;
           padding: 1rem 0;
+          flex-shrink: 0;
         }
 
         .nav-container {
@@ -432,15 +433,12 @@ function CampaignManager({ campaign, onBackToSelector }) {
         }
 
         .mobile-menu-dropdown {
-          position: fixed;
-          top: 65px;
-          left: 0;
-          right: 0;
           background: rgba(15, 15, 25, 0.98);
           backdrop-filter: blur(20px);
           border-bottom: 1px solid rgba(139, 92, 246, 0.2);
           z-index: 99;
           animation: slideDown 0.3s ease-out;
+          flex-shrink: 0;
         }
 
         .mobile-tabs-list {
@@ -481,11 +479,14 @@ function CampaignManager({ campaign, onBackToSelector }) {
         /* Contenido */
         .campaign-content {
           padding: 2rem;
-          margin-top: 80px;
-          height: calc(100vh - 80px);
           overflow-y: auto;
+          overflow-x: hidden;
           display: flex;
           flex-direction: column;
+          width: 100%;
+          flex: 1;
+          min-height: 0;
+          box-sizing: border-box;
         }
 
         /* Animaciones */
@@ -573,33 +574,49 @@ function CampaignManager({ campaign, onBackToSelector }) {
 
           .campaign-content {
             padding: 1rem;
-            margin-top: 65px;
-            height: calc(100vh - 65px);
+            width: 100%;
           }
         }
 
         @media (max-width: 480px) {
           .nav-container {
             padding: 0 0.5rem;
-            gap: 0.25rem;
+            gap: 0.5rem;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
           }
 
           .nav-left {
-            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             min-width: 0;
           }
 
           .nav-right {
-            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 0;
           }
 
           .campaign-title-nav {
             font-size: 0.9rem;
             max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .search-box {
+            width: 100%;
+            max-width: 120px;
+            min-width: 80px;
           }
 
           .search-input {
-            width: 90px;
+            width: 100%;
+            min-width: 80px;
             padding: 0.4rem 0.5rem 0.4rem 1.75rem;
             font-size: 0.75rem;
           }
@@ -613,6 +630,50 @@ function CampaignManager({ campaign, onBackToSelector }) {
           .btn-back {
             padding: 0.3rem 0.5rem;
             font-size: 0.8rem;
+            white-space: nowrap;
+          }
+          
+          .campaign-content {
+            padding: 0.5rem;
+            width: 100%;
+          }
+        }
+
+        /* Móvil muy pequeño */
+        @media (max-width: 360px) {
+          .nav-container {
+            padding: 0 0.25rem;
+            gap: 0.25rem;
+          }
+
+          .search-box {
+            max-width: 100px;
+            min-width: 70px;
+          }
+
+          .search-input {
+            min-width: 70px;
+            padding: 0.3rem 0.4rem 0.3rem 1.5rem;
+            font-size: 0.7rem;
+          }
+
+          .search-icon {
+            width: 10px;
+            height: 10px;
+            left: 0.4rem;
+          }
+
+          .btn-back {
+            padding: 0.25rem 0.4rem;
+            font-size: 0.75rem;
+          }
+
+          .campaign-content {
+            padding: 0.25rem;
+          }
+
+          .dashboard-container {
+            padding: 0.5rem;
           }
         }
       `}</style>
@@ -823,7 +884,7 @@ const QuestStatusCard = React.memo(function QuestStatusCard({
   )
 })
 
-// ✅ Dashboard mejorado con mejor rendimiento
+// ✅ Dashboard adaptado al estilo de la aplicación de referencia
 const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavigateToItem }) {
   const getCount = (type) => {
     return campaign[type]?.length || 0
@@ -880,168 +941,78 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
 
   return (
     <div className="dashboard-container fade-in">
-      {/* Header del Dashboard - Compact version */}
-      <div className="dashboard-header-compact">
-        <div className="dashboard-breadcrumb">
-          <span className="breadcrumb-icon">🏰</span>
-          <h1 className="campaign-title-dashboard">{campaign.name}</h1>
-        </div>
+      {/* Header del Dashboard - Estilo referencia */}
+      <div className="dashboard-header">
+        <h1 className="campaign-title">{campaign.name}</h1>
         {campaign.description && (
-          <p className="campaign-subtitle">"{campaign.description}"</p>
+          <p className="campaign-description">{campaign.description || 'Tu mundo de aventuras te espera'}</p>
         )}
       </div>
 
-      {/* Layout Principal Mejorado */}
+      {/* Navegación por categorías - Estilo referencia */}
+      <div className="category-nav">
+        {sections.map(section => (
+          <button
+            key={section.type}
+            onClick={() => onTabChange(section.type)}
+            className="category-button"
+            style={{ '--section-color': section.color }}
+          >
+            <div className="category-icon">{section.icon}</div>
+            <div className="category-count">{getCount(section.type)}</div>
+            <div className="category-label">{section.title}</div>
+          </button>
+        ))}
+      </div>
+
+      {/* Layout Principal - Dos columnas */}
       <div className="dashboard-main-layout">
-        {/* Sección Superior - Resumen General */}
-        <div className="dashboard-general-summary">
-          <div className="stats-overview">
-            <h3 className="section-title">📊 Resumen General</h3>
-            <div className="stats-grid">
-              {sections.map(section => (
-                <div
-                  key={section.type}
-                  className="stat-card"
-                  onClick={() => onTabChange(section.type)}
-                  style={{ '--card-color': section.color }}
-                >
-                  <div className="stat-icon">{section.icon}</div>
-                  <div className="stat-info">
-                    <div className="stat-count">{getCount(section.type)}</div>
-                    <div className="stat-label">{section.title}</div>
-                  </div>
-                </div>
-              ))}
+        {/* Columna Izquierda - Estadísticas */}
+        <div className="dashboard-stats-column">
+          <div className="stats-grid">
+            <div className="stat-card active-quests">
+              <div className="stat-icon">🎯</div>
+              <div className="stat-value">{activeQuests.length}</div>
+              <div className="stat-label">Misiones Activas</div>
+            </div>
+            <div className="stat-card completed-quests">
+              <div className="stat-icon">⭐</div>
+              <div className="stat-value">{completedQuests.length}</div>
+              <div className="stat-label">Completadas</div>
             </div>
           </div>
         </div>
 
-        {/* Sección Inferior - Detalle de Misiones */}
-        <div className="dashboard-quests-detail">
-          <h3 className="section-title">🎯 Estado de Misiones</h3>
-          
-          {/* Resumen de estados */}
-          <div className="quest-status-summary">
-            <div className="quest-status-item active" onClick={() => onTabChange('quests')}>
-              <div className="quest-status-icon">⏳</div>
-              <div className="quest-status-info">
-                <div className="quest-status-count">{activeQuests.length}</div>
-                <div className="quest-status-label">En Progreso</div>
-              </div>
-            </div>
-            <div className="quest-status-item completed" onClick={() => onTabChange('quests')}>
-              <div className="quest-status-icon">✅</div>
-              <div className="quest-status-info">
-                <div className="quest-status-count">{completedQuests.length}</div>
-                <div className="quest-status-label">Completadas</div>
-              </div>
-            </div>
-            <div className="quest-status-item pending" onClick={() => onTabChange('quests')}>
-              <div className="quest-status-icon">⏸️</div>
-              <div className="quest-status-info">
-                <div className="quest-status-count">{pendingQuests.length}</div>
-                <div className="quest-status-label">Pendientes</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Columnas de misiones por estado */}
-          <div className="missions-by-state">
-            {/* Misiones En Progreso */}
-            <div className="mission-column">
-              <h4 className="mission-column-title">⏳ En Progreso ({activeQuests.length})</h4>
+        {/* Columna Derecha - Misiones Activas */}
+        <div className="dashboard-quests-column">
+          <div className="card">
+            <h2 className="card-title">
+              <span className="card-title-icon">🎯</span>
+              Misiones Activas
+            </h2>
+            <div className="active-quests-list">
               {activeQuests.length > 0 ? (
-                <div className="mission-list">
-                  {activeQuests.slice(0, 5).map((quest, index) => (
-                    <div 
-                      key={quest.id || index}
-                      className="mission-item"
-                      onClick={() => onNavigateToItem(quest, 'quests')}
-                    >
-                      <span className="mission-icon">{quest.icon || '📜'}</span>
-                      <div className="mission-info">
-                        <div className="mission-name">{quest.name || quest.title}</div>
-                        <div className="mission-priority">{quest.priority || 'Media'}</div>
+                activeQuests.slice(0, 3).map((quest, index) => (
+                  <div 
+                    key={quest.id || index}
+                    className="quest-item"
+                    onClick={() => onNavigateToItem(quest, 'quests')}
+                  >
+                    <div className="quest-item-content">
+                      <div className="quest-item-left">
+                        <span className="quest-icon">{quest.icon || '📜'}</span>
+                        <div className="quest-info">
+                          <h3 className="quest-title">{quest.name || quest.title}</h3>
+                          <p className="quest-location">{quest.location || 'Sin ubicación'}</p>
+                        </div>
                       </div>
-                      <span className="mission-arrow">→</span>
+                      <span className="quest-priority-badge">{quest.priority || 'Media'}</span>
                     </div>
-                  ))}
-                  {activeQuests.length > 5 && (
-                    <div className="more-missions-link" onClick={() => onTabChange('quests')}>
-                      Ver todas ({activeQuests.length})
-                    </div>
-                  )}
-                </div>
+                  </div>
+                ))
               ) : (
-                <div className="no-missions">
-                  <span className="no-missions-icon">🎭</span>
+                <div className="no-quests">
                   <p>No hay misiones activas</p>
-                </div>
-              )}
-            </div>
-
-            {/* Misiones Completadas */}
-            <div className="mission-column">
-              <h4 className="mission-column-title">✅ Completadas ({completedQuests.length})</h4>
-              {completedQuests.length > 0 ? (
-                <div className="mission-list">
-                  {completedQuests.slice(0, 5).map((quest, index) => (
-                    <div 
-                      key={quest.id || index}
-                      className="mission-item completed"
-                      onClick={() => onNavigateToItem(quest, 'quests')}
-                    >
-                      <span className="mission-icon">{quest.icon || '📜'}</span>
-                      <div className="mission-info">
-                        <div className="mission-name">{quest.name || quest.title}</div>
-                        <div className="mission-reward">{quest.reward || 'Sin recompensa'}</div>
-                      </div>
-                      <span className="mission-arrow">→</span>
-                    </div>
-                  ))}
-                  {completedQuests.length > 5 && (
-                    <div className="more-missions-link" onClick={() => onTabChange('quests')}>
-                      Ver todas ({completedQuests.length})
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="no-missions">
-                  <span className="no-missions-icon">🏆</span>
-                  <p>No hay misiones completadas</p>
-                </div>
-              )}
-            </div>
-
-            {/* Misiones Pendientes */}
-            <div className="mission-column">
-              <h4 className="mission-column-title">⏸️ Pendientes ({pendingQuests.length})</h4>
-              {pendingQuests.length > 0 ? (
-                <div className="mission-list">
-                  {pendingQuests.slice(0, 5).map((quest, index) => (
-                    <div 
-                      key={quest.id || index}
-                      className="mission-item pending"
-                      onClick={() => onNavigateToItem(quest, 'quests')}
-                    >
-                      <span className="mission-icon">{quest.icon || '📜'}</span>
-                      <div className="mission-info">
-                        <div className="mission-name">{quest.name || quest.title}</div>
-                        <div className="mission-location">{quest.location || 'Sin ubicación'}</div>
-                      </div>
-                      <span className="mission-arrow">→</span>
-                    </div>
-                  ))}
-                  {pendingQuests.length > 5 && (
-                    <div className="more-missions-link" onClick={() => onTabChange('quests')}>
-                      Ver todas ({pendingQuests.length})
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="no-missions">
-                  <span className="no-missions-icon">📝</span>
-                  <p>No hay misiones pendientes</p>
                 </div>
               )}
             </div>
@@ -1055,54 +1026,101 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
           margin: 0 auto;
           padding: 2rem;
           min-height: auto;
+          width: 100%;
+          box-sizing: border-box;
         }
 
-        .dashboard-header-compact {
-          margin-bottom: 2rem;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          flex-wrap: wrap;
+        /* Header del Dashboard - Estilo referencia */
+        .dashboard-header {
+          text-align: center;
+          margin-bottom: 3rem;
+        }
+
+        .campaign-title {
+          font-size: 2.5rem;
+          font-weight: 900;
+          color: white;
+          margin: 0 0 1rem 0;
+          background: linear-gradient(135deg, #8b5cf6, #ec4899);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          text-align: center;
+        }
+
+        .campaign-description {
+          color: #9ca3af;
+          font-size: 1.125rem;
+          margin: 0;
+          text-align: center;
+        }
+
+        /* Navegación por categorías - Estilo referencia */
+        .category-nav {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
           gap: 1rem;
+          margin-bottom: 2rem;
         }
 
-        .dashboard-breadcrumb {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
+        .category-button {
+          background: linear-gradient(135deg, rgba(31, 41, 55, 0.8), rgba(31, 41, 55, 0.4));
+          border: 1px solid rgba(139, 92, 246, 0.2);
+          border-radius: 16px;
+          padding: 1.5rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+          backdrop-filter: blur(10px);
         }
 
-        .breadcrumb-icon {
-          font-size: 1.5rem;
+        .category-button::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, var(--section-color), transparent);
+          opacity: 0;
+          transition: opacity 0.3s ease;
         }
 
-        .breadcrumb-text {
-          font-size: 1.5rem;
+        .category-button:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+          border-color: var(--section-color);
+        }
+
+        .category-button:hover::before {
+          opacity: 0.1;
+        }
+
+        .category-icon {
+          font-size: 3rem;
+          display: block;
+          margin: 0 auto 0.75rem auto;
+          position: relative;
+          z-index: 1;
+        }
+
+        .category-count {
+          font-size: 1.875rem;
           font-weight: 700;
-          color: white;
-          background: linear-gradient(135deg, #8b5cf6, #ec4899);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
+          color: var(--section-color);
+          margin-bottom: 0.25rem;
+          position: relative;
+          z-index: 1;
         }
 
-        .campaign-title-dashboard {
-          font-size: 1.8rem;
-          font-weight: 700;
-          color: white;
-          margin: 0;
-          background: linear-gradient(135deg, #8b5cf6, #ec4899);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-
-        .campaign-subtitle {
-          color: var(--text-muted);
-          font-size: 0.95rem;
-          font-style: italic;
-          margin: 0;
+        .category-label {
+          font-size: 0.875rem;
+          color: #9ca3af;
+          font-weight: 500;
           opacity: 0.8;
+          position: relative;
+          z-index: 1;
         }
 
         .stat-highlight {
@@ -1133,18 +1151,20 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
         }
 
         .dashboard-main-layout {
+          display: grid;
+          grid-template-columns: 1fr 2fr;
+          gap: 2rem;
+        }
+
+        .dashboard-stats-column {
           display: flex;
           flex-direction: column;
-          gap: 2rem;
-          margin-top: 1rem;
+          gap: 1rem;
         }
 
-        .dashboard-general-summary {
-          width: 100%;
-        }
-
-        .dashboard-quests-detail {
-          width: 100%;
+        .dashboard-quests-column {
+          display: flex;
+          flex-direction: column;
         }
 
         .quest-status-summary {
@@ -1479,6 +1499,8 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
         @media (max-width: 768px) {
           .dashboard-container {
             padding: 1rem;
+            width: 100%;
+            max-width: 100%;
           }
           
           .dashboard-header-compact {
@@ -1568,6 +1590,95 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
 
           .mission-column-title {
             font-size: 1rem;
+          }
+        }
+
+        /* Dashboard responsive para móviles pequeños */
+        @media (max-width: 480px) {
+          .dashboard-container {
+            padding: 0.75rem;
+            width: 100%;
+            max-width: 100%;
+          }
+          
+          .category-nav {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+          }
+          
+          .category-button {
+            padding: 0.75rem;
+          }
+          
+          .campaign-title {
+            font-size: 1.5rem;
+          }
+
+          .stats-grid {
+            flex-direction: column;
+            gap: 0.5rem;
+          }
+
+          .quest-item-content {
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: flex-start;
+          }
+
+          .quest-item-left {
+            width: 100%;
+          }
+
+          .quest-priority-badge {
+            align-self: flex-end;
+          }
+        }
+
+        /* Dashboard responsive para móviles muy pequeños */
+        @media (max-width: 360px) {
+          .dashboard-container {
+            padding: 0.5rem;
+          }
+
+          .campaign-title {
+            font-size: 1.25rem;
+          }
+
+          .category-button {
+            padding: 0.5rem;
+          }
+
+          .category-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+          }
+
+          .category-count {
+            font-size: 1.25rem;
+          }
+
+          .category-label {
+            font-size: 0.7rem;
+          }
+
+          .stat-card {
+            padding: 0.75rem;
+          }
+
+          .stat-value {
+            font-size: 1.5rem;
+          }
+
+          .card-title {
+            font-size: 1rem;
+          }
+
+          .quest-item {
+            padding: 0.5rem;
+          }
+
+          .quest-title {
+            font-size: 0.9rem;
           }
         }
       `}</style>

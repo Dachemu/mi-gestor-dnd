@@ -34,7 +34,7 @@ function Modal({
       
       if (campaignContent) {
         campaignContent.style.overflow = 'hidden'
-        campaignContent.style.height = '100vh'
+        campaignContent.style.height = '100%'
       }
       if (campaignManager) {
         campaignManager.style.overflow = 'hidden'
@@ -64,10 +64,10 @@ function Modal({
 
   // Determinar tamaños del modal con mejor responsividad
   const sizes = {
-    small: { width: 'min(95vw, 400px)', maxHeight: 'calc(100vh - 4rem)' },
-    medium: { width: 'min(95vw, 700px)', maxHeight: 'calc(100vh - 4rem)' },
-    large: { width: 'min(98vw, 1000px)', maxHeight: 'calc(100vh - 4rem)' },
-    xlarge: { width: 'min(98vw, 1200px)', maxHeight: 'calc(100vh - 4rem)' }
+    small: { width: 'min(95vw, 400px)', maxHeight: 'calc(100% - 4rem)' },
+    medium: { width: 'min(95vw, 700px)', maxHeight: 'calc(100% - 4rem)' },
+    large: { width: 'min(98vw, 1000px)', maxHeight: 'calc(100% - 4rem)' },
+    xlarge: { width: 'min(98vw, 1200px)', maxHeight: 'calc(100% - 4rem)' }
   }
 
   const modalSize = sizes[size] || sizes.medium
@@ -79,8 +79,8 @@ function Modal({
         position: 'fixed',
         top: 0,
         left: 0,
-        width: '100vw',
-        height: '100vh',
+        width: '100%',
+        height: '100%',
         backgroundColor: 'rgba(0, 0, 0, 0.75)',
         backdropFilter: 'blur(6px)',
         display: 'flex',
@@ -204,7 +204,7 @@ function Modal({
             background: 'rgba(15, 15, 25, 0.2)',
             scrollbarWidth: 'thin',
             scrollbarColor: 'rgba(139, 92, 246, 0.3) transparent',
-            maxHeight: 'calc(100vh - 12rem)'
+            maxHeight: 'calc(100% - 12rem)'
           }}>
           {children}
         </div>
@@ -255,7 +255,7 @@ function Modal({
           }
           
           .modal-content {
-            max-height: calc(100vh - 10rem) !important;
+            max-height: calc(100% - 10rem) !important;
             padding-bottom: 2rem !important;
           }
         }
@@ -268,7 +268,7 @@ function Modal({
           }
           
           .modal-content {
-            max-height: calc(100vh - 8rem) !important;
+            max-height: calc(100% - 8rem) !important;
             padding-bottom: 2rem !important;
           }
         }
