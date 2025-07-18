@@ -8,7 +8,84 @@ import IconSelector from './IconSelector'
  * Reemplaza todos los componentes Form específicos (PlayerForm, QuestForm, etc.)
  * Maneja validación automática y diferentes tipos de campos
  */
-function DynamicForm({ entityType, config, item, onSave, onClose }) {
+function DynamicForm({ entityType, config, item, onSave, onClose, showButtons = true }) {
+  // Función para inyectar botones compactos en el header del modal (solo para creación)
+  const injectCreateButtons = () => {
+    // Solo inyectar botones si es un formulario de creación (no edición)
+    if (!item && showButtons) {
+      const actionContainer = document.getElementById('modal-compact-actions')
+      if (!actionContainer) return
+      
+      // Limpiar contenido previo
+      actionContainer.innerHTML = ''
+      
+      // Botón de guardar compacto
+      const saveButton = document.createElement('button')
+      saveButton.innerHTML = '💾'
+      saveButton.title = 'Guardar'
+      saveButton.style.cssText = `
+        background: rgba(16, 185, 129, 0.2);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-radius: 6px;
+        color: #10b981;
+        padding: 0.5rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+      `
+      saveButton.addEventListener('mouseenter', () => {
+        saveButton.style.background = 'rgba(16, 185, 129, 0.3)'
+        saveButton.style.borderColor = 'rgba(16, 185, 129, 0.5)'
+      })
+      saveButton.addEventListener('mouseleave', () => {
+        saveButton.style.background = 'rgba(16, 185, 129, 0.2)'
+        saveButton.style.borderColor = 'rgba(16, 185, 129, 0.3)'
+      })
+      saveButton.addEventListener('click', () => {
+        const form = document.querySelector('form')
+        if (form) {
+          form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+        }
+      })
+      actionContainer.appendChild(saveButton)
+      
+      // Botón de cancelar compacto
+      const cancelButton = document.createElement('button')
+      cancelButton.innerHTML = '❌'
+      cancelButton.title = 'Cancelar'
+      cancelButton.style.cssText = `
+        background: rgba(156, 163, 175, 0.2);
+        border: 1px solid rgba(156, 163, 175, 0.3);
+        border-radius: 6px;
+        color: #9ca3af;
+        padding: 0.5rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+      `
+      cancelButton.addEventListener('mouseenter', () => {
+        cancelButton.style.background = 'rgba(156, 163, 175, 0.3)'
+        cancelButton.style.borderColor = 'rgba(156, 163, 175, 0.5)'
+      })
+      cancelButton.addEventListener('mouseleave', () => {
+        cancelButton.style.background = 'rgba(156, 163, 175, 0.2)'
+        cancelButton.style.borderColor = 'rgba(156, 163, 175, 0.3)'
+      })
+      cancelButton.addEventListener('click', onClose)
+      actionContainer.appendChild(cancelButton)
+    }
+  }
+  
   // Inicializar formData con valores por defecto o del item existente
   const initializeFormData = () => {
     const initialData = {}
@@ -271,6 +348,14 @@ function DynamicForm({ entityType, config, item, onSave, onClose }) {
   }
 
   const fieldGroups = organizeFields()
+  
+  // Efecto para inyectar botones cuando se monta el componente
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      injectCreateButtons()
+    }, 100)
+    return () => clearTimeout(timer)
+  }, [])
 
   return (
     <form onSubmit={handleSubmit}>
@@ -293,13 +378,8 @@ function DynamicForm({ entityType, config, item, onSave, onClose }) {
         )}
       </div>
 
-      {/* Botones */}
-      <div style={{ 
-        display: 'flex', 
-        gap: '1rem', 
-        marginTop: '2rem',
-        justifyContent: 'flex-end'
-      }}>
+      {/* Botones - ocultos ya que ahora se manejan desde el header del modal */}
+      <div style={{ display: 'none' }}>
         <button
           type="button"
           onClick={onClose}

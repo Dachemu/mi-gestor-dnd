@@ -438,7 +438,13 @@ function UniversalDetails({
         saveButton.style.background = 'rgba(16, 185, 129, 0.2)'
         saveButton.style.borderColor = 'rgba(16, 185, 129, 0.3)'
       })
-      // Nota: El botón de guardar en modo edición será manejado por el formulario
+      // Hacer clic en el botón de guardar compacto debe activar el submit del formulario
+      saveButton.addEventListener('click', () => {
+        const form = document.querySelector('form')
+        if (form) {
+          form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+        }
+      })
       actionContainer.appendChild(saveButton)
 
       // Botón de cancelar compacto
@@ -497,6 +503,7 @@ function UniversalDetails({
           item={item}
           onSave={handleSave}
           onClose={handleCancelEdit}
+          showButtons={false}
         />
       </div>
     )

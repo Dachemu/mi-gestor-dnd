@@ -192,25 +192,37 @@ function Modal({
                 </h2>
               )}
               
-              {showCloseButton && (
-                <button
-                  onClick={onClose}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#9ca3af',
-                    cursor: 'pointer',
-                    padding: '0.5rem',
-                    borderRadius: '6px',
-                    transition: 'all 0.2s ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                {/* Container para botones compactos de edición/eliminación */}
+                <div 
+                  id="modal-compact-actions"
+                  style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '0.5rem' 
                   }}
-                >
-                  <X size={20} />
-                </button>
-              )}
+                />
+                
+                {showCloseButton && (
+                  <button
+                    onClick={onClose}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#9ca3af',
+                      cursor: 'pointer',
+                      padding: '0.5rem',
+                      borderRadius: '6px',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <X size={20} />
+                  </button>
+                )}
+              </div>
             </div>
           )}
 

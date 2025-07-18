@@ -100,11 +100,25 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
       itemData = { ...itemData, icon: entityConfig.fixedIcon }
     }
     
+    // Determinar si es creación o edición
+    // Primero verificar si tenemos editingItem (formulario modal)
     if (editingItem) {
       return handleEdit(itemData)
-    } else {
-      return handleCreate(itemData)
     }
+    
+    // Si no hay editingItem, verificar si el itemData tiene un ID existente
+    // Esto maneja el caso de edición inline desde UniversalDetails
+    if (itemData.id && items.some(item => item.id === itemData.id)) {
+      // Es una edición - simular editingItem temporal
+      const existingItem = items.find(item => item.id === itemData.id)
+      setEditingItem(existingItem)
+      const result = handleEdit(itemData)
+      setEditingItem(null) // Limpiar después de editar
+      return result
+    }
+    
+    // Es una creación nueva
+    return handleCreate(itemData)
   }
 
   // Eliminar elemento

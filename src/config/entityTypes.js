@@ -33,7 +33,7 @@ export const ENTITY_SCHEMAS = {
 
   quests: {
     title: { type: 'text', required: true, label: 'Título de la misión', placeholder: 'Ej: Recuperar el Amuleto Perdido' },
-    description: { type: 'textarea', required: true, label: 'Descripción', placeholder: 'Describe la misión: objetivos, contexto, lo que deben hacer los jugadores...' },
+    description: { type: 'textarea', label: 'Descripción', placeholder: 'Describe la misión: objetivos, contexto, lo que deben hacer los jugadores...' },
     status: { 
       type: 'select', 
       label: 'Estado', 
@@ -65,7 +65,7 @@ export const ENTITY_SCHEMAS = {
       defaultValue: 'Común',
       options: ['Común', 'Poco común', 'Raro', 'Épico', 'Legendario']
     },
-    description: { type: 'textarea', required: true, label: 'Descripción', placeholder: 'Apariencia, historia, características especiales...' },
+    description: { type: 'textarea', label: 'Descripción', placeholder: 'Apariencia, historia, características especiales...' },
     detailedDescription: { type: 'richtext', label: 'Descripción detallada', placeholder: 'Información adicional, historia detallada, propiedades mágicas...' },
     owner: { type: 'text', label: 'Propietario', placeholder: '¿Quién lo posee?' },
     location: { type: 'text', label: 'Ubicación', placeholder: '¿Dónde se encuentra?' },
@@ -75,7 +75,7 @@ export const ENTITY_SCHEMAS = {
   npcs: {
     name: { type: 'text', required: true, label: 'Nombre', placeholder: 'Ej: Maestro Elrond' },
     role: { type: 'text', required: true, label: 'Rol o Profesión', placeholder: 'Ej: Posadero, Comerciante, Guardia...' },
-    description: { type: 'textarea', required: true, label: 'Descripción', placeholder: 'Apariencia física, personalidad, trasfondo...' },
+    description: { type: 'textarea', label: 'Descripción', placeholder: 'Apariencia física, personalidad, trasfondo...' },
     location: { type: 'text', label: 'Ubicación habitual', placeholder: '¿Dónde se le puede encontrar normalmente?' },
     attitude: { 
       type: 'select', 
@@ -94,7 +94,7 @@ export const ENTITY_SCHEMAS = {
       label: 'Tipo de lugar',
       options: ['Ciudad', 'Pueblo', 'Taberna', 'Castillo', 'Fortaleza', 'Torre', 'Cueva', 'Mazmorra', 'Bosque', 'Montaña', 'Templo', 'Universidad', 'Mercado', 'Puerto', 'Ruinas', 'Otro']
     },
-    description: { type: 'textarea', required: true, label: 'Descripción', placeholder: 'Describe el lugar: su apariencia, atmósfera, características especiales...' },
+    description: { type: 'textarea', label: 'Descripción', placeholder: 'Describe el lugar: su apariencia, atmósfera, características especiales...' },
     importance: { 
       type: 'select', 
       label: 'Importancia en la campaña', 
