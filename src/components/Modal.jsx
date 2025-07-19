@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 
 /**
@@ -25,7 +26,7 @@ function Modal({
 
   const modalSize = sizes[size] || sizes.medium
 
-  // Manejar scroll y escape
+  // Manejar escape y garantizar posicionamiento correcto
   useEffect(() => {
     if (!isOpen) return
 
@@ -33,99 +34,68 @@ function Modal({
       if (e.key === 'Escape') onClose()
     }
     
-    // Prevenir scroll del body
-    const originalOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
+    // Forzar el modal a aparecer en el centro de la viewport visible
+    const positionModal = () => {
+      const modalOverlay = document.querySelector('[data-modal-overlay]')
+      if (modalOverlay) {
+        // Resetear cualquier transform previo
+        modalOverlay.style.transform = 'none'
+        modalOverlay.style.position = 'fixed'
+        modalOverlay.style.top = '0'
+        modalOverlay.style.left = '0'
+        modalOverlay.style.width = '100vw'
+        modalOverlay.style.height = '100vh'
+      }
+    }
+    
     document.addEventListener('keydown', handleEscape)
     
+    // Aplicar posicionamiento inmediatamente y después de un frame
+    positionModal()
+    requestAnimationFrame(positionModal)
+    
     return () => {
-      document.body.style.overflow = originalOverflow
       document.removeEventListener('keydown', handleEscape)
     }
   }, [isOpen, onClose])
 
-  // Ajuste dinámico del modal
+  // Scroll al inicio del modal cuando se abre
   useEffect(() => {
-    if (!isOpen || !modalRef.current || !contentRef.current) return
+    if (!isOpen || !contentRef.current) return
 
-    const adjustModal = () => {
-      const modal = modalRef.current
-      const content = contentRef.current
-      const overlay = modal.parentElement
-      const viewport = {
-        width: window.innerWidth,
-        height: window.innerHeight
+    const timer = setTimeout(() => {
+      if (contentRef.current) {
+        contentRef.current.scrollTop = 0
       }
-      
-      // Calcular altura disponible considerando padding responsive
-      const isMobile = viewport.width <= 768
-      const padding = isMobile ? 20 : 40 // Menos padding en móviles
-      const availableHeight = viewport.height - padding
-      
-      // Resetear estilos
-      modal.style.maxHeight = 'none'
-      modal.style.height = 'auto'
-      modal.style.margin = 'auto 0'
-      content.style.maxHeight = 'none'
-      content.style.overflowY = 'visible'
-      overlay.style.alignItems = 'center'
-      
-      // Forzar recálculo
-      const modalHeight = modal.offsetHeight
-      
-      if (modalHeight > availableHeight) {
-        // Modal es más grande que viewport - usar scroll
-        modal.style.maxHeight = `${availableHeight}px`
-        modal.style.height = `${availableHeight}px`
-        modal.style.margin = '0'
-        overlay.style.alignItems = 'flex-start'
-        
-        // Calcular altura del contenido restando header
-        const header = modal.querySelector('.modal-header-new')
-        const headerHeight = header ? header.offsetHeight : 0
-        const contentHeight = availableHeight - headerHeight
-        
-        content.style.maxHeight = `${contentHeight}px`
-        content.style.overflowY = 'auto'
-      } else {
-        // Modal cabe en viewport - centrarlo
-        overlay.style.alignItems = 'center'
-        modal.style.margin = '0'
-      }
-    }
+    }, 50)
 
-    // Ejecutar con pequeño delay para asegurar que el DOM esté listo
-    const timer = setTimeout(adjustModal, 50)
-    window.addEventListener('resize', adjustModal)
-    
-    return () => {
-      clearTimeout(timer)
-      window.removeEventListener('resize', adjustModal)
-    }
+    return () => clearTimeout(timer)
   }, [isOpen, children])
 
   if (!isOpen) return null
 
-  return (
+  const modalContent = (
     <>
-      {/* Portal-style overlay que ignora todos los estilos padre */}
+      {/* Overlay que siempre se centra en la viewport */}
       <div 
+        data-modal-overlay
         style={{
           position: 'fixed',
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          zIndex: 999999, // Muy alto para asegurar que esté encima
+          zIndex: 999999,
           backgroundColor: 'rgba(0, 0, 0, 0.75)',
           backdropFilter: 'blur(6px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: 'clamp(10px, 2vw, 20px)',
+          padding: '20px',
           boxSizing: 'border-box',
           overflowY: 'auto',
-          overflowX: 'hidden'
+          overflowX: 'hidden',
+          isolation: 'isolate'
         }}
         onClick={onClose}
       >
@@ -139,9 +109,7 @@ function Modal({
             boxShadow: '0 32px 64px rgba(0, 0, 0, 0.8)',
             width: '100%',
             maxWidth: modalSize.width,
-            minHeight: 'min-content',
-            maxHeight: 'none', // Será ajustado por JS
-            margin: '0', // Será ajustado por JS
+            maxHeight: '90vh', // Usar más espacio vertical
             display: 'flex',
             flexDirection: 'column',
             position: 'relative',
@@ -233,7 +201,7 @@ function Modal({
               padding: 'clamp(1rem, 3vw, 1.5rem) clamp(1rem, 4vw, 2rem) clamp(1.5rem, 4vw, 2rem)',
               flex: 1,
               minHeight: 0,
-              overflow: 'visible', // Será ajustado por JS si es necesario
+              overflow: 'auto', // Permitir scroll si es necesario
               boxSizing: 'border-box'
             }}
           >
@@ -257,6 +225,9 @@ function Modal({
       `}</style>
     </>
   )
+
+  // Usar portal para montar directamente en body y evitar problemas de scroll
+  return createPortal(modalContent, document.body)
 }
 
 export default Modal

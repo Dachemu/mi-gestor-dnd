@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { debug } from '../utils/logger'
 
 // ✨ Función para obtener tipo de relación inversa
 const getInverseRelationship = (relationshipType) => {
@@ -52,7 +53,7 @@ export function useConnections(campaign, updateCampaign) {
   const createConnection = useCallback((sourceItem, sourceType, targetItem, targetType, relationshipType = 'general', context = '') => {
     if (!campaign || !updateCampaign) return
 
-    console.log('Conectando:', sourceItem.name, 'con', targetItem.name)
+    debug('Conectando:', sourceItem.name, 'con', targetItem.name)
 
     const updates = { ...campaign }
 
@@ -117,7 +118,7 @@ export function useConnections(campaign, updateCampaign) {
   const removeConnection = useCallback((sourceItem, sourceType, targetItem, targetType) => {
     if (!campaign || !updateCampaign) return
 
-    console.log('Desconectando:', sourceItem.name, 'de', targetItem.name)
+    debug('Desconectando:', sourceItem.name, 'de', targetItem.name)
 
     const updates = { ...campaign }
 

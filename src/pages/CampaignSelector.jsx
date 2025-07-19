@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { debug, error as logError } from '../utils/logger'
 import { Upload, Download, Trash2 } from 'lucide-react'
 import { loadCampaigns, saveCampaigns, generateId } from '../services/storage'
 import { useNotification } from '../hooks/useNotification.jsx'
@@ -74,7 +75,7 @@ const exportCampaign = (campaign) => {
     URL.revokeObjectURL(url);
     return true;
   } catch (error) {
-    console.error('Error al exportar campaña:', error);
+    logError('Error al exportar campaña:', error);
     return false;
   }
 };
@@ -136,7 +137,7 @@ function CampaignSelector({ onSelectCampaign }) {
 
   // 🎯 Función para crear nueva campaña
   const handleCreateCampaign = (newCampaignBasic) => {
-    console.log('Creando nueva campaña:', newCampaignBasic)
+    debug('Creando nueva campaña:', newCampaignBasic)
     
     // Crear campaña con estructura básica
     const newCampaign = {

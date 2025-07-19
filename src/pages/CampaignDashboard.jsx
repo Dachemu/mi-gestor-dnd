@@ -1,19 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Search, ArrowLeft, Menu, X } from 'lucide-react'
-import LocationsManager from './LocationsPage'
-import NPCsManager from './NPCsPage'
-import QuestsManager from './QuestsPage'
-import ObjectsManager from './ObjectsPage'
-import PlayersManager from './PlayersPage'
-import NotesManager from './NotesPage'
+import { SearchIcon, BackIcon, MenuIcon, CloseIcon } from '../components/icons'
+import { useLogger } from '../hooks/useLogger'
+import UniversalManager from '../components/EntityManager'
 import ConnectionModal from '../components/ConnectionModal'
 import SearchDropdown from '../components/GlobalSearchDropdown'
 import Dashboard from '../components/Dashboard'
 import { useConnections } from '../hooks/useConnections'
 import { useSearch } from '../hooks/useSearch'
-import { saveCampaigns, loadCampaigns } from '../services/storage'
+import { saveCampaigns, loadCampaigns } from '../services'
 
-// Configuración de las pestañas
+// Tabs configuration
 const TABS = [
   { id: 'dashboard', name: 'Dashboard', icon: '🏠' },
   { id: 'locations', name: 'Lugares', icon: '📍' },
@@ -25,6 +21,7 @@ const TABS = [
 ]
 
 function CampaignManager({ campaign, onBackToSelector }) {
+  const { debug, logError } = useLogger()
   const [activeTab, setActiveTab] = useState('dashboard')
   const [currentCampaign, setCurrentCampaign] = useState(campaign)
   const [selectedItemForNavigation, setSelectedItemForNavigation] = useState(null)
@@ -32,7 +29,7 @@ function CampaignManager({ campaign, onBackToSelector }) {
   const [isMobile, setIsMobile] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   
-  // Detectar si es móvil
+  // Detect if mobile
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768)
@@ -45,25 +42,25 @@ function CampaignManager({ campaign, onBackToSelector }) {
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // Cerrar menú móvil al cambiar de pestaña
+  // Close mobile menu when tab changes
   useEffect(() => {
     setIsMobileMenuOpen(false)
   }, [activeTab])
 
-  // ✅ Función mejorada para actualizar la campaña con guardado automático
+  // Enhanced function to update campaign with auto-save
   const updateCampaign = useCallback((updates) => {
-    console.log('Actualizando campaña:', updates)
+    debug('Actualizando campaña:', updates)
     setCurrentCampaign(prev => {
       const newCampaign = { ...prev, ...updates }
       
-      // Guardar automáticamente los cambios
+      // Auto-save changes
       saveChanges(newCampaign)
       
       return newCampaign
     })
   }, [])
 
-  // ✅ Función para guardar cambios en localStorage
+  // Function to save changes to localStorage
   const saveChanges = useCallback((campaignToSave) => {
     if (isSaving) return
     
@@ -76,9 +73,9 @@ function CampaignManager({ campaign, onBackToSelector }) {
           : c
       )
       saveCampaigns(updatedCampaigns)
-      console.log('Cambios guardados automáticamente')
+      debug('Cambios guardados automáticamente')
     } catch (error) {
-      console.error('Error al guardar cambios:', error)
+      logError('Error al guardar cambios:', error)
     } finally {
       setIsSaving(false)
     }
@@ -88,14 +85,14 @@ function CampaignManager({ campaign, onBackToSelector }) {
   const connections = useConnections(currentCampaign, updateCampaign)
   const search = useSearch(currentCampaign)
 
-  // ✅ Función mejorada para navegar a un elemento conectado
+  // Enhanced function to navigate to connected element
   const navigateToItem = useCallback((item, itemType) => {
-    console.log('Navegando a:', itemType, item.name || item.title)
+    debug('Navegando a:', itemType, item.name || item.title)
     
-    // Cambiar a la pestaña correcta
+    // Switch to correct tab
     setActiveTab(itemType)
     
-    // Seleccionar el elemento específico
+    // Select specific element
     setSelectedItemForNavigation({
       item,
       type: itemType,
@@ -132,7 +129,7 @@ function CampaignManager({ campaign, onBackToSelector }) {
               className="btn-back"
               aria-label="Volver a campañas"
             >
-              <ArrowLeft size={16} />
+              <BackIcon size={16} />
               {!isMobile && <span>Campañas</span>}
             </button>
           </div>
@@ -169,7 +166,7 @@ function CampaignManager({ campaign, onBackToSelector }) {
                 className="search-input"
                 aria-label="Buscar en la campaña"
               />
-              <Search size={16} className="search-icon" />
+              <SearchIcon size={16} className="search-icon" />
               
               {search.showSearchDropdown && search.searchResults.length > 0 && (
                 <SearchDropdown
@@ -199,7 +196,7 @@ function CampaignManager({ campaign, onBackToSelector }) {
                 className="mobile-menu-toggle"
                 aria-label="Menú de navegación"
               >
-                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                {isMobileMenuOpen ? <CloseIcon size={24} /> : <MenuIcon size={24} />}
               </button>
             )}
           </div>
@@ -703,24 +700,19 @@ function TabContent({
     updateCampaign
   }
 
-  switch (activeTab) {
-    case 'dashboard':
-      return <Dashboard campaign={campaign} onTabChange={onTabChange} onNavigateToItem={onNavigateToItem} />
-    case 'locations':
-      return <LocationsManager {...commonProps} />
-    case 'players':
-      return <PlayersManager {...commonProps} />
-    case 'npcs':
-      return <NPCsManager {...commonProps} />
-    case 'objects':
-      return <ObjectsManager {...commonProps} />
-    case 'quests':
-      return <QuestsManager {...commonProps} />
-    case 'notes':
-      return <NotesManager {...commonProps} />
-    default:
-      return <Dashboard campaign={campaign} onTabChange={onTabChange} onNavigateToItem={onNavigateToItem} />
+  // Dynamic entity managers using UniversalManager
+  if (activeTab === 'dashboard') {
+    return <Dashboard campaign={campaign} onTabChange={onTabChange} onNavigateToItem={onNavigateToItem} />
   }
+
+  // All entity types use UniversalManager directly
+  const entityTypes = ['locations', 'players', 'npcs', 'objects', 'quests', 'notes']
+  if (entityTypes.includes(activeTab)) {
+    return <UniversalManager entityType={activeTab} {...commonProps} />
+  }
+
+  // Default fallback
+  return <Dashboard campaign={campaign} onTabChange={onTabChange} onNavigateToItem={onNavigateToItem} />
 }
 
 // ✅ Componente para las tarjetas de estado de misiones
