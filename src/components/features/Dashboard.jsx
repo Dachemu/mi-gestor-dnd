@@ -1,5 +1,6 @@
 import React from 'react'
-import { COLORS, GRADIENTS } from '../constants/colors'
+import { COLORS, GRADIENTS } from '../../constants/colors'
+import { BaseCard, BaseButton, BaseBadge } from '../ui/base'
 
 /**
  * Dashboard Component - Réplica exacta del archivo de referencia
@@ -36,32 +37,54 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
 
   // Componente reutilizable para las secciones de misiones
   const MissionSection = ({ title, icon, quests, emptyMessage, colorScheme, onNavigateToItem, getPriorityColor }) => (
-    <div className={`mission-section ${colorScheme}`}>
+    <BaseCard variant="mission" className={`mission-section ${colorScheme}`}>
       <div className="mission-header">
         <span className="mission-icon">{icon}</span>
-        <h3 className="mission-title">{title}</h3>
-        <span className="mission-count">{quests.length}</span>
+        <BaseCard.Title className="mission-title">{title}</BaseCard.Title>
+        <BaseBadge 
+          variant="count" 
+          color={
+            colorScheme === 'active' ? 'orange' :
+            colorScheme === 'completed' ? 'green' :
+            'gray'
+          }
+          size="sm"
+        >
+          {quests.length}
+        </BaseBadge>
       </div>
       <div className="mission-list">
         {quests.length > 0 ? (
           <>
             {quests.slice(0, 5).map((quest, index) => (
-              <div 
+              <BaseCard
                 key={quest.id || index}
-                className="mission-item"
+                variant="compact"
+                clickable
                 onClick={() => onNavigateToItem(quest, 'quests')}
+                hoverEffect="lift"
+                icon={quest.icon || '📜'}
+                className="mission-item-card"
               >
-                <div className="mission-content">
-                  <div className="mission-quest-icon">{quest.icon || '📜'}</div>
-                  <div className="mission-info">
-                    <h4 className="mission-quest-title">{quest.title || quest.name}</h4>
-                    <p className="mission-location">{quest.location || 'Sin ubicación'}</p>
-                  </div>
-                </div>
-                <span className={`mission-priority ${getPriorityColor(quest.priority)}`}>
+                <BaseCard.Title className="mission-quest-title">
+                  {quest.title || quest.name}
+                </BaseCard.Title>
+                <BaseCard.Description className="mission-location">
+                  {quest.location || 'Sin ubicación'}
+                </BaseCard.Description>
+                <BaseBadge 
+                  variant="priority" 
+                  color={
+                    quest.priority === 'Crítica' ? 'red' :
+                    quest.priority === 'Alta' ? 'orange' :
+                    quest.priority === 'Media' ? 'blue' :
+                    'green'
+                  }
+                  size="sm"
+                >
                   {quest.priority || 'Media'}
-                </span>
-              </div>
+                </BaseBadge>
+              </BaseCard>
             ))}
             {quests.length > 5 && (
               <div className="mission-more">
@@ -75,7 +98,7 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
           </div>
         )}
       </div>
-    </div>
+    </BaseCard>
   )
 
   return (
@@ -90,26 +113,25 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
         </p>
       </div>
 
-      {/* Category Navigation - Compact Single Line */}
+      {/* Category Navigation - Using BaseCard */}
       <div className="category-nav-compact">
         {Object.entries(categoryConfig).map(([key, config]) => (
-          <button
+          <BaseCard
             key={key}
+            variant="category"
+            clickable
             onClick={() => onTabChange(key)}
-            className="category-button-compact"
+            hoverEffect="glow"
+            icon={config.icon}
+            gradient={`linear-gradient(135deg, ${config.color}, ${config.colorEnd})`}
             style={{
               '--color-start': config.color,
               '--color-end': config.colorEnd
             }}
           >
-            <div className="category-icon-compact">{config.icon}</div>
-            <div className="category-info-compact">
-              <div className="category-count-compact">
-                {(campaign[key] || []).length}
-              </div>
-              <div className="category-name-compact">{config.name}</div>
-            </div>
-          </button>
+            <BaseCard.Title>{(campaign[key] || []).length}</BaseCard.Title>
+            <div className="category-name-compact">{config.name}</div>
+          </BaseCard>
         ))}
       </div>
 
@@ -174,72 +196,13 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
           margin: 0;
         }
 
-        /* Category Navigation - Compact Single Line */
+        /* Category Navigation - Using BaseCard */
         .category-nav-compact {
           display: flex;
           flex-wrap: wrap;
           gap: 1rem;
           margin-bottom: 2rem;
           justify-content: space-between;
-        }
-
-        .category-button-compact {
-          flex: 1;
-          min-width: 140px;
-          padding: 1rem;
-          border-radius: 12px;
-          border: 1px solid rgba(139, 92, 246, 0.2);
-          background: rgba(20, 20, 35, 0.6);
-          cursor: pointer;
-          transition: all 0.2s ease;
-          position: relative;
-          overflow: hidden;
-          backdrop-filter: blur(10px);
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-        }
-
-        .category-button-compact::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(135deg, var(--color-start), var(--color-end));
-          opacity: 0.05;
-          transition: opacity 0.2s ease;
-        }
-
-        .category-button-compact:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-          border-color: var(--color-start);
-        }
-
-        .category-button-compact:hover::before {
-          opacity: 0.15;
-        }
-
-        .category-icon-compact {
-          font-size: 1.5rem;
-          position: relative;
-          z-index: 1;
-          flex-shrink: 0;
-        }
-
-        .category-info-compact {
-          position: relative;
-          z-index: 1;
-          flex: 1;
-        }
-
-        .category-count-compact {
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: white;
-          margin-bottom: 0.125rem;
         }
 
         .category-name-compact {
@@ -258,20 +221,9 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
         }
 
         .mission-section {
-          background: rgba(15, 15, 25, 0.85);
-          backdrop-filter: blur(12px);
-          border: 1px solid rgba(139, 92, 246, 0.2);
-          border-radius: 16px;
-          padding: 1.5rem;
           min-height: 300px;
           display: flex;
           flex-direction: column;
-          transition: all 0.2s ease;
-        }
-
-        .mission-section:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
         }
 
         .mission-section.active {
@@ -308,31 +260,6 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
           flex: 1;
         }
 
-        .mission-count {
-          background: rgba(255, 255, 255, 0.1);
-          color: white;
-          padding: 0.25rem 0.75rem;
-          border-radius: 12px;
-          font-size: 0.875rem;
-          font-weight: 600;
-          min-width: 24px;
-          text-align: center;
-        }
-
-        .mission-section.active .mission-count {
-          background: rgba(245, 158, 11, 0.2);
-          color: #f59e0b;
-        }
-
-        .mission-section.pending .mission-count {
-          background: rgba(107, 114, 128, 0.2);
-          color: #9ca3af;
-        }
-
-        .mission-section.completed .mission-count {
-          background: rgba(16, 185, 129, 0.2);
-          color: #10b981;
-        }
 
         .mission-list {
           flex: 1;
@@ -341,59 +268,22 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
           gap: 0.75rem;
         }
 
-        .mission-item {
-          background: rgba(31, 41, 55, 0.3);
-          border-radius: 12px;
-          padding: 1rem;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          border: 1px solid transparent;
-        }
-
-        .mission-item:hover {
-          background: rgba(31, 41, 55, 0.5);
-          border-color: rgba(139, 92, 246, 0.3);
-          transform: translateX(2px);
-        }
-
-        .mission-content {
-          display: flex;
-          align-items: center;
-          flex: 1;
-        }
-
-        .mission-quest-icon {
-          font-size: 1.25rem;
-          margin-right: 0.75rem;
-        }
-
-        .mission-info {
-          flex: 1;
+        .mission-item-card {
+          margin-bottom: 0.75rem;
+          position: relative;
         }
 
         .mission-quest-title {
           font-size: 1rem;
           font-weight: 600;
-          color: white;
           margin: 0 0 0.25rem 0;
         }
 
         .mission-location {
           font-size: 0.8rem;
-          color: #9ca3af;
-          margin: 0;
+          margin: 0 0 0.5rem 0;
         }
 
-        .mission-priority {
-          padding: 0.25rem 0.5rem;
-          border-radius: 8px;
-          font-size: 0.7rem;
-          font-weight: 600;
-          color: white;
-        }
 
         .mission-empty {
           flex: 1;
@@ -440,15 +330,6 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
             gap: 0.75rem;
           }
 
-          .category-button-compact {
-            min-width: 120px;
-            padding: 0.75rem;
-          }
-
-          .category-count-compact {
-            font-size: 1.25rem;
-          }
-
           .category-name-compact {
             font-size: 0.7rem;
           }
@@ -465,23 +346,6 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
 
           .category-nav-compact {
             gap: 0.5rem;
-          }
-
-          .category-button-compact {
-            min-width: 100px;
-            padding: 0.5rem;
-            flex-direction: column;
-            text-align: center;
-            gap: 0.25rem;
-          }
-
-          .category-icon-compact {
-            font-size: 1.25rem;
-          }
-
-          .category-count-compact {
-            font-size: 1rem;
-            margin-bottom: 0;
           }
 
           .category-name-compact {
@@ -507,10 +371,6 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
             font-size: 1.1rem;
           }
 
-          .mission-item {
-            padding: 0.75rem;
-          }
-
           .mission-quest-title {
             font-size: 0.9rem;
           }
@@ -533,19 +393,6 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
             gap: 0.25rem;
           }
 
-          .category-button-compact {
-            min-width: 80px;
-            padding: 0.4rem;
-          }
-
-          .category-icon-compact {
-            font-size: 1rem;
-          }
-
-          .category-count-compact {
-            font-size: 0.9rem;
-          }
-
           .category-name-compact {
             font-size: 0.6rem;
           }
@@ -564,19 +411,8 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
             font-size: 1rem;
           }
 
-          .mission-item {
-            padding: 0.5rem;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.5rem;
-          }
-
-          .mission-content {
-            width: 100%;
-          }
-
-          .mission-priority {
-            align-self: flex-end;
+          .mission-item-card {
+            margin-bottom: 0.5rem;
           }
 
           .mission-quest-title {

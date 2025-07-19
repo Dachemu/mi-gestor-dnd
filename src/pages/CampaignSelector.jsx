@@ -3,6 +3,7 @@ import { debug, error as logError } from '../utils/logger'
 import { Upload, Download, Trash2 } from 'lucide-react'
 import { loadCampaigns, saveCampaigns, generateId } from '../services/storage'
 import { useNotification } from '../hooks/useNotification.jsx'
+import { BaseButton, BaseInput, BaseCard } from '../components/ui/base'
 
 // Datos iniciales mínimos para nuevas campañas
 const INITIAL_CAMPAIGN_DATA = {
@@ -260,19 +261,21 @@ function CampaignSelector({ onSelectCampaign }) {
           justifyContent: 'center',
           flexWrap: 'wrap'
         }}>
-          <button
+          <BaseButton
+            variant="primary"
             onClick={() => setShowNewCampaignForm(true)}
-            className="btn-primary fade-in"
+            className="fade-in"
           >
             ➕ Nueva Campaña
-          </button>
-          <button
+          </BaseButton>
+          <BaseButton
+            variant="secondary"
             onClick={handleImportCampaign}
-            className="btn-secondary fade-in"
+            icon={<Upload size={16} />}
+            className="fade-in"
           >
-            <Upload size={16} />
             Importar
-          </button>
+          </BaseButton>
         </div>
 
         {/* Lista de campañas o mensaje de bienvenida */}
@@ -294,23 +297,18 @@ function CampaignSelector({ onSelectCampaign }) {
             }}>
               Crea tu primera campaña para comenzar a construir mundos épicos y gestionar aventuras inolvidables.
             </p>
-            <button
+            <BaseButton
+              variant="primary"
+              size="lg"
               onClick={() => setShowNewCampaignForm(true)}
               style={{
-                background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
-                color: 'white',
                 padding: '1.5rem 3rem',
-                borderRadius: '15px',
-                border: 'none',
-                cursor: 'pointer',
-                fontWeight: '700',
                 fontSize: '1.3rem',
-                transition: 'all 0.3s ease',
                 boxShadow: '0 8px 30px rgba(139, 92, 246, 0.4)'
               }}
             >
               🚀 Crear Mi Primera Campaña
-            </button>
+            </BaseButton>
           </div>
         ) : (
           <div style={{
@@ -345,132 +343,69 @@ function CampaignSelector({ onSelectCampaign }) {
 // 🎯 Componente para cada tarjeta de campaña
 function CampaignCard({ campaign, onSelect, onDelete, onExport }) {
   return (
-    <div
+    <BaseCard
+      variant="campaign"
+      clickable
       onClick={onSelect}
-      style={{
-        background: 'rgba(31, 41, 55, 0.5)',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(139, 92, 246, 0.3)',
-        borderRadius: '20px',
-        padding: '2rem',
-        cursor: 'pointer',
-        transition: 'all 0.3s ease',
-        position: 'relative',
-        overflow: 'hidden'
+      hoverEffect="lift"
+      stats={{
+        'Lugares': campaign.locations?.length || 0,
+        'NPCs': campaign.npcs?.length || 0,
+        'Misiones': campaign.quests?.length || 0
       }}
       className="campaign-card"
     >
-      {/* Header con título y acciones */}
       <div style={{ 
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'flex-start',
         marginBottom: '1rem'
       }}>
-        <h3 style={{ 
-          color: 'white', 
-          fontSize: '1.5rem', 
-          fontWeight: 'bold',
-          margin: 0,
-          flex: 1,
-          paddingRight: '1rem'
-        }}>
+        <BaseCard.Title>
           {campaign.name}
-        </h3>
+        </BaseCard.Title>
         
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button
+        <BaseCard.Actions>
+          <BaseButton
+            variant="compact"
             onClick={(e) => {
               e.stopPropagation()
               onExport()
             }}
+            icon={<Download size={16} />}
+            title="Exportar campaña"
             style={{
               background: 'rgba(59, 130, 246, 0.2)',
-              border: '1px solid rgba(59, 130, 246, 0.3)',
-              borderRadius: '8px',
-              color: '#3b82f6',
-              padding: '0.5rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
+              borderColor: 'rgba(59, 130, 246, 0.3)',
+              color: '#3b82f6'
             }}
-            title="Exportar campaña"
-          >
-            <Download size={16} />
-          </button>
-          <button
+          />
+          <BaseButton
+            variant="compact"
             onClick={(e) => {
               e.stopPropagation()
               onDelete()
             }}
+            icon={<Trash2 size={16} />}
+            title="Eliminar campaña"
             style={{
               background: 'rgba(239, 68, 68, 0.2)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              borderRadius: '8px',
-              color: '#ef4444',
-              padding: '0.5rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
+              borderColor: 'rgba(239, 68, 68, 0.3)',
+              color: '#ef4444'
             }}
-            title="Eliminar campaña"
-          >
-            <Trash2 size={16} />
-          </button>
-        </div>
+          />
+        </BaseCard.Actions>
       </div>
 
-      <p style={{
-        color: '#e5e7eb',
-        marginBottom: '1.5rem',
-        fontSize: '0.9rem',
-        lineHeight: '1.5'
-      }}>
+      <BaseCard.Description>
         {campaign.description || 'Una aventura épica te espera...'}
-      </p>
+      </BaseCard.Description>
 
-      {/* Estadísticas */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '1rem',
-        marginBottom: '1.5rem'
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#3b82f6' }}>
-            {campaign.locations?.length || 0}
-          </div>
-          <div style={{ fontSize: '0.8rem', color: '#9ca3af' }}>Lugares</div>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981' }}>
-            {campaign.npcs?.length || 0}
-          </div>
-          <div style={{ fontSize: '0.8rem', color: '#9ca3af' }}>NPCs</div>
-        </div>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#f59e0b' }}>
-            {campaign.quests?.length || 0}
-          </div>
-          <div style={{ fontSize: '0.8rem', color: '#9ca3af' }}>Misiones</div>
-        </div>
-      </div>
-
-      {/* Fechas */}
-      <div style={{
-        fontSize: '0.8rem',
-        color: '#6b7280',
-        borderTop: '1px solid rgba(139, 92, 246, 0.2)',
-        paddingTop: '1rem',
-        display: 'flex',
-        justifyContent: 'space-between'
-      }}>
+      <BaseCard.Footer>
         <span>Creada: {new Date(campaign.createdAt).toLocaleDateString()}</span>
         <span>Actualizada: {new Date(campaign.lastModified).toLocaleDateString()}</span>
-      </div>
-    </div>
+      </BaseCard.Footer>
+    </BaseCard>
   )
 }
 
@@ -529,61 +464,45 @@ function NewCampaignForm({ onClose, onCreateCampaign }) {
         </h2>
 
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ 
-              color: 'white', 
-              fontWeight: '600', 
-              marginBottom: '0.5rem', 
-              display: 'block' 
-            }}>
-              Nombre de la campaña *
-            </label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({...prev, name: e.target.value}))}
-              placeholder="Ej: La Sombra del Dragón"
-              className="input-field"
-              required
-            />
-          </div>
+          <BaseInput
+            label="Nombre de la campaña"
+            placeholder="Ej: La Sombra del Dragón"
+            value={formData.name}
+            onChange={(e) => setFormData(prev => ({...prev, name: e.target.value}))}
+            required
+            size="md"
+            style={{ marginBottom: '1.5rem' }}
+          />
 
-          <div style={{ marginBottom: '2rem' }}>
-            <label style={{ 
-              color: 'white', 
-              fontWeight: '600', 
-              marginBottom: '0.5rem', 
-              display: 'block' 
-            }}>
-              Descripción (opcional)
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({...prev, description: e.target.value}))}
-              placeholder="Una breve descripción de tu campaña..."
-              className="input-field"
-              style={{ minHeight: '100px', resize: 'vertical' }}
-            />
-          </div>
+          <BaseInput
+            variant="textarea"
+            label="Descripción (opcional)"
+            placeholder="Una breve descripción de tu campaña..."
+            value={formData.description}
+            onChange={(e) => setFormData(prev => ({...prev, description: e.target.value}))}
+            rows={4}
+            size="md"
+            style={{ marginBottom: '2rem' }}
+          />
 
           <div style={{ 
             display: 'flex', 
             gap: '1rem', 
             justifyContent: 'flex-end' 
           }}>
-            <button
-              type="button"
+            <BaseButton
+              variant="secondary"
               onClick={onClose}
-              className="btn-secondary"
+              type="button"
             >
               Cancelar
-            </button>
-            <button
+            </BaseButton>
+            <BaseButton
+              variant="primary"
               type="submit"
-              className="btn-primary"
             >
               🚀 Crear Campaña
-            </button>
+            </BaseButton>
           </div>
         </form>
       </div>

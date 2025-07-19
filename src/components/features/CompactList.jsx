@@ -1,5 +1,6 @@
 import React from 'react'
 import { Eye, Edit, Trash2, Link2 } from 'lucide-react'
+import { BaseCard, BaseBadge } from '../ui/base'
 
 /**
  * Componente para mostrar listas de elementos en formato compacto tipo cards
@@ -60,204 +61,78 @@ function CompactList({
         const connectionCount = getConnectionCount ? getConnectionCount(item) : 0
         
         return (
-          <div
+          <BaseCard
             key={item.id}
-            style={{
-              background: 'linear-gradient(135deg, rgba(15, 15, 25, 0.95) 0%, rgba(26, 26, 46, 0.9) 100%)',
-              border: '1px solid rgba(139, 92, 246, 0.25)',
-              borderRadius: '20px',
-              padding: '2rem',
-              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-              cursor: 'pointer',
-              position: 'relative',
-              overflow: 'hidden',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)'
-            }}
-            className="compact-card"
+            variant="compact"
+            clickable
             onClick={() => onSelectItem(item)}
+            hoverEffect="lift"
+            icon={item.icon || '📝'}
+            badge={connectionCount > 0 ? connectionCount : null}
+            gradient="linear-gradient(90deg, #8b5cf6, #3b82f6, #10b981, #f59e0b, #ec4899)"
+            className="compact-card"
           >
-            {/* Gradiente decorativo superior */}
-            <div style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: '3px',
-              background: 'linear-gradient(90deg, #8b5cf6, #3b82f6, #10b981, #f59e0b, #ec4899)',
-              borderRadius: '20px 20px 0 0'
-            }} />
-            
-            {/* Efecto de brillo sutil */}
-            <div style={{
-              position: 'absolute',
-              top: '3px',
-              left: '1rem',
-              right: '1rem',
-              height: '1px',
-              background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)',
-              borderRadius: '1px'
-            }} />
-            
-            {/* Icono del elemento */}
-            <div style={{
-              fontSize: '3rem',
-              marginBottom: '1.5rem',
-              textAlign: 'center',
-              filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5))',
-              position: 'relative'
-            }}>
-              <div style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'radial-gradient(circle, rgba(139, 92, 246, 0.2), transparent)',
-                borderRadius: '50%',
-                filter: 'blur(10px)',
-                transform: 'scale(1.5)'
-              }} />
-              <span style={{ position: 'relative', zIndex: 1 }}>
-                {item.icon || '📝'}
-              </span>
-            </div>
-            
-            {/* Nombre/Título */}
-            <h3 style={{
-              fontSize: '1.2rem',
-              fontWeight: '700',
-              background: 'linear-gradient(135deg, #ffffff 0%, #e5e7eb 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              margin: '0 0 1rem 0',
-              lineHeight: '1.3',
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              textAlign: 'center'
-            }}>
+            <BaseCard.Title style={{ textAlign: 'center' }}>
               {item.name || item.title}
-            </h3>
+            </BaseCard.Title>
 
-            {/* Información secundaria */}
+            {/* Información secundaria usando BaseBadge */}
             <div style={{
               display: 'flex',
               flexWrap: 'wrap',
               gap: '0.5rem',
               marginBottom: '1rem'
             }}>
-              {/* Tipo específico por item */}
               {item.type && (
-                <span style={{
-                  background: 'linear-gradient(135deg, var(--accent-blue), #2563eb)',
-                  color: 'white',
-                  padding: '0.375rem 0.875rem',
-                  borderRadius: '20px',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
-                  boxShadow: '0 2px 8px rgba(59, 130, 246, 0.3)'
-                }}>
+                <BaseBadge variant="type" color="blue" size="sm">
                   {item.type}
-                </span>
+                </BaseBadge>
               )}
-              
               {item.class && (
-                <span style={{
-                  background: 'linear-gradient(135deg, var(--accent-green), #059669)',
-                  color: 'white',
-                  padding: '0.375rem 0.875rem',
-                  borderRadius: '20px',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
-                  boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)'
-                }}>
+                <BaseBadge variant="category" color="green" size="sm">
                   {item.class}
-                </span>
+                </BaseBadge>
               )}
-              
               {item.role && (
-                <span style={{
-                  background: 'linear-gradient(135deg, var(--accent-purple), #7c3aed)',
-                  color: 'white',
-                  padding: '0.375rem 0.875rem',
-                  borderRadius: '20px',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
-                  boxShadow: '0 2px 8px rgba(139, 92, 246, 0.3)'
-                }}>
+                <BaseBadge variant="category" color="purple" size="sm">
                   {item.role}
-                </span>
+                </BaseBadge>
               )}
-              
               {item.status && (
-                <span style={{
-                  background: item.status === 'Completada' ? 'linear-gradient(135deg, var(--accent-green), #059669)' : 
-                           item.status === 'En progreso' ? 'linear-gradient(135deg, var(--accent-orange), #d97706)' : 
-                           'linear-gradient(135deg, var(--accent-gray), #4b5563)',
-                  color: 'white',
-                  padding: '0.375rem 0.875rem',
-                  borderRadius: '20px',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
-                  boxShadow: item.status === 'Completada' ? '0 2px 8px rgba(16, 185, 129, 0.3)' : 
-                           item.status === 'En progreso' ? '0 2px 8px rgba(245, 158, 11, 0.3)' : 
-                           '0 2px 8px rgba(107, 114, 128, 0.3)'
-                }}>
+                <BaseBadge 
+                  variant="status" 
+                  color={
+                    item.status === 'Completada' ? 'green' : 
+                    item.status === 'En progreso' ? 'orange' : 
+                    'gray'
+                  }
+                  size="sm"
+                >
                   {item.status}
-                </span>
+                </BaseBadge>
               )}
             </div>
 
-            {/* Descripción/Vista previa */}
+            {/* Descripción usando BaseCard.Description */}
             {(item.description || item.content) && (
-              <p style={{
-                color: 'var(--text-muted)',
-                fontSize: '0.9rem',
-                lineHeight: '1.4',
-                margin: '0 0 1rem 0',
-                display: '-webkit-box',
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden'
-              }}>
+              <BaseCard.Description>
                 {item.description || item.content}
-              </p>
+              </BaseCard.Description>
             )}
 
             {/* Indicador de conexiones */}
             {connectionCount > 0 && (
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                color: 'var(--accent-blue)',
-                fontSize: '0.8rem',
-                marginBottom: '1rem'
-              }}>
+              <div className="connection-indicator">
                 <Link2 size={14} />
                 <span>{connectionCount} conexión{connectionCount !== 1 ? 'es' : ''}</span>
               </div>
             )}
 
             {/* Indicador de click */}
-            <div style={{
-              marginTop: 'auto',
-              paddingTop: '1rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--text-muted)',
-              fontSize: '0.85rem',
-              opacity: 0.7
-            }}>
-              Clic para abrir
-            </div>
-          </div>
+            <BaseCard.Footer>
+              <span style={{ margin: '0 auto', opacity: 0.7 }}>Clic para abrir</span>
+            </BaseCard.Footer>
+          </BaseCard>
         )
       })}
 
@@ -300,6 +175,17 @@ function CompactList({
         
         .compact-card:hover::before {
           opacity: 1;
+        }
+        
+        
+        /* Connection indicator */
+        .connection-indicator {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: #3b82f6;
+          font-size: 0.8rem;
+          margin-bottom: 1rem;
         }
         
         @media (min-width: 1600px) {

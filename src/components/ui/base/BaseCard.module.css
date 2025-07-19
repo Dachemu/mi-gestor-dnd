@@ -1,0 +1,423 @@
+/* ====================================
+   🃏 BASE CARD COMPONENT
+   ==================================== */
+
+.baseCard {
+  position: relative;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  border: 1px solid rgba(139, 92, 246, 0.1);
+  background: rgba(31, 41, 55, 0.5);
+  
+  /* Focus styles para accesibilidad */
+  outline: none;
+}
+
+.baseCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.clickable {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ====================================
+   🎨 VARIANTES DE ESTILO
+   ==================================== */
+
+/* Campaign Card - Para selector de campañas */
+.campaign {
+  background: rgba(31, 41, 55, 0.5);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 20px;
+  padding: 2rem;
+  min-height: 280px;
+}
+
+/* Compact Card - Para listas compactas */
+.compact {
+  background: rgba(31, 41, 55, 0.6);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Dashboard Card - Para secciones del dashboard */
+.dashboard {
+  background: rgba(31, 41, 55, 0.5);
+  border: 1px solid rgba(139, 92, 246, 0.1);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+/* Mission Card - Para tarjetas de misiones */
+.mission {
+  background: rgba(31, 41, 55, 0.6);
+  border: 2px solid var(--border-color, rgba(139, 92, 246, 0.3));
+  border-radius: 12px;
+  padding: 1.5rem;
+  position: relative;
+}
+
+/* Category Card - Para botones de categoría */
+.category {
+  background: rgba(31, 41, 55, 0.4);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ====================================
+   ✨ EFECTOS DE HOVER
+   ==================================== */
+
+/* Lift Effect (default) */
+.hoverLift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+.campaign.hoverLift:hover {
+  border-color: rgba(139, 92, 246, 0.4);
+  box-shadow: 0 16px 40px rgba(139, 92, 246, 0.2);
+}
+
+/* Glow Effect */
+.hoverGlow:hover {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+/* Scale Effect */
+.hoverScale:hover {
+  transform: scale(1.02);
+}
+
+/* Compact specific hover */
+.compact.hoverLift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15);
+}
+
+/* ====================================
+   📑 ESTRUCTURA INTERNA
+   ==================================== */
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.cardIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.compact .cardIcon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.category .cardIcon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.cardBadge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(139, 92, 246, 0.2);
+  color: var(--primary-light);
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cardContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ====================================
+   📝 ELEMENTOS DE CONTENIDO
+   ==================================== */
+
+.cardTitle {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.2;
+}
+
+.compact .cardTitle {
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
+}
+
+.category .cardTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  text-align: center;
+}
+
+.cardSubtitle {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cardDescription {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0 0 1.5rem 0;
+  flex: 1;
+}
+
+.compact .cardDescription {
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.cardFooter {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(139, 92, 246, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.cardActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+/* ====================================
+   📊 ESTADÍSTICAS (Campaign Cards)
+   ==================================== */
+
+.statsSection {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.statItem {
+  text-align: center;
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary);
+  margin-bottom: 0.25rem;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+/* ====================================
+   🌈 GRADIENTE OVERLAY
+   ==================================== */
+
+.gradientOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--card-gradient, linear-gradient(90deg, #8b5cf6, #ec4899));
+  z-index: 1;
+}
+
+.category .gradientOverlay {
+  height: 100%;
+  opacity: 0.1;
+  background: var(--card-gradient, linear-gradient(135deg, #8b5cf6, #ec4899));
+}
+
+/* ====================================
+   📱 RESPONSIVE
+   ==================================== */
+
+@media (max-width: 768px) {
+  .campaign {
+    padding: 1.5rem;
+    min-height: 240px;
+  }
+  
+  .compact {
+    padding: 1rem;
+  }
+  
+  .dashboard {
+    padding: 1rem;
+  }
+  
+  .mission {
+    padding: 1rem;
+  }
+  
+  .category {
+    padding: 1rem;
+    min-height: 100px;
+  }
+  
+  .cardTitle {
+    font-size: 1.3rem;
+  }
+  
+  .compact .cardTitle {
+    font-size: 1.1rem;
+  }
+  
+  .category .cardTitle {
+    font-size: 1rem;
+  }
+  
+  .statsSection {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+  }
+  
+  .statValue {
+    font-size: 1.2rem;
+  }
+  
+  .cardIcon {
+    font-size: 1.2rem;
+  }
+  
+  .compact .cardIcon {
+    font-size: 1.5rem;
+  }
+  
+  .category .cardIcon {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .campaign {
+    padding: 1rem;
+    min-height: 200px;
+  }
+  
+  .statsSection {
+    gap: 0.5rem;
+  }
+  
+  .statValue {
+    font-size: 1rem;
+  }
+  
+  .statLabel {
+    font-size: 0.7rem;
+  }
+  
+  .cardBadge {
+    top: 0.75rem;
+    right: 0.75rem;
+    padding: 0.2rem 0.4rem;
+    font-size: 0.6rem;
+  }
+}
+
+/* ====================================
+   🎯 VARIANTES ESPECIALIZADAS
+   ==================================== */
+
+/* Estados para mission cards */
+.mission[data-status="completed"] {
+  --border-color: rgba(16, 185, 129, 0.5);
+}
+
+.mission[data-status="in-progress"] {
+  --border-color: rgba(245, 158, 11, 0.5);
+}
+
+.mission[data-status="pending"] {
+  --border-color: rgba(107, 114, 128, 0.5);
+}
+
+/* Compact card con contador */
+.compact .cardBadge {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-weight: 600;
+  min-width: 24px;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Category card hover con gradiente */
+.category:hover .gradientOverlay {
+  opacity: 0.2;
+}
+
+/* Campaign card con imagen de fondo */
+.campaign.withImage {
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.campaign.withImage::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 15, 25, 0.7);
+  z-index: 0;
+}
+
+.campaign.withImage > * {
+  position: relative;
+  z-index: 1;
+}

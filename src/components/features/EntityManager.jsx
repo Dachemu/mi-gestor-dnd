@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { useCRUD } from '../hooks/useCRUD.jsx'
-import { getEntityConfig } from '../config/entityTypes.js'
+import { useCRUD } from '../../hooks/useCRUD.jsx'
+import { getEntityConfig } from '../../config/entityTypes.js'
 import ConnectionsDisplay from './ConnectionsDisplay'
-import Modal from './Modal'
+import { BaseModal } from '../ui/base'
 import CompactList from './CompactList'
 import DynamicForm from './DynamicForm'
 import UniversalDetails from './UniversalDetails'
@@ -242,11 +242,11 @@ function UniversalManager({
       )}
 
       {/* Modal de formulario */}
-      <Modal
+      <BaseModal
         isOpen={showForm}
         onClose={closeForm}
         title={editingItem ? `✏️ Editar ${config.name}` : `➕ Nuevo ${config.name}`}
-        size="large"
+        size="lg"
       >
         <DynamicForm
           entityType={entityType}
@@ -255,14 +255,14 @@ function UniversalManager({
           onSave={handleSave}
           onClose={closeForm}
         />
-      </Modal>
+      </BaseModal>
 
       {/* Modal de detalles */}
-      <Modal
+      <BaseModal
         isOpen={!!selectedItem}
         onClose={closeDetails}
         title={selectedItem ? `${config.icon} ${selectedItem.name || selectedItem.title}` : ''}
-        size="large"
+        size="lg"
       >
         {selectedItem && (
           <UniversalDetails
@@ -284,7 +284,7 @@ function UniversalManager({
             campaign={campaign}
           />
         )}
-      </Modal>
+      </BaseModal>
     </div>
   )
 }

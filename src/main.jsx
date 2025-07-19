@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom/client'
-import BackgroundParticles from './components/BackgroundParticles'
+import BackgroundParticles from './components/layout/BackgroundParticles'
 import CampaignSelector from './pages/CampaignSelector'
 import CampaignDashboard from './pages/CampaignDashboard'
 import './App.css'

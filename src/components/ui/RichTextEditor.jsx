@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Bold, Italic, Underline, List, ListOrdered, Quote, Eye, Palette } from 'lucide-react'
-import { formatMarkdownToHtml } from '../utils/textFormatter'
+import { formatMarkdownToHtml } from '../../utils/textFormatter'
 
 /**
  * Editor de texto enriquecido completamente reescrito

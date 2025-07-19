@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import Modal from './Modal'
+import { BaseModal } from '../ui/base'
 
 // Configuración de tipos disponibles para conexiones
 const CONNECTION_TYPES = {
@@ -84,11 +84,11 @@ function ConnectionModal({
   if (!sourceItem) return null
 
   return (
-    <Modal
+    <BaseModal
       isOpen={true}
       onClose={onClose}
       title={`🔗 Conectar "${sourceItem.name || sourceItem.title}"`}
-      size="large"
+      size="lg"
     >
       <div style={{
         maxHeight: '70vh',
@@ -183,7 +183,7 @@ function ConnectionModal({
           </div>
         </div>
       </div>
-    </Modal>
+    </BaseModal>
   )
 }
 

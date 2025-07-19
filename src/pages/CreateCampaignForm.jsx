@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { generateId } from '../services/storage'
-import Modal from '../components/Modal'
+import { BaseModal } from '../components/ui/base'
 
 function CreateCampaignForm({ onClose, onCreateCampaign }) {
   // Estado del formulario
@@ -74,11 +74,11 @@ function CreateCampaignForm({ onClose, onCreateCampaign }) {
   }
 
   return (
-    <Modal
+    <BaseModal
       isOpen={true}
       onClose={onClose}
       title="✨ Nueva Campaña"
-      size="medium"
+      size="md"
     >
 
         {/* Formulario */}
@@ -214,7 +214,7 @@ function CreateCampaignForm({ onClose, onCreateCampaign }) {
             </button>
           </div>
         </form>
-    </Modal>
+    </BaseModal>
   )
 }
 

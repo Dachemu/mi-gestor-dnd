@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { validateEntity } from '../config/entityTypes.js'
-import RichTextEditor from './RichTextEditor'
-import IconSelector from './IconSelector'
+import { validateEntity } from '../../config/entityTypes.js'
+import RichTextEditor from '../ui/RichTextEditor'
+import IconSelector from '../ui/IconSelector'
 
 /**
  * Componente de formulario dinámico que genera formularios basado en esquemas

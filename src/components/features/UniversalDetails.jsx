@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import ConnectionsDisplay from './ConnectionsDisplay'
 import DynamicForm from './DynamicForm'
-import { formatMarkdownToHtml } from '../utils/textFormatter'
+import { formatMarkdownToHtml } from '../../utils/textFormatter'
+import { BaseBadge } from '../ui/base'
 
 /**
  * Componente de detalles universal que reemplaza todos los *Details específicos
@@ -183,31 +184,38 @@ function UniversalDetails({
                 if (!value) return null
                 
                 return (
-                  <span key={fieldName} style={{
-                    padding: '0.5rem 1rem',
-                    background: `${getFieldColor(fieldName, value)}20`,
-                    color: getFieldColor(fieldName, value),
-                    borderRadius: '8px',
-                    fontSize: '0.9rem',
-                    fontWeight: '600'
-                  }}>
-                    {getFieldIcon(fieldName, value)} {value}
-                  </span>
+                  <BaseBadge 
+                    key={fieldName}
+                    variant="info"
+                    color="blue"
+                    size="md"
+                    icon={getFieldIcon(fieldName, value)}
+                    style={{
+                      background: `${getFieldColor(fieldName, value)}20`,
+                      color: getFieldColor(fieldName, value),
+                      border: `1px solid ${getFieldColor(fieldName, value)}40`
+                    }}
+                  >
+                    {value}
+                  </BaseBadge>
                 )
               })}
               
               {/* Campo especial de nivel para jugadores */}
               {entityType === 'players' && item.level && (
-                <span style={{
-                  padding: '0.5rem 1rem',
-                  background: `${getFieldColor('level', item.level)}20`,
-                  color: getFieldColor('level', item.level),
-                  borderRadius: '8px',
-                  fontSize: '0.9rem',
-                  fontWeight: '600'
-                }}>
-                  ⭐ Nivel {item.level}
-                </span>
+                <BaseBadge 
+                  variant="category"
+                  color="purple"
+                  size="md"
+                  icon="⭐"
+                  style={{
+                    background: `${getFieldColor('level', item.level)}20`,
+                    color: getFieldColor('level', item.level),
+                    border: `1px solid ${getFieldColor('level', item.level)}40`
+                  }}
+                >
+                  Nivel {item.level}
+                </BaseBadge>
               )}
             </div>
           </div>

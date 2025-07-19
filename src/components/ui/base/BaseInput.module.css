@@ -1,0 +1,355 @@
+/* ====================================
+   📝 BASE INPUT COMPONENT
+   ==================================== */
+
+.inputContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+/* ====================================
+   🏷️ LABEL
+   ==================================== */
+
+.label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.required {
+  color: var(--danger);
+  margin-left: 0.25rem;
+}
+
+/* ====================================
+   📦 INPUT WRAPPER
+   ==================================== */
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* ====================================
+   📝 BASE INPUT STYLES
+   ==================================== */
+
+.baseInput {
+  width: 100%;
+  background: rgba(31, 41, 55, 0.6);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 10px;
+  color: white;
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.baseInput::placeholder {
+  color: var(--text-disabled);
+}
+
+.baseInput:focus {
+  background: rgba(31, 41, 55, 0.8);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.baseInput:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(31, 41, 55, 0.3);
+}
+
+/* ====================================
+   📏 TAMAÑOS
+   ==================================== */
+
+.sm .baseInput {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  min-height: 32px;
+}
+
+.md .baseInput {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border-radius: 10px;
+  min-height: 44px;
+}
+
+.lg .baseInput {
+  padding: 1rem 1.25rem;
+  font-size: 1.1rem;
+  border-radius: 12px;
+  min-height: 52px;
+}
+
+/* ====================================
+   🔍 VARIANTES ESPECIALES
+   ==================================== */
+
+/* Search Input */
+.search {
+  background: rgba(31, 41, 55, 0.8);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.search:focus {
+  background: rgba(31, 41, 55, 0.95);
+}
+
+/* Textarea */
+.textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.5;
+  font-family: inherit;
+}
+
+/* Select */
+.select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* ====================================
+   🎯 ICONOS
+   ==================================== */
+
+.hasIcon.sm {
+  padding-left: 2rem;
+}
+
+.hasIcon.md {
+  padding-left: 2.5rem;
+}
+
+.hasIcon.lg {
+  padding-left: 3rem;
+}
+
+.iconRight.sm {
+  padding-left: 0.75rem;
+  padding-right: 2rem;
+}
+
+.iconRight.md {
+  padding-left: 1rem;
+  padding-right: 2.5rem;
+}
+
+.iconRight.lg {
+  padding-left: 1.25rem;
+  padding-right: 3rem;
+}
+
+.iconWrapper {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-disabled);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.iconLeft {
+  left: 0.75rem;
+}
+
+.iconRight {
+  right: 0.75rem;
+}
+
+/* Tamaños de iconos */
+.sm .iconWrapper {
+  width: 14px;
+  height: 14px;
+}
+
+.md .iconWrapper {
+  width: 16px;
+  height: 16px;
+}
+
+.lg .iconWrapper {
+  width: 18px;
+  height: 18px;
+}
+
+.sm .iconLeft {
+  left: 0.5rem;
+}
+
+.sm .iconRight {
+  right: 0.5rem;
+}
+
+/* ====================================
+   ❌ ESTADOS DE ERROR
+   ==================================== */
+
+.hasError .baseInput {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.hasError .baseInput:focus {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.errorMessage {
+  color: var(--danger);
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+/* ====================================
+   🎨 FOCUS ENHANCEMENTS
+   ==================================== */
+
+.baseInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ====================================
+   📱 RESPONSIVE
+   ==================================== */
+
+@media (max-width: 768px) {
+  .sm .baseInput {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.75rem;
+    min-height: 28px;
+  }
+  
+  .md .baseInput {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    min-height: 40px;
+  }
+  
+  .lg .baseInput {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    min-height: 48px;
+  }
+  
+  .hasIcon.sm {
+    padding-left: 1.75rem;
+  }
+  
+  .hasIcon.md {
+    padding-left: 2rem;
+  }
+  
+  .hasIcon.lg {
+    padding-left: 2.5rem;
+  }
+  
+  .iconWrapper {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .sm .iconLeft {
+    left: 0.375rem;
+  }
+  
+  .md .iconLeft {
+    left: 0.5rem;
+  }
+  
+  .lg .iconLeft {
+    left: 0.75rem;
+  }
+}
+
+/* ====================================
+   🎯 UTILIDADES
+   ==================================== */
+
+/* Para inputs en formularios horizontales */
+.inline {
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
+
+.inline .label {
+  margin-bottom: 0;
+  white-space: nowrap;
+  min-width: fit-content;
+}
+
+/* Para grupos de inputs */
+.inputGroup {
+  display: flex;
+  gap: 0;
+}
+
+.inputGroup .baseInput:not(:first-child) {
+  border-left: none;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.inputGroup .baseInput:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* Para inputs con sufijo/prefijo */
+.withAddon .baseInput {
+  border-radius: 0;
+}
+
+.addon {
+  background: rgba(31, 41, 55, 0.4);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  padding: 0 0.75rem;
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.addonLeft {
+  border-right: none;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.addonRight {
+  border-left: none;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}

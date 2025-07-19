@@ -1,6 +1,6 @@
 import React from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import useDropdown from '../hooks/useDropdown'
+import useDropdown from '../../hooks/useDropdown.js'
 
 /**
  * Base component for dropdown selectors (emojis, icons, etc.)
