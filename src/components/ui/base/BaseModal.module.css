@@ -3,19 +3,29 @@
    ==================================== */
 
 .modalOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
   background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(10px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem !important;
+  margin: 0 !important;
   animation: fadeIn 0.3s ease;
-  overflow-y: auto;
+  overflow: hidden !important;
+  z-index: 999999 !important;
+  /* Complete isolation from ANY parent context */
+  isolation: isolate;
+  /* Prevent any scroll behavior */
+  overscroll-behavior: none !important;
+  /* Ensure absolute positioning context */
+  transform: translateZ(0);
 }
 
 @keyframes fadeIn {
@@ -39,10 +49,13 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   animation: slideUp 0.3s ease;
   outline: none;
+  height: 90vh;
+  width: 90vw;
+  max-width: 1200px;
   max-height: 90vh;
   overflow: hidden;
-  width: 100%;
-  margin: auto;
+  /* Modal is a self-contained viewport */
+  isolation: isolate;
 }
 
 @keyframes slideUp {
@@ -89,24 +102,34 @@
    ==================================== */
 
 .sm {
-  max-width: 400px;
+  width: 60vw;
+  height: 70vh;
+  max-width: 500px;
 }
 
 .md {
-  max-width: 600px;
+  width: 75vw;
+  height: 80vh;
+  max-width: 700px;
 }
 
 .lg {
-  max-width: 800px;
-}
-
-.xl {
+  width: 90vw;
+  height: 90vh;
   max-width: 1200px;
 }
 
+.xl {
+  width: 95vw;
+  height: 95vh;
+  max-width: 1400px;
+}
+
 .full {
-  max-width: 95vw;
-  max-height: 95vh;
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  border-radius: 0;
 }
 
 /* ====================================
@@ -143,10 +166,36 @@
 
 .modalContent {
   flex: 1;
-  padding: 0 2rem;
+  padding: 0 2rem 2rem 2rem;
   overflow-y: auto;
+  overflow-x: hidden;
   color: white;
   line-height: 1.6;
+  /* This is the ONLY scroll in the modal system */
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 92, 246, 0.3) transparent;
+  /* Ensure content fills available space */
+  min-height: 0;
+  height: 100%;
+}
+
+/* Webkit scrollbar styling for modal content */
+.modalContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modalContent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modalContent::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.3);
+  border-radius: 3px;
+}
+
+.modalContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.5);
 }
 
 .modalFooter {
@@ -188,14 +237,22 @@
 
 @media (max-width: 768px) {
   .modalOverlay {
-    padding: 0.5rem;
+    padding: 0;
     align-items: flex-end;
   }
   
   .baseModal {
+    width: 100vw;
+    height: 90vh;
+    max-width: none;
     border-radius: 16px 16px 0 0;
-    max-height: 95vh;
     animation: slideUpMobile 0.3s ease;
+  }
+  
+  .lg, .xl {
+    width: 100vw;
+    height: 90vh;
+    max-width: none;
   }
   
   @keyframes slideUpMobile {
@@ -218,7 +275,7 @@
   }
   
   .modalContent {
-    padding: 0 1.5rem;
+    padding: 0 1.5rem 1.5rem 1.5rem;
   }
   
   .modalFooter {
@@ -244,6 +301,24 @@
     max-width: 100%;
     max-height: 100vh;
     border-radius: 0;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .baseModal {
+    width: 95vw;
+    height: 85vh;
+  }
+  
+  .lg {
+    width: 95vw;
+    height: 90vh;
+  }
+  
+  .xl {
+    width: 98vw;
+    height: 92vh;
   }
 }
 

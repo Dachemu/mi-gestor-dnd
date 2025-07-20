@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { BaseButton } from './index'
 import styles from './BaseModal.module.css'
@@ -64,14 +65,30 @@ const BaseModal = ({
   // Efecto para manejar el scroll del body
   useEffect(() => {
     if (isOpen) {
+      // Store original styles
+      const originalOverflow = document.body.style.overflow
+      const originalHeight = document.body.style.height
+      const originalPosition = document.body.style.position
+      
+      // Completely lock body scroll
       document.body.style.overflow = 'hidden'
+      document.body.style.height = '100vh'
+      document.body.style.position = 'fixed'
+      document.body.style.width = '100%'
+      document.body.style.top = '0'
+      document.body.style.left = '0'
+      
       onOpen()
-    } else {
-      document.body.style.overflow = ''
-    }
-
-    return () => {
-      document.body.style.overflow = ''
+      
+      return () => {
+        // Restore original styles
+        document.body.style.overflow = originalOverflow
+        document.body.style.height = originalHeight
+        document.body.style.position = originalPosition
+        document.body.style.width = ''
+        document.body.style.top = ''
+        document.body.style.left = ''
+      }
     }
   }, [isOpen, onOpen])
 
@@ -109,7 +126,8 @@ const BaseModal = ({
     className
   ].filter(Boolean).join(' ')
 
-  return (
+  // Render modal content
+  const modalContent = (
     <div
       ref={overlayRef}
       className={styles.modalOverlay}
@@ -161,6 +179,9 @@ const BaseModal = ({
       </div>
     </div>
   )
+
+  // Use portal to render outside component tree
+  return createPortal(modalContent, document.body)
 }
 
 // Subcomponentes para composición

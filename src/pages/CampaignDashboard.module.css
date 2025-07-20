@@ -296,6 +296,34 @@
   flex: 1;
   min-height: 0;
   box-sizing: border-box;
+  /* Smooth scrolling */
+  scroll-behavior: smooth;
+  /* Custom scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139, 92, 246, 0.2) transparent;
+}
+
+/* Custom webkit scrollbar for campaign content */
+.campaignContent::-webkit-scrollbar {
+  width: 8px;
+}
+
+.campaignContent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.campaignContent::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.2);
+  border-radius: 4px;
+}
+
+.campaignContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.3);
+}
+
+/* Modal state - not used currently but available for future enhancements */
+.campaignContent.modalOpen {
+  /* Could be used for additional modal-specific styles */
 }
 
 /* ====================================
