@@ -55,14 +55,21 @@ function SearchDropdown({ searchTerm, results, onItemClick, onClose }) {
             <p style={{ 
               color: 'white', 
               fontWeight: '600',
-              margin: 0
+              margin: 0,
+              fontSize: '0.95rem',
+              lineHeight: '1.4',
+              WebkitFontSmoothing: 'antialiased',
+              MozOsxFontSmoothing: 'grayscale'
             }}>
               {result.name || result.title}
             </p>
             <p style={{ 
-              color: '#9ca3af', 
-              fontSize: '0.875rem',
-              margin: 0
+              color: '#a1a1aa', 
+              fontSize: '0.8rem',
+              margin: 0,
+              lineHeight: '1.3',
+              fontWeight: '400',
+              WebkitFontSmoothing: 'antialiased'
             }}>
               {result.role || result.class || result.status || result.type}
             </p>

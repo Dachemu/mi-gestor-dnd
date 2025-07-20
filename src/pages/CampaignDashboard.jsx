@@ -4,6 +4,7 @@ import { useLogger } from '../hooks/useLogger.js'
 import UniversalManager from '../components/features/EntityManager'
 import ConnectionModal from '../components/features/ConnectionModal'
 import SearchDropdown from '../components/features/GlobalSearchDropdown'
+import { ImprovedSearchBox } from '../components/features/ImprovedSearchBox'
 import Dashboard from '../components/features/Dashboard'
 import { useConnections } from '../hooks/useConnections.js'
 import { useSearch } from '../hooks/useSearch.js'
@@ -174,30 +175,10 @@ function CampaignManager({ campaign, onBackToSelector }) {
 
           {/* Sección derecha */}
           <div className={`${styles.navSection} ${styles.navRight}`}>
-            <div className={styles.searchBox}>
-              <BaseInput
-                variant="search"
-                size="sm"
-                placeholder="Buscar..."
-                value={search.searchTerm}
-                onChange={(e) => search.handleSearchChange(e.target.value)}
-                onFocus={search.handleSearchFocus}
-                onBlur={search.handleSearchBlur}
-                icon={<SearchIcon size={16} />}
-                aria-label="Buscar en la campaña"
-                className={styles.searchInput}
-              />
-              
-              {search.showSearchDropdown && search.searchResults.length > 0 && (
-                <SearchDropdown
-                  searchTerm={search.searchTerm}
-                  results={search.searchResults}
-                  onItemClick={handleSearchItemClick}
-                  onClose={search.closeSearch}
-                />
-              )}
-            </div>
-
+            <ImprovedSearchBox 
+              search={search} 
+              navigateToItem={handleSearchItemClick} 
+            />
             {/* Botón de exportar */}
             {!isMobile && (
               <BaseButton
@@ -222,9 +203,10 @@ function CampaignManager({ campaign, onBackToSelector }) {
                 💾 Guardando...
               </span>
             )}
+          </div>
 
-            {/* Botón menú móvil */}
-            {isMobile && (
+          {/* Botón menú móvil */}
+          {isMobile && (
               <BaseButton
                 variant="compact"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -232,8 +214,7 @@ function CampaignManager({ campaign, onBackToSelector }) {
                 aria-label="Menú de navegación"
                 className={styles.mobileMenuToggle}
               />
-            )}
-          </div>
+          )}
         </div>
       </nav>
 

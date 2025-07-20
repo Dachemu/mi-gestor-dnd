@@ -137,29 +137,38 @@
    🎯 ICONOS
    ==================================== */
 
-.hasIcon.sm {
-  padding-left: 2rem;
-}
-
-.hasIcon.md {
+.hasIcon {
   padding-left: 2.5rem;
 }
 
-.hasIcon.lg {
+.sm .hasIcon {
+  padding-left: 2rem;
+}
+
+.md .hasIcon {
+  padding-left: 2.5rem;
+}
+
+.lg .hasIcon {
   padding-left: 3rem;
 }
 
-.iconRight.sm {
-  padding-left: 0.75rem;
-  padding-right: 2rem;
-}
-
-.iconRight.md {
+.iconRight {
   padding-left: 1rem;
   padding-right: 2.5rem;
 }
 
-.iconRight.lg {
+.sm .iconRight {
+  padding-left: 0.75rem;
+  padding-right: 2rem;
+}
+
+.md .iconRight {
+  padding-left: 1rem;
+  padding-right: 2.5rem;
+}
+
+.lg .iconRight {
   padding-left: 1.25rem;
   padding-right: 3rem;
 }

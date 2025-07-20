@@ -68,7 +68,7 @@ const BaseInput = forwardRef(({
   const inputClasses = [
     styles.baseInput,
     styles[variant],
-    icon && styles.hasIcon,
+    icon && iconPosition === 'left' && styles.hasIcon,
     icon && iconPosition === 'right' && styles.iconRight
   ].filter(Boolean).join(' ')
 

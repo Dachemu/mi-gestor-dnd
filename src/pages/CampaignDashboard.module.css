@@ -180,8 +180,15 @@
   background: var(--bg-secondary-alpha-80);
   border: var(--border-primary-hover);
   border-radius: var(--radius-large);
-  padding: 0.6rem 1rem 0.6rem 2.5rem;
+  padding: 0.6rem 1rem 0.6rem 2.5rem !important;
+  /* Fix font rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1;
+  /* Improve contrast */
   color: white;
+  font-weight: 500;
   font-size: 0.9rem;
   outline: none;
   transition: var(--transition-fast);
@@ -194,7 +201,15 @@
 }
 
 .searchInput::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+.searchBox :global(.iconWrapper) {
+  left: 0.75rem !important;
   color: #6b7280;
+  z-index: 2;
 }
 
 .searchIcon {
@@ -311,6 +326,11 @@
 @media (max-width: 1200px) {
   .searchInput {
     width: 200px;
+    padding-left: 2.25rem !important;
+  }
+  
+  .searchBox :global(.iconWrapper) {
+    left: 0.65rem !important;
   }
   
   .exportText {
@@ -336,6 +356,11 @@
   .searchInput {
     width: 160px;
     font-size: 0.85rem;
+    padding-left: 2rem !important;
+  }
+  
+  .searchBox :global(.iconWrapper) {
+    left: 0.6rem !important;
   }
   
   .exportButton {
@@ -366,7 +391,7 @@
 
   .searchInput {
     width: 120px;
-    padding: 0.5rem 0.75rem 0.5rem 2rem;
+    padding: 0.5rem 0.75rem 0.5rem 2rem !important;
     font-size: 0.8rem;
   }
 
@@ -415,7 +440,7 @@
 
   .searchInput {
     width: 100%;
-    padding: 0.4rem 0.5rem 0.4rem 1.75rem;
+    padding: 0.4rem 0.5rem 0.4rem 1.75rem !important;
     font-size: 0.75rem;
     border-radius: var(--radius-medium);
   }
@@ -451,7 +476,7 @@
   }
 
   .searchInput {
-    padding: 0.3rem 0.4rem 0.3rem 1.5rem;
+    padding: 0.3rem 0.4rem 0.3rem 1.5rem !important;
     font-size: 0.7rem;
     border-radius: 6px;
   }

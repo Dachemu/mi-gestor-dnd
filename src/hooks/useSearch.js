@@ -10,7 +10,7 @@ export function useSearch(campaign) {
   const [showSearchDropdown, setShowSearchDropdown] = useState(false)
   
   // Debounce del término de búsqueda para optimizar rendimiento
-  const debouncedSearchTerm = useDebounce(searchTerm, 300)
+  const debouncedSearchTerm = useDebounce(searchTerm, 150)
 
   // Función que realiza la búsqueda en todos los elementos
   const searchResults = useMemo(() => {
