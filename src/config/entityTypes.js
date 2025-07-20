@@ -10,13 +10,11 @@ export const ENTITY_SCHEMAS = {
     player: { type: 'text', label: 'Jugador real', placeholder: 'Nombre del jugador' },
     class: { 
       type: 'select', 
-      required: true, 
       label: 'Clase',
       options: ['Bárbaro', 'Bardo', 'Brujo', 'Clérigo', 'Druida', 'Explorador', 'Guerrero', 'Hechicero', 'Mago', 'Monje', 'Paladín', 'Pícaro', 'Artificiero']
     },
     race: { 
       type: 'select', 
-      required: true, 
       label: 'Raza',
       options: ['Humano', 'Elfo', 'Enano', 'Mediano', 'Dracónido', 'Gnomo', 'Semielfo', 'Semiorco', 'Tiefling', 'Aarakocra', 'Genasi', 'Otro']
     },
@@ -74,7 +72,7 @@ export const ENTITY_SCHEMAS = {
 
   npcs: {
     name: { type: 'text', required: true, label: 'Nombre', placeholder: 'Ej: Maestro Elrond' },
-    role: { type: 'text', required: true, label: 'Rol o Profesión', placeholder: 'Ej: Posadero, Comerciante, Guardia...' },
+    role: { type: 'text', label: 'Rol o Profesión', placeholder: 'Ej: Posadero, Comerciante, Guardia...' },
     description: { type: 'textarea', label: 'Descripción', placeholder: 'Apariencia física, personalidad, trasfondo...' },
     location: { type: 'text', label: 'Ubicación habitual', placeholder: '¿Dónde se le puede encontrar normalmente?' },
     attitude: { 
@@ -114,7 +112,7 @@ export const ENTITY_SCHEMAS = {
       defaultValue: 'General',
       options: ['General', 'Sesión', 'Trama', 'Personajes', 'Mundo', 'Reglas']
     },
-    content: { type: 'richtext', required: true, label: 'Contenido', placeholder: 'Escribe el contenido de tu nota aquí...', minHeight: '300px' },
+    content: { type: 'richtext', label: 'Contenido', placeholder: 'Escribe el contenido de tu nota aquí...', minHeight: '300px' },
     modifiedAt: { type: 'datetime', label: 'Fecha de modificación', readOnly: true }
   }
 }

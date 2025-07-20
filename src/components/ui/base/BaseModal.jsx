@@ -153,6 +153,14 @@ const BaseModal = ({
                 {title}
               </h2>
             )}
+            
+            {/* Container for compact action buttons (edit/delete) */}
+            <div 
+              id="modal-compact-actions" 
+              className={styles.compactActions}
+              aria-label="Acciones del objeto"
+            />
+            
             {showCloseButton && (
               <BaseButton
                 variant="compact"

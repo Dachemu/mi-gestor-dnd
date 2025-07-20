@@ -159,9 +159,18 @@
   background-clip: text;
 }
 
+.compactActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+
 .closeButton {
   flex-shrink: 0;
-  margin-left: 1rem;
+  margin-left: 0.5rem;
 }
 
 .modalContent {
@@ -274,6 +283,11 @@
     font-size: 1.25rem;
   }
   
+  .compactActions {
+    gap: 0.4rem;
+    margin-right: 0.4rem;
+  }
+  
   .modalContent {
     padding: 0 1.5rem 1.5rem 1.5rem;
   }
@@ -340,6 +354,11 @@
   
   .modalTitle {
     font-size: 1.1rem;
+  }
+  
+  .compactActions {
+    gap: 0.3rem;
+    margin-right: 0.3rem;
   }
   
   .modalContent {
