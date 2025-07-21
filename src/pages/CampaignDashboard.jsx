@@ -24,7 +24,7 @@ const TABS = [
   { id: 'notes', name: 'Notas', icon: '📝' }
 ]
 
-function CampaignManager({ campaign, onBackToSelector }) {
+function CampaignDashboard({ campaign, onBackToSelector }) {
   const { debug, logError } = useLogger()
   const [activeTab, setActiveTab] = useState('dashboard')
   const [currentCampaign, setCurrentCampaign] = useState(campaign)
@@ -480,4 +480,4 @@ const QuestStatusCard = React.memo(function QuestStatusCard({
 
 
 
-export default CampaignManager
+export default CampaignDashboard

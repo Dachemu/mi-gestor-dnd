@@ -1,90 +1,16 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import ReactDOM from 'react-dom/client'
 import { validateEntity } from '../../config/entityTypes.js'
 import RichTextEditor from '../ui/RichTextEditor'
 import IconSelector from '../ui/IconSelector'
+import EmojiSelector from '../ui/EmojiSelector'
 
 /**
  * Componente de formulario dinámico que genera formularios basado en esquemas
  * Reemplaza todos los componentes Form específicos (PlayerForm, QuestForm, etc.)
  * Maneja validación automática y diferentes tipos de campos
  */
-function DynamicForm({ entityType, config, item, onSave, onClose, showButtons = true }) {
-  // Función para inyectar botones compactos en el header del modal (solo para creación)
-  const injectCreateButtons = () => {
-    // Solo inyectar botones si es un formulario de creación (no edición)
-    if (!item && showButtons) {
-      const actionContainer = document.getElementById('modal-compact-actions')
-      if (!actionContainer) return
-      
-      // Limpiar contenido previo
-      actionContainer.innerHTML = ''
-      
-      // Botón de guardar compacto
-      const saveButton = document.createElement('button')
-      saveButton.innerHTML = '💾'
-      saveButton.title = 'Guardar'
-      saveButton.style.cssText = `
-        background: rgba(16, 185, 129, 0.2);
-        border: 1px solid rgba(16, 185, 129, 0.3);
-        border-radius: 6px;
-        color: #10b981;
-        padding: 0.5rem;
-        cursor: pointer;
-        font-size: 0.9rem;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 32px;
-        height: 32px;
-      `
-      saveButton.addEventListener('mouseenter', () => {
-        saveButton.style.background = 'rgba(16, 185, 129, 0.3)'
-        saveButton.style.borderColor = 'rgba(16, 185, 129, 0.5)'
-      })
-      saveButton.addEventListener('mouseleave', () => {
-        saveButton.style.background = 'rgba(16, 185, 129, 0.2)'
-        saveButton.style.borderColor = 'rgba(16, 185, 129, 0.3)'
-      })
-      saveButton.addEventListener('click', () => {
-        const form = document.querySelector('form')
-        if (form) {
-          form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
-        }
-      })
-      actionContainer.appendChild(saveButton)
-      
-      // Botón de cancelar compacto
-      const cancelButton = document.createElement('button')
-      cancelButton.innerHTML = '❌'
-      cancelButton.title = 'Cancelar'
-      cancelButton.style.cssText = `
-        background: rgba(156, 163, 175, 0.2);
-        border: 1px solid rgba(156, 163, 175, 0.3);
-        border-radius: 6px;
-        color: #9ca3af;
-        padding: 0.5rem;
-        cursor: pointer;
-        font-size: 0.9rem;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 32px;
-        height: 32px;
-      `
-      cancelButton.addEventListener('mouseenter', () => {
-        cancelButton.style.background = 'rgba(156, 163, 175, 0.3)'
-        cancelButton.style.borderColor = 'rgba(156, 163, 175, 0.5)'
-      })
-      cancelButton.addEventListener('mouseleave', () => {
-        cancelButton.style.background = 'rgba(156, 163, 175, 0.2)'
-        cancelButton.style.borderColor = 'rgba(156, 163, 175, 0.3)'
-      })
-      cancelButton.addEventListener('click', onClose)
-      actionContainer.appendChild(cancelButton)
-    }
-  }
+function DynamicForm({ entityType, config, item, onSave, onClose, showCompactButtons = false }) {
   
   // Inicializar formData con valores por defecto o del item existente
   const initializeFormData = () => {
@@ -108,6 +34,136 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showButtons = 
 
   const [formData, setFormData] = useState(initializeFormData)
   const [errors, setErrors] = useState({})
+  
+  // Función para manejar el guardado desde botones compactos
+  const handleCompactSave = () => {
+    // Crear evento sintético que handleSubmit espera
+    const syntheticEvent = {
+      preventDefault: () => {},
+      target: {
+        elements: Object.keys(formData).reduce((acc, key) => {
+          acc[key] = { value: formData[key] }
+          return acc
+        }, {})
+      }
+    }
+    
+    // Llamar directamente a handleSubmit
+    handleSubmit(syntheticEvent)
+  }
+
+  // Renderizar botones compactos en el header del modal
+  useEffect(() => {
+    if (!showCompactButtons) return
+    
+    const actionContainer = document.getElementById('modal-compact-actions')
+    if (!actionContainer) return
+    
+    // Limpiar COMPLETAMENTE cualquier botón existente
+    actionContainer.innerHTML = ''
+    
+    // Crear contenedor para los botones React
+    const buttonContainer = document.createElement('div')
+    buttonContainer.style.cssText = `
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    `
+    actionContainer.appendChild(buttonContainer)
+    
+    // Crear root para React 18
+    let root = null
+    
+    // Componente de botones compactos (ORDEN CORRECTO: Guardar primero, Cancelar segundo)
+    const CompactButtons = () => (
+      <>
+        <button
+          type="button"
+          onClick={handleCompactSave}
+          onMouseEnter={(e) => {
+            e.target.style.background = 'rgba(16, 185, 129, 0.3)'
+            e.target.style.borderColor = 'rgba(16, 185, 129, 0.5)'
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = 'rgba(16, 185, 129, 0.2)'
+            e.target.style.borderColor = 'rgba(16, 185, 129, 0.3)'
+          }}
+          style={{
+            background: 'rgba(16, 185, 129, 0.2)',
+            border: '1px solid rgba(16, 185, 129, 0.3)',
+            borderRadius: '6px',
+            color: '#10b981',
+            padding: '0.5rem',
+            cursor: 'pointer',
+            fontSize: '0.9rem',
+            transition: 'all 0.2s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minWidth: '32px',
+            height: '32px'
+          }}
+          title="Guardar"
+        >
+          💾
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          onMouseEnter={(e) => {
+            e.target.style.background = 'rgba(156, 163, 175, 0.3)'
+            e.target.style.borderColor = 'rgba(156, 163, 175, 0.5)'
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = 'rgba(156, 163, 175, 0.2)'
+            e.target.style.borderColor = 'rgba(156, 163, 175, 0.3)'
+          }}
+          style={{
+            background: 'rgba(156, 163, 175, 0.2)',
+            border: '1px solid rgba(156, 163, 175, 0.3)',
+            borderRadius: '6px',
+            color: '#9ca3af',
+            padding: '0.5rem',
+            cursor: 'pointer',
+            fontSize: '0.9rem',
+            transition: 'all 0.2s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minWidth: '32px',
+            height: '32px'
+          }}
+          title="Cancelar"
+        >
+          ❌
+        </button>
+      </>
+    )
+    
+    // Renderizar usando createRoot para React 18
+    if (ReactDOM.createRoot) {
+      root = ReactDOM.createRoot(buttonContainer)
+      root.render(<CompactButtons />)
+    }
+    
+    // Cleanup function
+    return () => {
+      if (root) {
+        root.unmount()
+      }
+      // Limpiar el container completamente
+      if (actionContainer) {
+        actionContainer.innerHTML = ''
+      }
+    }
+  }, [showCompactButtons, onClose, handleCompactSave])
+  
+  // ✅ Efecto para re-inicializar formData cuando cambian item o config
+  React.useEffect(() => {
+    const newFormData = initializeFormData()
+    setFormData(newFormData)
+    setErrors({}) // Limpiar errores al cambiar el item
+  }, [item, config, entityType]) // Re-ejecutar cuando cambien las props críticas
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -137,6 +193,7 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showButtons = 
       ...(item ? { modifiedAt: new Date().toISOString() } : {})
     }
 
+    // Llamar a la función de guardado
     onSave(dataToSave)
   }
 
@@ -173,6 +230,20 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showButtons = 
         )
 
       case 'textarea':
+        return (
+          <textarea
+            placeholder={fieldConfig.placeholder}
+            rows={fieldConfig.rows || 4}
+            {...baseProps}
+            style={{
+              ...baseProps.style,
+              resize: 'vertical',
+              minHeight: '100px'
+            }}
+          />
+        )
+
+      case 'richtext':
         return (
           <RichTextEditor
             name={fieldName}
@@ -235,6 +306,10 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showButtons = 
           const fieldConfig = config.schema[fieldName]
           if (!fieldConfig) return null
 
+          // Campos de nombre/título con selector de emoji integrado
+          const isNameField = ['name', 'title'].includes(fieldName)
+          const hasIconField = config.schema.icon || config.schema.avatar
+
           return (
             <div key={fieldName}>
               {/* No mostrar label para campos de icono/avatar ya que IconSelector lo incluye */}
@@ -248,7 +323,25 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showButtons = 
                   {fieldConfig.label} {fieldConfig.required && '*'}
                 </label>
               )}
-              {renderField(fieldName, fieldConfig)}
+              
+              {/* Si es campo de nombre/título y hay campo icon/avatar, mostrar juntos */}
+              {isNameField && hasIconField ? (
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end' }}>
+                  <div style={{ flex: 1 }}>
+                    {renderField(fieldName, fieldConfig)}
+                  </div>
+                  <EmojiSelector
+                    value={formData.icon || formData.avatar || ''}
+                    onChange={handleChange}
+                    name={config.schema.icon ? 'icon' : 'avatar'}
+                    entityType={entityType}
+                  />
+                </div>
+              ) : (
+                // Renderizar campo normal (pero omitir icon/avatar si ya se renderizó con el nombre)
+                fieldName !== 'icon' && fieldName !== 'avatar' && renderField(fieldName, fieldConfig)
+              )}
+              
               {errors[fieldName] && (
                 <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: '0.25rem 0 0 0' }}>
                   {errors[fieldName]}
@@ -275,35 +368,32 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showButtons = 
     switch (entityType) {
       case 'players':
         groups.push(
-          { fields: ['name', 'playerName'], columns: 2 },
+          { fields: ['name', 'player'], columns: 2 },
           { fields: ['class', 'race', 'level'], columns: 3 },
           { fields: ['background'] },
-          { fields: ['avatar'], columns: 1 },
           { fields: ['description'] },
-          { fields: ['hitPoints', 'armorClass', 'speed'], columns: 3 },
-          { fields: ['notes'] }
+          { fields: ['backstory'] },
+          { fields: ['hitPoints', 'armorClass', 'speed'], columns: 3 }
         )
         break
 
       case 'quests':
         groups.push(
-          { fields: ['name'] },
-          { fields: ['icon'] },
+          { fields: ['title'] },
           { fields: ['description'] },
           { fields: ['status', 'priority'], columns: 2 },
           { fields: ['location'] },
           { fields: ['reward'] },
-          { fields: ['notes'] }
+          { fields: ['detailedDescription'] }
         )
         break
 
       case 'objects':
         groups.push(
           { fields: ['name'] },
-          { fields: ['icon'] },
           { fields: ['type', 'rarity'], columns: 2 },
           { fields: ['description'] },
-          { fields: ['properties'] },
+          { fields: ['detailedDescription'] },
           { fields: ['owner', 'location'], columns: 2 }
         )
         break
@@ -311,30 +401,28 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showButtons = 
       case 'npcs':
         groups.push(
           { fields: ['name'] },
-          { fields: ['icon'] },
           { fields: ['role'] },
           { fields: ['description'] },
           { fields: ['location'] },
           { fields: ['attitude'] },
-          { fields: ['notes'] }
+          { fields: ['detailedDescription'] }
         )
         break
 
       case 'locations':
         groups.push(
           { fields: ['name'] },
-          { fields: ['icon'] },
+          { fields: ['type'] },
           { fields: ['description'] },
           { fields: ['importance'] },
           { fields: ['inhabitants'] },
-          { fields: ['notes'] }
+          { fields: ['detailedDescription'] }
         )
         break
 
       case 'notes':
         groups.push(
           { fields: ['title', 'category'], columns: 2 },
-          { fields: ['icon'] },
           { fields: ['content'] }
         )
         break
@@ -349,16 +437,10 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showButtons = 
 
   const fieldGroups = organizeFields()
   
-  // Efecto para inyectar botones cuando se monta el componente
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      injectCreateButtons()
-    }, 100)
-    return () => clearTimeout(timer)
-  }, [])
+  // ✅ Sin efectos de inyección - usaremos botones nativos
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form id="dynamic-form" onSubmit={handleSubmit}>
       <div style={{
         display: 'grid',
         gap: '1.5rem',
@@ -378,22 +460,6 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showButtons = 
         )}
       </div>
 
-      {/* Botones - ocultos ya que ahora se manejan desde el header del modal */}
-      <div style={{ display: 'none' }}>
-        <button
-          type="button"
-          onClick={onClose}
-          className="btn-secondary"
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          className="btn-primary"
-        >
-          {item ? '💾 Guardar Cambios' : `➕ Crear ${config.name}`}
-        </button>
-      </div>
     </form>
   )
 }

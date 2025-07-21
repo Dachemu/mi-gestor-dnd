@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import React from 'react'
 import { generateId } from '../services/storage'
 import { useNotification } from './useNotification.jsx'
 
@@ -123,16 +122,14 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
 
   // Eliminar elemento
   const handleDelete = (id, name) => {
-    if (window.confirm(`¿Estás seguro de que quieres eliminar "${name}"?`)) {
-      setItems(prev => prev.filter(item => item.id !== id))
-      
-      // Si el elemento eliminado estaba seleccionado, deseleccionar
-      if (selectedItem?.id === id) {
-        setSelectedItem(null)
-      }
-      
-      showNotification(`${itemName} "${name}" eliminado`)
+    setItems(prev => prev.filter(item => item.id !== id))
+    
+    // Si el elemento eliminado estaba seleccionado, deseleccionar
+    if (selectedItem?.id === id) {
+      setSelectedItem(null)
     }
+    
+    showNotification(`${itemName} "${name}" eliminado`)
   }
 
   // Seleccionar elemento para ver detalles

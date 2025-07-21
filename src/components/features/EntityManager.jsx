@@ -59,6 +59,7 @@ function UniversalManager({
         [entityType]: updatedItems
       })
     }
+    return savedItem
   }
 
   // Función mejorada para eliminar que actualiza la campaña
@@ -242,12 +243,13 @@ function UniversalManager({
       )}
 
       {/* Modal de formulario */}
-      <BaseModal
-        isOpen={showForm}
-        onClose={closeForm}
-        title={editingItem ? `✏️ Editar ${config.name}` : `➕ Nuevo ${config.name}`}
-        size="lg"
-      >
+      {showForm && (
+        <BaseModal
+          isOpen={showForm}
+          onClose={closeForm}
+          title={editingItem ? `✏️ Editar ${config.name}` : `➕ Nuevo ${config.name}`}
+          size="lg"
+        >
         <DynamicForm
           entityType={entityType}
           config={config}
@@ -255,7 +257,8 @@ function UniversalManager({
           onSave={handleSave}
           onClose={closeForm}
         />
-      </BaseModal>
+        </BaseModal>
+      )}
 
       {/* Modal de detalles */}
       <BaseModal

@@ -3,6 +3,7 @@ import ConnectionsDisplay from './ConnectionsDisplay'
 import DynamicForm from './DynamicForm'
 import { formatMarkdownToHtml } from '../../utils/textFormatter'
 import { BaseBadge } from '../ui/base'
+import { validateEntity } from '../../config/entityTypes.js'
 
 /**
  * Componente de detalles universal que reemplaza todos los *Details específicos
@@ -337,19 +338,13 @@ function UniversalDetails({
     setIsEditing(true)
   }
 
-  // Función para inyectar botones compactos en el header del modal
-  const injectCompactButtons = () => {
+  // Función para inyectar botones compactos - solo para modo vista
+  const injectViewButtons = () => {
     const actionContainer = document.getElementById('modal-compact-actions')
     const fallbackActions = document.getElementById('fallback-actions')
     
-    if (!actionContainer) {
-      // Si no hay container compacto, mostrar botones fallback
-      if (fallbackActions) {
-        fallbackActions.style.display = 'flex'
-      }
-      return
-    }
-
+    if (!actionContainer || isEditing) return
+    
     // Ocultar botones fallback ya que usaremos los compactos
     if (fallbackActions) {
       fallbackActions.style.display = 'none'
@@ -358,144 +353,85 @@ function UniversalDetails({
     // Limpiar contenido previo
     actionContainer.innerHTML = ''
 
-    if (!isEditing) {
-      // Botón de editar compacto
-      const editButton = document.createElement('button')
-      editButton.innerHTML = '✏️'
-      editButton.title = 'Editar'
-      editButton.style.cssText = `
-        background: rgba(139, 92, 246, 0.2);
-        border: 1px solid rgba(139, 92, 246, 0.3);
-        border-radius: 6px;
-        color: #a78bfa;
-        padding: 0.5rem;
-        cursor: pointer;
-        font-size: 0.9rem;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 32px;
-        height: 32px;
-      `
-      editButton.addEventListener('mouseenter', () => {
-        editButton.style.background = 'rgba(139, 92, 246, 0.3)'
-        editButton.style.borderColor = 'rgba(139, 92, 246, 0.5)'
-      })
-      editButton.addEventListener('mouseleave', () => {
-        editButton.style.background = 'rgba(139, 92, 246, 0.2)'
-        editButton.style.borderColor = 'rgba(139, 92, 246, 0.3)'
-      })
-      editButton.addEventListener('click', handleStartEdit)
-      actionContainer.appendChild(editButton)
+    // Solo botones de vista (editar y eliminar)
+    // Botón de editar compacto
+    const editButton = document.createElement('button')
+    editButton.innerHTML = '✏️'
+    editButton.title = 'Editar'
+    editButton.style.cssText = `
+      background: rgba(139, 92, 246, 0.2);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 6px;
+      color: #a78bfa;
+      padding: 0.5rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 32px;
+      height: 32px;
+    `
+    editButton.addEventListener('mouseenter', () => {
+      editButton.style.background = 'rgba(139, 92, 246, 0.3)'
+      editButton.style.borderColor = 'rgba(139, 92, 246, 0.5)'
+    })
+    editButton.addEventListener('mouseleave', () => {
+      editButton.style.background = 'rgba(139, 92, 246, 0.2)'
+      editButton.style.borderColor = 'rgba(139, 92, 246, 0.3)'
+    })
+    editButton.addEventListener('click', handleStartEdit)
+    actionContainer.appendChild(editButton)
 
-      // Botón de eliminar compacto
-      const deleteButton = document.createElement('button')
-      deleteButton.innerHTML = '🗑️'
-      deleteButton.title = 'Eliminar'
-      deleteButton.style.cssText = `
-        background: rgba(239, 68, 68, 0.2);
-        border: 1px solid rgba(239, 68, 68, 0.3);
-        border-radius: 6px;
-        color: #ef4444;
-        padding: 0.5rem;
-        cursor: pointer;
-        font-size: 0.9rem;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 32px;
-        height: 32px;
-      `
-      deleteButton.addEventListener('mouseenter', () => {
-        deleteButton.style.background = 'rgba(239, 68, 68, 0.3)'
-        deleteButton.style.borderColor = 'rgba(239, 68, 68, 0.5)'
-      })
-      deleteButton.addEventListener('mouseleave', () => {
-        deleteButton.style.background = 'rgba(239, 68, 68, 0.2)'
-        deleteButton.style.borderColor = 'rgba(239, 68, 68, 0.3)'
-      })
-      deleteButton.addEventListener('click', onDelete)
-      actionContainer.appendChild(deleteButton)
-    } else {
-      // Botón de guardar compacto
-      const saveButton = document.createElement('button')
-      saveButton.innerHTML = '💾'
-      saveButton.title = 'Guardar'
-      saveButton.style.cssText = `
-        background: rgba(16, 185, 129, 0.2);
-        border: 1px solid rgba(16, 185, 129, 0.3);
-        border-radius: 6px;
-        color: #10b981;
-        padding: 0.5rem;
-        cursor: pointer;
-        font-size: 0.9rem;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 32px;
-        height: 32px;
-      `
-      saveButton.addEventListener('mouseenter', () => {
-        saveButton.style.background = 'rgba(16, 185, 129, 0.3)'
-        saveButton.style.borderColor = 'rgba(16, 185, 129, 0.5)'
-      })
-      saveButton.addEventListener('mouseleave', () => {
-        saveButton.style.background = 'rgba(16, 185, 129, 0.2)'
-        saveButton.style.borderColor = 'rgba(16, 185, 129, 0.3)'
-      })
-      // Hacer clic en el botón de guardar compacto debe activar el submit del formulario
-      saveButton.addEventListener('click', () => {
-        const form = document.querySelector('form')
-        if (form) {
-          form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
-        }
-      })
-      actionContainer.appendChild(saveButton)
-
-      // Botón de cancelar compacto
-      const cancelButton = document.createElement('button')
-      cancelButton.innerHTML = '❌'
-      cancelButton.title = 'Cancelar'
-      cancelButton.style.cssText = `
-        background: rgba(156, 163, 175, 0.2);
-        border: 1px solid rgba(156, 163, 175, 0.3);
-        border-radius: 6px;
-        color: #9ca3af;
-        padding: 0.5rem;
-        cursor: pointer;
-        font-size: 0.9rem;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 32px;
-        height: 32px;
-      `
-      cancelButton.addEventListener('mouseenter', () => {
-        cancelButton.style.background = 'rgba(156, 163, 175, 0.3)'
-        cancelButton.style.borderColor = 'rgba(156, 163, 175, 0.5)'
-      })
-      cancelButton.addEventListener('mouseleave', () => {
-        cancelButton.style.background = 'rgba(156, 163, 175, 0.2)'
-        cancelButton.style.borderColor = 'rgba(156, 163, 175, 0.3)'
-      })
-      cancelButton.addEventListener('click', handleCancelEdit)
-      actionContainer.appendChild(cancelButton)
-    }
+    // Botón de eliminar compacto
+    const deleteButton = document.createElement('button')
+    deleteButton.innerHTML = '🗑️'
+    deleteButton.title = 'Eliminar'
+    deleteButton.style.cssText = `
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 6px;
+      color: #ef4444;
+      padding: 0.5rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 32px;
+      height: 32px;
+    `
+    deleteButton.addEventListener('mouseenter', () => {
+      deleteButton.style.background = 'rgba(239, 68, 68, 0.3)'
+      deleteButton.style.borderColor = 'rgba(239, 68, 68, 0.5)'
+    })
+    deleteButton.addEventListener('mouseleave', () => {
+      deleteButton.style.background = 'rgba(239, 68, 68, 0.2)'
+      deleteButton.style.borderColor = 'rgba(239, 68, 68, 0.3)'
+    })
+    deleteButton.addEventListener('click', () => {
+      if (window.confirm(`¿Estás seguro de que quieres eliminar "${item.name || item.title}"?`)) {
+        onDelete()
+      }
+    })
+    actionContainer.appendChild(deleteButton)
   }
 
-  // Efecto para inyectar botones cuando cambia el estado de edición
+  // Efecto para inyectar botones solo en modo vista
   useEffect(() => {
-    injectCompactButtons()
+    if (!isEditing) {
+      injectViewButtons()
+    }
   }, [isEditing])
 
   // Efecto para inyectar botones cuando se monta el componente
   useEffect(() => {
     const timer = setTimeout(() => {
-      injectCompactButtons()
+      if (!isEditing) {
+        injectViewButtons()
+      }
     }, 100)
     return () => clearTimeout(timer)
   }, [])
@@ -511,7 +447,7 @@ function UniversalDetails({
           item={item}
           onSave={handleSave}
           onClose={handleCancelEdit}
-          showButtons={false}
+          showCompactButtons={true}
         />
       </div>
     )
@@ -560,7 +496,11 @@ function UniversalDetails({
           ✏️ Editar
         </button>
         <button
-          onClick={onDelete}
+          onClick={() => {
+            if (window.confirm(`¿Estás seguro de que quieres eliminar "${item.name || item.title}"?`)) {
+              onDelete()
+            }
+          }}
           style={{
             background: 'rgba(239, 68, 68, 0.2)',
             border: '1px solid rgba(239, 68, 68, 0.3)',
