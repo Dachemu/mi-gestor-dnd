@@ -63,52 +63,22 @@ function ConnectionsDisplay({
   }
 
   return (
-    <div style={{
-      background: 'rgba(31, 41, 55, 0.3)',
-      border: '1px solid rgba(139, 92, 246, 0.2)',
-      borderRadius: '12px',
-      padding: '1.5rem'
-    }}>
-      {/* Header con título y botón para agregar conexiones */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: '1.5rem',
-        paddingBottom: '0.75rem',
-        borderBottom: '1px solid rgba(139, 92, 246, 0.1)'
-      }}>
-        <h4 style={{ 
-          color: 'white', 
-          fontSize: '1.1rem', 
-          fontWeight: '600',
-          margin: 0,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem'
-        }}>
+    <div className="connections-container">
+      {/* Header compacto con título y botón */}
+      <div className="connections-header">
+        <h4 className="connections-title">
           🔗 Conexiones ({totalConnections})
         </h4>
-        
         <button
           onClick={() => onOpenConnectionModal(item, itemType)}
-          style={{
-            background: 'rgba(139, 92, 246, 0.2)',
-            border: '1px solid rgba(139, 92, 246, 0.3)',
-            borderRadius: '8px',
-            color: '#a78bfa',
-            padding: '0.5rem 0.75rem',
-            cursor: 'pointer',
-            fontSize: '0.8rem',
-            fontWeight: '600'
-          }}
+          className="connect-btn"
         >
-          ➕ Conectar
+          ➕
         </button>
       </div>
 
-      {/* Secciones por tipo de conexión */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      {/* Grid compacto de conexiones */}
+      <div className="connections-grid">
         {Object.entries(CONNECTION_TYPES).map(([type, config]) => {
           const connectedItems = linkedItems[type] || []
           
@@ -126,81 +96,195 @@ function ConnectionsDisplay({
           )
         })}
       </div>
+
+      {/* Estilos CSS-in-JS para diseño compacto */}
+      <style jsx>{`
+        .connections-container {
+          background: rgba(31, 41, 55, 0.3);
+          border: 1px solid rgba(139, 92, 246, 0.2);
+          border-radius: 12px;
+          padding: 1rem;
+        }
+
+        .connections-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 1rem;
+          padding-bottom: 0.5rem;
+          border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+        }
+
+        .connections-title {
+          color: white;
+          font-size: 0.95rem;
+          font-weight: 600;
+          margin: 0;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .connect-btn {
+          background: rgba(139, 92, 246, 0.2);
+          border: 1px solid rgba(139, 92, 246, 0.3);
+          border-radius: 6px;
+          color: #a78bfa;
+          padding: 0.4rem 0.6rem;
+          cursor: pointer;
+          font-size: 0.8rem;
+          font-weight: 600;
+          transition: all 0.2s ease;
+        }
+
+        .connect-btn:hover {
+          background: rgba(139, 92, 246, 0.3);
+        }
+
+        .connections-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 0.75rem;
+        }
+
+        @media (max-width: 768px) {
+          .connections-grid {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+          }
+
+          .connections-container {
+            padding: 0.75rem;
+          }
+
+          .connections-title {
+            font-size: 0.85rem;
+          }
+
+          .connect-btn {
+            padding: 0.3rem 0.5rem;
+            font-size: 0.75rem;
+          }
+        }
+      `}</style>
     </div>
   )
 }
 
-// Sección para mostrar conexiones de un tipo específico
+// Sección para mostrar conexiones de un tipo específico - VERSION COMPACTA
 function ConnectionTypeSection({ type, config, items, onRemove, onNavigate }) {
+  // Limitar a mostrar máximo 3 elementos para compactación
+  const maxItems = 3;
+  const displayItems = items.slice(0, maxItems);
+  const hasMore = items.length > maxItems;
+
   return (
-    <div style={{
-      background: 'rgba(31, 41, 55, 0.3)',
-      border: '1px solid rgba(139, 92, 246, 0.2)',
-      borderRadius: '12px',
-      padding: '1rem'
-    }}>
-      {/* Header del tipo */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.5rem',
-        marginBottom: '1rem',
-        paddingBottom: '0.5rem',
-        borderBottom: '1px solid rgba(139, 92, 246, 0.1)'
-      }}>
-        <span style={{ fontSize: '1.2rem' }}>{config.icon}</span>
-        <h5 style={{ 
-          color: config.color, 
-          fontSize: '1rem', 
-          fontWeight: '600',
-          margin: 0
-        }}>
+    <div className="connection-type-section">
+      {/* Header compacto del tipo */}
+      <div className="connection-type-header">
+        <span className="connection-type-icon">{config.icon}</span>
+        <h5 className="connection-type-title" style={{ color: config.color }}>
           {config.name} ({items.length})
         </h5>
       </div>
 
-      {/* Lista de elementos conectados */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        {items.map(connectedItem => (
+      {/* Lista compacta de elementos conectados */}
+      <div className="connection-items">
+        {displayItems.map(connectedItem => (
           <ConnectionItem
             key={connectedItem.id}
             item={connectedItem}
             config={config}
             onRemove={() => onRemove(connectedItem)}
             onNavigate={() => onNavigate(connectedItem)}
+            compact={true}
           />
         ))}
+        {hasMore && (
+          <div className="connection-more">
+            + {items.length - maxItems} más...
+          </div>
+        )}
       </div>
+
+      {/* Estilos para la sección compacta */}
+      <style jsx>{`
+        .connection-type-section {
+          background: rgba(31, 41, 55, 0.4);
+          border: 1px solid rgba(139, 92, 246, 0.15);
+          border-radius: 8px;
+          padding: 0.75rem;
+        }
+
+        .connection-type-header {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          margin-bottom: 0.75rem;
+          padding-bottom: 0.5rem;
+          border-bottom: 1px solid rgba(139, 92, 246, 0.08);
+        }
+
+        .connection-type-icon {
+          font-size: 1rem;
+        }
+
+        .connection-type-title {
+          font-size: 0.85rem;
+          font-weight: 600;
+          margin: 0;
+        }
+
+        .connection-items {
+          display: flex;
+          flex-direction: column;
+          gap: 0.4rem;
+        }
+
+        .connection-more {
+          font-size: 0.75rem;
+          color: #8b5cf6;
+          text-align: center;
+          padding: 0.25rem;
+          background: rgba(139, 92, 246, 0.1);
+          border-radius: 4px;
+          font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+          .connection-type-section {
+            padding: 0.5rem;
+          }
+
+          .connection-type-header {
+            margin-bottom: 0.5rem;
+          }
+
+          .connection-type-title {
+            font-size: 0.8rem;
+          }
+        }
+      `}</style>
     </div>
   )
 }
 
-// Item individual de conexión - ✨ MEJORADO con navegación
-function ConnectionItem({ item, config, onRemove, onNavigate }) {
+// Item individual de conexión - VERSION COMPACTA
+function ConnectionItem({ item, config, onRemove, onNavigate, compact = false }) {
+  const displayName = item.name || item.title || 'Sin nombre';
+  const displayDetail = item.role || item.class || item.status || item.type;
+  
   return (
-    <div style={{
-      background: 'rgba(31, 41, 55, 0.4)',
-      border: '1px solid rgba(139, 92, 246, 0.1)',
-      borderRadius: '8px',
-      padding: '0.75rem',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '0.75rem',
-      transition: 'all 0.2s ease'
-    }}>
+    <div className="connection-item">
       {/* Icono del elemento */}
-      <span style={{ fontSize: '1.2rem', flexShrink: 0 }}>
+      <span className="connection-item-icon">
         {item.icon || item.avatar || config.icon}
       </span>
 
-      {/* Información del elemento - ✨ CLICKEABLE para navegar */}
+      {/* Información del elemento - CLICKEABLE para navegar */}
       <div 
         onClick={onNavigate}
-        style={{ 
-          flex: 1,
-          cursor: 'pointer',
-          transition: 'color 0.2s ease'
-        }}
+        className="connection-item-info"
         onMouseEnter={(e) => {
           e.currentTarget.style.color = config.color
         }}
@@ -208,47 +292,124 @@ function ConnectionItem({ item, config, onRemove, onNavigate }) {
           e.currentTarget.style.color = 'white'
         }}
       >
-        <div style={{ 
-          color: 'white', 
-          fontWeight: '600',
-          fontSize: '0.9rem',
-          marginBottom: '0.25rem'
-        }}>
-          {item.name || item.title}
+        <div className="connection-item-name">
+          {displayName}
         </div>
-        <div style={{ 
-          color: 'var(--text-muted)', 
-          fontSize: '0.8rem'
-        }}>
-          {item.role || item.class || item.status || item.type || 'Ver detalles →'}
-        </div>
+        {displayDetail && (
+          <div className="connection-item-detail">
+            {displayDetail}
+          </div>
+        )}
       </div>
 
-      {/* Botón para eliminar conexión */}
+      {/* Botón compacto para eliminar conexión */}
       <button
         onClick={(e) => {
           e.stopPropagation()
           onRemove()
         }}
-        style={{
-          background: 'rgba(239, 68, 68, 0.2)',
-          border: '1px solid rgba(239, 68, 68, 0.3)',
-          borderRadius: '6px',
-          color: '#ef4444',
-          padding: '0.25rem',
-          cursor: 'pointer',
-          fontSize: '0.7rem',
-          width: '24px',
-          height: '24px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0
-        }}
+        className="connection-item-remove"
         title="Eliminar conexión"
       >
         ✕
       </button>
+
+      {/* Estilos para el item compacto */}
+      <style jsx>{`
+        .connection-item {
+          background: rgba(31, 41, 55, 0.5);
+          border: 1px solid rgba(139, 92, 246, 0.08);
+          border-radius: 6px;
+          padding: 0.5rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          transition: all 0.2s ease;
+        }
+
+        .connection-item:hover {
+          background: rgba(139, 92, 246, 0.1);
+          border-color: rgba(139, 92, 246, 0.2);
+          transform: translateY(-1px);
+        }
+
+        .connection-item-icon {
+          font-size: 1rem;
+          flex-shrink: 0;
+        }
+
+        .connection-item-info {
+          flex: 1;
+          cursor: pointer;
+          transition: color 0.2s ease;
+          min-width: 0;
+        }
+
+        .connection-item-name {
+          color: white;
+          font-weight: 600;
+          font-size: 0.8rem;
+          margin-bottom: 0.1rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .connection-item-detail {
+          color: #9ca3af;
+          font-size: 0.7rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .connection-item-remove {
+          background: rgba(239, 68, 68, 0.2);
+          border: 1px solid rgba(239, 68, 68, 0.3);
+          border-radius: 4px;
+          color: #ef4444;
+          padding: 0.2rem;
+          cursor: pointer;
+          font-size: 0.6rem;
+          width: 18px;
+          height: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          transition: all 0.2s ease;
+        }
+
+        .connection-item-remove:hover {
+          background: rgba(239, 68, 68, 0.3);
+          transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+          .connection-item {
+            padding: 0.4rem;
+            gap: 0.4rem;
+          }
+
+          .connection-item-icon {
+            font-size: 0.9rem;
+          }
+
+          .connection-item-name {
+            font-size: 0.75rem;
+          }
+
+          .connection-item-detail {
+            font-size: 0.65rem;
+          }
+
+          .connection-item-remove {
+            width: 16px;
+            height: 16px;
+            font-size: 0.55rem;
+          }
+        }
+      `}</style>
     </div>
   )
 }

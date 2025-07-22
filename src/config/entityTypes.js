@@ -13,18 +13,9 @@ export const ENTITY_SCHEMAS = {
       label: 'Clase',
       options: ['Bárbaro', 'Bardo', 'Brujo', 'Clérigo', 'Druida', 'Explorador', 'Guerrero', 'Hechicero', 'Mago', 'Monje', 'Paladín', 'Pícaro', 'Artificiero']
     },
-    race: { 
-      type: 'select', 
-      label: 'Raza',
-      options: ['Humano', 'Elfo', 'Enano', 'Mediano', 'Dracónido', 'Gnomo', 'Semielfo', 'Semiorco', 'Tiefling', 'Aarakocra', 'Genasi', 'Otro']
-    },
-    level: { type: 'number', label: 'Nivel', min: 1, max: 20, defaultValue: '1' },
     background: { type: 'text', label: 'Trasfondo', placeholder: 'Ej: Noble, Forajido, Ermitaño...' },
     description: { type: 'textarea', label: 'Descripción del personaje', placeholder: 'Apariencia, personalidad, historia personal...' },
     backstory: { type: 'richtext', label: 'Historia del personaje', placeholder: 'Historia completa del personaje, conexiones con la trama, motivaciones...' },
-    hitPoints: { type: 'number', label: 'Puntos de vida', placeholder: 'HP', min: 1 },
-    armorClass: { type: 'number', label: 'Clase de armadura', placeholder: 'CA', min: 1 },
-    speed: { type: 'number', label: 'Velocidad (pies)', placeholder: '30', min: 0 },
     avatar: { type: 'text', label: 'Avatar', defaultValue: '⚔️' },
     icon: { type: 'text', label: 'Icono', defaultValue: '⚔️' }
   },
@@ -130,19 +121,13 @@ export const ENTITY_CONFIGS = {
     schema: ENTITY_SCHEMAS.players,
     displayFields: {
       primary: 'name',
-      secondary: ['class', 'race'],
-      status: 'level',
+      secondary: ['class'],
       description: 'description'
     },
     detailSections: [
       {
         title: 'Información básica',
-        fields: ['player', 'class', 'race', 'level', 'background', 'description']
-      },
-      {
-        title: 'Estadísticas',
-        fields: ['hitPoints', 'armorClass', 'speed'],
-        render: 'stats'
+        fields: ['player', 'class', 'background', 'description']
       },
       {
         title: 'Historia del personaje',
@@ -150,16 +135,7 @@ export const ENTITY_CONFIGS = {
         render: 'html'
       }
     ],
-    colors: {
-      level: (level) => {
-        if (!level) return '#6b7280'
-        const levelNum = parseInt(level)
-        if (levelNum >= 15) return '#ff6b35'
-        if (levelNum >= 10) return '#8b5cf6'
-        if (levelNum >= 5) return '#3b82f6'
-        return '#10b981'
-      }
-    }
+    colors: {}
   },
 
   quests: {

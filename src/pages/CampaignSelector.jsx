@@ -245,77 +245,53 @@ function CampaignSelector({ onSelectCampaign }) {
         {/* Notificación */}
         <NotificationComponent />
 
-        {/* Título principal */}
-        <h1 className="main-title fade-in">
-          ⚔️ Gestor de Campañas D&D
-        </h1>
-        <p className="subtitle fade-in">
-          Crea y gestiona aventuras épicas con todas las herramientas que necesitas
-        </p>
-
-        {/* Botones de acción */}
-        <div style={{ 
-          display: 'flex', 
-          gap: '1rem', 
-          marginBottom: '3rem',
-          justifyContent: 'center',
-          flexWrap: 'wrap'
-        }}>
-          <BaseButton
-            variant="primary"
-            onClick={() => setShowNewCampaignForm(true)}
-            className="fade-in"
-          >
-            ➕ Nueva Campaña
-          </BaseButton>
-          <BaseButton
-            variant="secondary"
-            onClick={handleImportCampaign}
-            icon={<Upload size={16} />}
-            className="fade-in"
-          >
-            Importar
-          </BaseButton>
-        </div>
-
-        {/* Lista de campañas o mensaje de bienvenida */}
-        {campaigns.length === 0 ? (
-          <div style={{ textAlign: 'center', color: '#9ca3af' }}>
-            <h3 style={{ 
-              fontSize: '1.8rem', 
-              marginBottom: '1rem', 
-              color: '#e5e7eb' 
-            }}>
-              ¡Bienvenido, Dungeon Master! 🎲
-            </h3>
-            <p style={{ 
-              color: '#6b7280', 
-              marginBottom: '2rem',
-              fontSize: '1.2rem',
-              maxWidth: '500px',
-              margin: '0 auto 2rem'
-            }}>
-              Crea tu primera campaña para comenzar a construir mundos épicos y gestionar aventuras inolvidables.
-            </p>
+        {/* Título principal compacto */}
+        <div className="header-compact">
+          <h1 className="main-title-compact fade-in">
+            ⚔️ Gestor de Campañas D&D
+          </h1>
+          
+          {/* Botones de acción integrados en el header */}
+          <div className="header-actions fade-in">
             <BaseButton
               variant="primary"
-              size="lg"
+              size="sm"
               onClick={() => setShowNewCampaignForm(true)}
-              style={{
-                padding: '1.5rem 3rem',
-                fontSize: '1.3rem',
-                boxShadow: '0 8px 30px rgba(139, 92, 246, 0.4)'
-              }}
             >
-              🚀 Crear Mi Primera Campaña
+              ➕ Nueva
+            </BaseButton>
+            <BaseButton
+              variant="secondary"
+              size="sm"
+              onClick={handleImportCampaign}
+              icon={<Upload size={14} />}
+            >
+              Importar
             </BaseButton>
           </div>
+        </div>
+
+        {/* Lista de campañas o mensaje de bienvenida - más compacta */}
+        {campaigns.length === 0 ? (
+          <div className="welcome-section">
+            <div className="welcome-content">
+              <h3 className="welcome-title">
+                ¡Bienvenido, Dungeon Master! 🎲
+              </h3>
+              <p className="welcome-subtitle">
+                Crea tu primera campaña para comenzar a construir mundos épicos.
+              </p>
+              <BaseButton
+                variant="primary"
+                onClick={() => setShowNewCampaignForm(true)}
+                style={{ marginTop: '1rem' }}
+              >
+                🚀 Crear Mi Primera Campaña
+              </BaseButton>
+            </div>
+          </div>
         ) : (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-            gap: '2rem'
-          }}>
+          <div className="campaigns-grid-compact">
             {campaigns.map(campaign => (
               <CampaignCard
                 key={campaign.id}
@@ -328,6 +304,140 @@ function CampaignSelector({ onSelectCampaign }) {
           </div>
         )}
       </div>
+
+      {/* Estilos para layout compacto */}
+      <style jsx>{`
+        .header-compact {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+          max-width: 1200px;
+          margin: 0 auto 2rem;
+          padding: 0 1rem;
+          gap: 2rem;
+        }
+
+        .main-title-compact {
+          font-size: clamp(1.5rem, 4vw, 2.5rem);
+          font-weight: 700;
+          background: linear-gradient(135deg, #ffffff 0%, #a78bfa 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          margin: 0;
+          flex: 1;
+        }
+
+        .header-actions {
+          display: flex;
+          gap: 0.75rem;
+          flex-shrink: 0;
+        }
+
+        .welcome-section {
+          width: 100%;
+          max-width: 600px;
+          margin: 0 auto;
+          text-align: center;
+          padding: 2rem 1rem;
+        }
+
+        .welcome-content {
+          background: rgba(31, 41, 55, 0.3);
+          border: 1px solid rgba(139, 92, 246, 0.2);
+          border-radius: 20px;
+          padding: 2rem;
+          backdrop-filter: blur(10px);
+        }
+
+        .welcome-title {
+          font-size: 1.8rem;
+          font-weight: 600;
+          color: #e5e7eb;
+          margin: 0 0 1rem;
+        }
+
+        .welcome-subtitle {
+          color: #9ca3af;
+          font-size: 1rem;
+          margin: 0 0 1.5rem;
+          line-height: 1.5;
+        }
+
+        .campaigns-grid-compact {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+          gap: 1.5rem;
+          width: 100%;
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 1rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+          .header-compact {
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+          }
+
+          .main-title-compact {
+            font-size: clamp(1.2rem, 6vw, 2rem);
+          }
+
+          .header-actions {
+            gap: 0.5rem;
+          }
+
+          .campaigns-grid-compact {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            padding: 0 0.5rem;
+          }
+
+          .welcome-section {
+            padding: 1rem 0.5rem;
+          }
+
+          .welcome-content {
+            padding: 1.5rem;
+          }
+
+          .welcome-title {
+            font-size: 1.5rem;
+          }
+
+          .welcome-subtitle {
+            font-size: 0.9rem;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .header-compact {
+            padding: 0 0.5rem;
+          }
+
+          .main-title-compact {
+            font-size: clamp(1rem, 7vw, 1.8rem);
+          }
+
+          .welcome-content {
+            padding: 1rem;
+            border-radius: 15px;
+          }
+
+          .welcome-title {
+            font-size: 1.3rem;
+          }
+
+          .welcome-subtitle {
+            font-size: 0.85rem;
+          }
+        }
+      `}</style>
 
       {/* Modal para nueva campaña */}
       {showNewCampaignForm && (

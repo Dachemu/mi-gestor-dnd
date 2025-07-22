@@ -90,16 +90,16 @@ body {
    📦 CONTENEDORES
    ==================================== */
 .app-container {
-  min-height: 100%;
-  height: 100%;
-  padding: 2rem;
+  min-height: 100vh;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   overflow-x: hidden;
   width: 100%;
   max-width: 100vw;
+  padding-top: 2rem;
 }
 
 /* ====================================
