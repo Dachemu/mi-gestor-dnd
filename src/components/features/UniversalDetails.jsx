@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import ConnectionsDisplay from './ConnectionsDisplay'
 import DynamicForm from './DynamicForm'
-import { formatMarkdownToHtml } from '../../utils/textFormatter'
+// TiptapEditor ya genera HTML, no necesitamos formatear markdown
 import { BaseBadge } from '../ui/base'
 import { validateEntity } from '../../config/entityTypes.js'
 
@@ -58,7 +58,7 @@ function UniversalDetails({
               border: '1px solid rgba(139, 92, 246, 0.1)',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
             }}
-            dangerouslySetInnerHTML={{ __html: formatMarkdownToHtml(value) }}
+            dangerouslySetInnerHTML={{ __html: value }}
           />
         )
 

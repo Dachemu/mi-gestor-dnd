@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom/client'
 import { validateEntity } from '../../config/entityTypes.js'
-import RichTextEditor from '../ui/RichTextEditor'
+import TiptapEditor from '../ui/TiptapEditor'
 import IconSelector from '../ui/IconSelector'
 import EmojiSelector from '../ui/EmojiSelector'
 
@@ -245,12 +245,13 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showCompactBut
 
       case 'richtext':
         return (
-          <RichTextEditor
+          <TiptapEditor
             name={fieldName}
             value={formData[fieldName] || ''}
             onChange={handleChange}
             placeholder={fieldConfig.placeholder}
             minHeight={fieldConfig.minHeight || '200px'}
+            maxHeight={fieldConfig.maxHeight || '400px'}
           />
         )
 
