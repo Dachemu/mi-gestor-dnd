@@ -368,8 +368,9 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showCompactBut
     switch (entityType) {
       case 'players':
         groups.push(
-          { fields: ['name', 'player'], columns: 2 },
-          { fields: ['class', 'race', 'level'], columns: 3 },
+          { fields: ['name'] },
+          { fields: ['player', 'class'], columns: 2 },
+          { fields: ['race', 'level'], columns: 2 },
           { fields: ['background'] },
           { fields: ['description'] },
           { fields: ['backstory'] },
