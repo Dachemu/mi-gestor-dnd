@@ -1,0 +1,62 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1F2937;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#374151;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="diceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F9FAFB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E5E7EB;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="2" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" fill="url(#bgGrad)" rx="72"/>
+  
+  <!-- Main D20 (Icosahedron) -->
+  <g transform="translate(256,180)" filter="url(#shadow)">
+    <!-- Top faces -->
+    <polygon points="0,-80 -60,0 0,40" fill="url(#diceGrad)" stroke="#D1D5DB" stroke-width="1"/>
+    <polygon points="0,-80 60,0 0,40" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="1"/>
+    <polygon points="0,-80 0,40 -60,0" fill="#E5E7EB" stroke="#D1D5DB" stroke-width="1"/>
+    <polygon points="0,-80 0,40 60,0" fill="#F9FAFB" stroke="#D1D5DB" stroke-width="1"/>
+    
+    <!-- Bottom faces -->
+    <polygon points="-60,0 0,40 -30,80" fill="#D1D5DB" stroke="#9CA3AF" stroke-width="1"/>
+    <polygon points="60,0 0,40 30,80" fill="#E5E7EB" stroke="#9CA3AF" stroke-width="1"/>
+    <polygon points="0,40 -30,80 30,80" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1"/>
+    
+    <!-- Face details -->
+    <circle cx="0" cy="-20" r="3" fill="#8B5CF6"/>
+    <circle cx="-20" cy="10" r="2" fill="#8B5CF6"/>
+    <circle cx="20" cy="10" r="2" fill="#8B5CF6"/>
+  </g>
+  
+  <!-- Title -->
+  <text x="256" y="320" text-anchor="middle" font-family="serif" font-size="52" font-weight="bold" fill="#F9FAFB">D&amp;D</text>
+  <text x="256" y="360" text-anchor="middle" font-family="sans-serif" font-size="28" fill="#D1D5DB">Manager</text>
+  
+  <!-- Decorative elements -->
+  <g transform="translate(256,420)">
+    <!-- Small dice -->
+    <rect x="-80" y="-8" width="16" height="16" fill="#8B5CF6" rx="2" transform="rotate(15)"/>
+    <circle cx="-76" cy="0" r="1.5" fill="#F9FAFB"/>
+    <circle cx="-84" cy="0" r="1.5" fill="#F9FAFB"/>
+    
+    <rect x="64" y="-8" width="16" height="16" fill="#8B5CF6" rx="2" transform="rotate(-15)"/>
+    <circle cx="68" cy="0" r="1.5" fill="#F9FAFB"/>
+    <circle cx="76" cy="0" r="1.5" fill="#F9FAFB"/>
+    
+    <!-- Decorative line -->
+    <path d="M-40,20 Q0,10 40,20" stroke="#8B5CF6" stroke-width="2" fill="none" opacity="0.7"/>
+  </g>
+  
+  <!-- Corner accents -->
+  <circle cx="80" cy="80" r="4" fill="#8B5CF6" opacity="0.3"/>
+  <circle cx="432" cy="80" r="4" fill="#8B5CF6" opacity="0.3"/>
+  <circle cx="80" cy="432" r="4" fill="#8B5CF6" opacity="0.3"/>
+  <circle cx="432" cy="432" r="4" fill="#8B5CF6" opacity="0.3"/>
+</svg>

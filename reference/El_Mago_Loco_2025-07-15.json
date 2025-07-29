@@ -1,0 +1,1296 @@
+{
+  "locations": [
+    {
+      "id": "1751809014769-bcr00rz1i",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [
+          "1751809069044-1im9fio7a",
+          "1751809197493-imhezbocr"
+        ],
+        "npcs": [],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Nivel de la Marzmorra (Nivel 1)",
+      "icon": "⛰️",
+      "createdAt": "2025-07-06T13:37:43.939Z",
+      "importance": "Baja",
+      "detailedDescription": "<div><b><br></b></div>"
+    },
+    {
+      "id": "1751809069044-1im9fio7a",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [
+          "1751489771390-vgylhdsyb"
+        ],
+        "npcs": [
+          "1751809099370-3om8i1ld5"
+        ],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Cámaras Arcanas (Nivel 2)",
+      "icon": "⚗️",
+      "createdAt": "2025-07-06T13:38:02.148Z",
+      "importance": "Media"
+    },
+    {
+      "id": "1751809197493-imhezbocr",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [],
+        "npcs": [
+          "1751816472892-ej0h0gmcd",
+          "1751836150905-7cnr0akmo",
+          "1752343662740-1cu8nvg1a"
+        ],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Sargauth Level (Nivel 3)",
+      "createdAt": "2025-07-06T13:40:23.857Z",
+      "icon": "🧟",
+      "importance": "Alta"
+    },
+    {
+      "id": "1751489971653-crel5zsgn",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [
+          "1751489879807-tb75qk5xo"
+        ],
+        "npcs": [
+          "1751807292402-ywda82aup",
+          "1751822797307-gmnbbzglb",
+          "1752403689395-mf4mol4r2"
+        ],
+        "quests": [
+          "1751490146260-9r6cja198",
+          "1751822607838-j5mlize84"
+        ],
+        "objects": [
+          "1752416365438-ljcofrsrx"
+        ]
+      },
+      "name": "Skullport",
+      "icon": "🌃",
+      "type": "Ciudad",
+      "importance": "Alta",
+      "createdAt": "2025-07-02T21:00:02.797Z"
+    },
+    {
+      "id": "1751809225638-5e3ani7v9",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [],
+        "npcs": [],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Cavernas Retorcidas (Nivel 4)",
+      "createdAt": "2025-07-06T13:40:33.325Z",
+      "icon": "🧟‍♀️"
+    },
+    {
+      "id": "1751809234305-cq8b7bibz",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [
+          "1751489817138-srz8zz8ox"
+        ],
+        "npcs": [],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Bosque de Wyllow (Nivel 5)",
+      "createdAt": "2025-07-06T13:40:46.088Z",
+      "icon": "🌳"
+    },
+    {
+      "id": "1751809254639-9k49gg9xa",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [
+          "1751489694361-safztm7rx"
+        ],
+        "npcs": [],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Nivel Perdido (Nivel 6)",
+      "createdAt": "2025-07-06T13:41:02.871Z",
+      "icon": "🕌"
+    },
+    {
+      "id": "1751809399948-ptbbchbri",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [
+          "1751489879807-tb75qk5xo",
+          "1751489771390-vgylhdsyb"
+        ],
+        "npcs": [
+          "1751816902371-1ux26ezfx"
+        ],
+        "quests": [
+          "1751808880366-mu9qymj2o"
+        ],
+        "objects": []
+      },
+      "name": "Castillo de Maddgoth (Nivel 8)",
+      "icon": "🕍",
+      "createdAt": "2025-07-06T13:43:36.540Z",
+      "importance": "Alta"
+    },
+    {
+      "id": "1751490695824-c27rllyrg",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [
+          "1751489879807-tb75qk5xo",
+          "1751489771390-vgylhdsyb"
+        ],
+        "npcs": [
+          "1751809099370-3om8i1ld5"
+        ],
+        "quests": []
+      },
+      "name": "Dweomercore (Nivel 9)",
+      "icon": "🏛️",
+      "type": "Universidad Mágica",
+      "description": "",
+      "detailedDescription": "<br>",
+      "importance": "Alta",
+      "createdAt": "2025-07-02T21:12:04.645Z"
+    },
+    {
+      "id": "1751809540039-7797eyvt5",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [],
+        "npcs": [
+          "1751816472892-ej0h0gmcd",
+          "1751816706968-f1s212buq"
+        ],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Coto de Murial (Nivel 10)",
+      "icon": "☠️",
+      "createdAt": "2025-07-06T13:46:24.838Z"
+    },
+    {
+      "id": "1751809594321-kqjv2ok2n",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [],
+        "npcs": [],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Túneles de los Trogloditas (Nivel 11)",
+      "createdAt": "2025-07-06T13:47:08.788Z",
+      "icon": "👹"
+    },
+    {
+      "id": "1751809635962-43d0clx3z",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [
+          "1751489694361-safztm7rx"
+        ],
+        "npcs": [],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Nivel del Laberinto (Nivel 12)",
+      "createdAt": "2025-07-06T13:47:26.915Z"
+    },
+    {
+      "id": "1751809648746-0obnv2w44",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [
+          "1751489771390-vgylhdsyb"
+        ],
+        "npcs": [
+          "1751809099370-3om8i1ld5",
+          "1752396114161-30xe6vcsq"
+        ],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Chatarrería de Trobriand (Nivel 13)",
+      "icon": "⚙️",
+      "createdAt": "2025-07-06T13:47:51.700Z",
+      "importance": "Alta"
+    },
+    {
+      "id": "1751809705754-qdci0iydw",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [],
+        "npcs": [
+          "1752343662740-1cu8nvg1a",
+          "1752343839405-2cf6hgvmp"
+        ],
+        "quests": [
+          "1752343921439-2pkoycglu"
+        ],
+        "objects": []
+      },
+      "name": "Feudo de Arcturia (Nivel 14)",
+      "icon": "🔮",
+      "createdAt": "2025-07-06T13:48:50.929Z"
+    },
+    {
+      "id": "1751809744788-lyg08qyz4",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [],
+        "npcs": [],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Carrera de Obstáculos (Nivel 15)",
+      "icon": "🪖",
+      "createdAt": "2025-07-06T13:49:24.868Z"
+    },
+    {
+      "id": "1751809767086-jwb8l56sg",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [
+          "1751489841870-iexefjez5"
+        ],
+        "npcs": [],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Laberinto de Cristal (Nivel 16)",
+      "icon": "🪟",
+      "createdAt": "2025-07-06T13:49:47.415Z"
+    },
+    {
+      "id": "1751809799790-ekj77um4a",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [
+          "1751489879807-tb75qk5xo",
+          "1751489817138-srz8zz8ox"
+        ],
+        "npcs": [],
+        "quests": [
+          "1751808617303-986grbq7w"
+        ],
+        "objects": []
+      },
+      "name": "Marprofunda (Nivel 17)",
+      "icon": "🧿",
+      "createdAt": "2025-07-06T13:50:23.821Z",
+      "importance": "Alta"
+    },
+    {
+      "id": "1751809846182-7sxi7txzk",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [
+          "1751489694361-safztm7rx",
+          "1751489841870-iexefjez5"
+        ],
+        "npcs": [],
+        "quests": [],
+        "objects": [
+          "1751817098298-b7pzbd0ds"
+        ]
+      },
+      "name": "Condena de Vanrak (Nivel 18)",
+      "icon": "🐉",
+      "createdAt": "2025-07-06T13:51:06.359Z",
+      "importance": "Crítica"
+    },
+    {
+      "id": "1751809892954-pk4953uo",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [
+          "1751489841870-iexefjez5"
+        ],
+        "npcs": [
+          "1751835845843-cbxm2quty"
+        ],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Cavernas de Cieno (Nivel 19)",
+      "createdAt": "2025-07-06T13:52:04.319Z",
+      "importance": "Crítica",
+      "icon": "🪝"
+    },
+    {
+      "id": "1751809927259-psh779xjv",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [
+          "1751489817138-srz8zz8ox"
+        ],
+        "npcs": [
+          "1751816902371-1ux26ezfx",
+          "1752396757523-sc5i3cx4m"
+        ],
+        "quests": [
+          "1751808200529-h4z8zje60"
+        ],
+        "objects": []
+      },
+      "name": "Caernas de Rocarrúnica (Nivel 20)",
+      "icon": "💎",
+      "createdAt": "2025-07-06T13:52:38.882Z",
+      "importance": "Crítica"
+    },
+    {
+      "id": "1751809999911-o5wt45jym",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [],
+        "npcs": [],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Nivel Terminal (Nivel 21)",
+      "createdAt": "2025-07-06T13:53:32.189Z"
+    },
+    {
+      "id": "1751810014789-m4rq5va2a",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [
+          "1751489771390-vgylhdsyb",
+          "1751489694361-safztm7rx"
+        ],
+        "npcs": [],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Fortaleza de Shadowdusk (Nivel 22)",
+      "icon": "🧛‍♀️",
+      "createdAt": "2025-07-06T13:53:55.824Z",
+      "importance": "Crítica"
+    },
+    {
+      "id": "1751810051908-gmtdr9kc0",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [],
+        "npcs": [
+          "1752343839405-2cf6hgvmp"
+        ],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Guarida del Mago Loco (Nivel 23)",
+      "createdAt": "2025-07-06T13:54:24.823Z",
+      "icon": "🪬"
+    }
+  ],
+  "players": [
+    {
+      "id": "1751489879807-tb75qk5xo",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751489971653-crel5zsgn",
+          "1751490695824-c27rllyrg",
+          "1751809399948-ptbbchbri",
+          "1751809799790-ekj77um4a"
+        ],
+        "players": [],
+        "npcs": [
+          "1751807292402-ywda82aup",
+          "1751816902371-1ux26ezfx",
+          "1751822797307-gmnbbzglb",
+          "1752396757523-sc5i3cx4m"
+        ],
+        "quests": [
+          "1751490146260-9r6cja198",
+          "1751808617303-986grbq7w",
+          "1751808200529-h4z8zje60",
+          "1751808880366-mu9qymj2o"
+        ],
+        "objects": [
+          "1752416365438-ljcofrsrx"
+        ]
+      },
+      "name": "Oz",
+      "player": "Joan",
+      "class": "Mago",
+      "avatar": "🧙‍♂️",
+      "backstory": "Tras decidirse a bajar al Undermontain y gracias a sus vínculos con los Arpistas, varias misiones han llegado hasta Oz:<div><ul><li><span style=\"font-family: inherit;\">Deuda de los Arpistas en Skullport.</span></li><li>Recuperar un fragmento de Roca Rúnica.</li><li>Rastros de Maddgoth.</li><li>Extrañas alteraciones de la magia (Mago Loco).</li></ul><div>Sin embargo, eso no es todo, el rumor que más le llama la atención es la existencia de una escuela de magia en el Undermontain regentada por el propio Mago Loco (Dweomercore). Allí será puesta a prueba por primera vez la lealtad de Oz a los Arpistas. No sin antes haberse encontrado con el propio Mago Loco en Skuullport, donde le concederá amigablemente una invitación para entrar en Dweomercore.\n</div><div>Karstis, mago de Dweomercore, hará todo lo posible por evitar que Oz llegue a la escuela, ya que siente celos de él y ha sido avisado de su llegada.\n</div><div>Por otra parte, Maddgoth, descubrirá lo que ha ocurrido en el nivel 7 y tomará represalias al respecto. Aqui varias opciones:</div><div><ul><li><span style=\"font-family: inherit;\">Forma alianza con Ezzet, el liche del nivel 20. Esto permite conectar las historias de Hiro y Oz.</span></li><li>Cal'al Claddani, a quién tienen que entregar la misión en Skullport es en realidad una espía de Maddgoth.</li></ul></div></div>",
+      "createdAt": "2025-07-02T20:58:29.142Z"
+    },
+    {
+      "id": "1751489771390-vgylhdsyb",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751809069044-1im9fio7a",
+          "1751809399948-ptbbchbri",
+          "1751809648746-0obnv2w44",
+          "1751490695824-c27rllyrg",
+          "1751810014789-m4rq5va2a"
+        ],
+        "players": [],
+        "npcs": [
+          "1751809099370-3om8i1ld5",
+          "1751816902371-1ux26ezfx",
+          "1752343662740-1cu8nvg1a",
+          "1752396114161-30xe6vcsq",
+          "1752396757523-sc5i3cx4m"
+        ],
+        "quests": [],
+        "objects": [
+          "1752396249774-51duquiru",
+          "1752416365438-ljcofrsrx"
+        ]
+      },
+      "avatar": "🛡️",
+      "name": "Fin",
+      "player": "David",
+      "class": "Artificiero",
+      "backstory": "Connor&nbsp;Galifianakis, el abuelo de Fin, fue compañero de Trobiriand \"El Mago del Metal\", uno de los principales aprendices del mago loco.&nbsp;El único recuerdo que tiene ahora mismo de él es un anillo roto que servirá para controlar a los Scaladars del nivel 13.\r<div>Hasta entonces, Fin irá descubriendo quién fue su abuelo y el íntimo vínculo que tuvo con el Mago Loco y Trobiriand. A su vez, descubrirá poco a poco que es miembro de la familia Shadowdusk.\r</div><div>Yarlithra Shadowdusk fue la madre de su abuelo Connor (un hijo ilegítimo), lo que convierte a Connor en hermanastro de Dezmyr y Zalthar. Y por tanto, a Fin en un posible abanderado, o incluso heredero, de la familia.\r</div><div>Esto pondrá en una situación complicada a Fin, ya que las referencias que vaya encontrando en su camino le irán indicando que guarda relación con los Shadowdusk, hasta que finalmente encuentre la verdad. Por ejemplo, el Mago Loco le dirá que se parece mucho a su abuelo y que él está velando por la familia. También sentirá la llamada del \"Far Realm\" a medida que vaya descendiendo en la montaña.\r</div><div>Esto pone en posible conflicto a Fin con Boris.</div>",
+      "createdAt": "2025-07-02T20:56:45.229Z"
+    },
+    {
+      "id": "1751489841870-iexefjez5",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751809767086-jwb8l56sg",
+          "1751809846182-7sxi7txzk",
+          "1751809892954-pk4953uo"
+        ],
+        "players": [
+          "1751489817138-srz8zz8ox"
+        ],
+        "npcs": [
+          "1751835845843-cbxm2quty",
+          "1751836150905-7cnr0akmo"
+        ],
+        "quests": [],
+        "objects": [
+          "1751817098298-b7pzbd0ds"
+        ]
+      },
+      "name": "Lola",
+      "player": "Mónica",
+      "avatar": "🪈",
+      "class": "Bardo",
+      "backstory": "Lola es una adoradora de Selûne. Su conexión con ella se ha hecho más fuerte desde que llegó a Waterdeep, pero en realidad no es Selûne quién le habla, es el \"Capitan N'ghathrod\" del nivel 19 que quiere recuperar su timón, el cuál es el objeto de las profecías que cantaban sobre Lola.\r<div>A lo largo de su descenso, y sobre todo por su interacción con Hiro, Lola irá notando que los mensajes que recibe de \"Selûne\" empiezan a ser sospechosos, haciéndola dudar de su fe y el motivo por el que participa en la expedición.\r</div><div>Su interacción con los distintos azotamentes que van a apareciendo será cada vez más obvia y los Githyankis la percibirán como una posible amenaza.\r</div><div>En el nivel 18, Shar le ofrecerá librarse de su \"falsa diosa\" a cambio de rendirle pleitesía.</div>",
+      "createdAt": "2025-07-02T20:57:58.644Z"
+    },
+    {
+      "id": "1751489817138-srz8zz8ox",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751809799790-ekj77um4a",
+          "1751809927259-psh779xjv",
+          "1751809234305-cq8b7bibz"
+        ],
+        "players": [
+          "1751489841870-iexefjez5"
+        ],
+        "npcs": [
+          "1751816902371-1ux26ezfx",
+          "1752396757523-sc5i3cx4m"
+        ],
+        "quests": [
+          "1751808200529-h4z8zje60",
+          "1751808617303-986grbq7w"
+        ]
+      },
+      "name": "Hiro",
+      "player": "Rafa",
+      "class": "Monje",
+      "avatar": "🗡️",
+      "backstory": "Un mago con un extraño símbolo en forma de espiral (Ezzat, el liche del nivel 20) asesinó a toda su familia y robó un fragmento de la piedra que estos protegían (rocarúnica).\r<div>La venganza lo consume y un día, una extraña voz (el Mago Loco) le ofrece un pacto de \"donar su cuerpo\" a cambio de poder venganse. Al aceptar, es transportado inmediatamente al Undermontain, lo que no sabe, es que en realidad el cuerpo que siente como suyo es una proyección hecha por los azotamentes del nivel 15 que están experimentando con nuevas formas de mejorar su Alterdeep mientras mantienen su auténtico cuerpo en una cápsula.\r</div><div>Los azotamentes están instigados por el Mago Loco para destruir al liche, ya que le molesta, pero ellos están más centrados en su investigación y su lucha contra los Githyankis del nivel 16.\r</div><div>A su vez, el&nbsp;\"Capitan N'ghathrod\" del nivel 19 quiere ganar más poder a través de Lola y recuperar su Timón. Por lo que las comunicaciones entre el capitán, los azotamentes, Lola y Hiro forman interferencias que afectan a su cuerpo.</div>",
+      "createdAt": "2025-07-02T20:57:20.718Z"
+    },
+    {
+      "id": "1751489694361-safztm7rx",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751809846182-7sxi7txzk",
+          "1751810014789-m4rq5va2a",
+          "1751809635962-43d0clx3z",
+          "1751809254639-9k49gg9xa"
+        ],
+        "players": [],
+        "npcs": [
+          "1751816472892-ej0h0gmcd",
+          "1752403689395-mf4mol4r2"
+        ],
+        "quests": [
+          "1751808424604-8hmwyj5ku"
+        ],
+        "objects": [
+          "1751817098298-b7pzbd0ds"
+        ]
+      },
+      "avatar": "⚔️",
+      "name": "Boris",
+      "player": "Fede",
+      "class": "Paladin",
+      "backstory": "Jarlaxle Baenre se presentará como J. P. Nevercot y mostrará su verdadera identidad, para darles la noticia de que él está extendiendo los rumores sobre que bajarán al Undermontain ya que necesita que le hagan un favor.\r<div>Le preocupa los movimientos que están ocurriendo en las sombras, cosa que a los héroes también.\r</div><div>Concede a Boris un documento en infracomún que le \"permitirá una audiencia con la persona que ha estado buscando\" pero no le dará más información.\r</div><div>Se trata de un documento que permite una audiencia con \"Erelal Freth\" la sacerdotisa líder de la casa Freth que ordenó el ataque contra el pueblo de Boris.\r</div><div>Durante su descenso, Shar, la diosa de la oscuridad se comunicará con él, para intentar hacerle caer en una espiral de locura y así convertirlo en el jinete de&nbsp;Umbraxakar, convirtiéndose en un campeón de la diosa cuyo objetivo es recuperar el honor de la Casa Moonstar de la manera más sombría.\r</div><div>A su vez, Boris irá descubriendo que los Drows tan sólo sirvieron como mercenarios para un propósito mucho mayor, desestabilizar el equilibrio entre las familias nobles de Waterdeep y así colocar a los Shadowdusk como títeres de Halaster.</div>",
+      "description": "Enano",
+      "createdAt": "2025-07-02T20:56:07.569Z"
+    }
+  ],
+  "npcs": [
+    {
+      "id": "1751807292402-ywda82aup",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751489971653-crel5zsgn"
+        ],
+        "players": [
+          "1751489879807-tb75qk5xo"
+        ],
+        "npcs": [],
+        "quests": [
+          "1751490146260-9r6cja198"
+        ],
+        "objects": []
+      },
+      "name": "Cal'al Claddani",
+      "role": "Tabernera",
+      "location": "Flagon and the Dragon (Skullport)",
+      "description": "Semidrow",
+      "detailedDescription": "Proporcionó asistencia a un espía Harper.",
+      "createdAt": "2025-07-06T13:13:15.719Z",
+      "attitude": "Amistoso",
+      "icon": "🚬"
+    },
+    {
+      "id": "1751807897435-tqh9vidjw",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [],
+        "npcs": [],
+        "quests": [
+          "1751808105992-1vit450su"
+        ],
+        "objects": []
+      },
+      "name": "Volothamp Geddarm",
+      "role": "Explorador",
+      "location": "Desconocida",
+      "description": "Simpático y alocado",
+      "attitude": "Amistoso",
+      "createdAt": "2025-07-06T13:18:47.025Z",
+      "icon": "🪕"
+    },
+    {
+      "id": "1751809099370-3om8i1ld5",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751809069044-1im9fio7a",
+          "1751809648746-0obnv2w44",
+          "1751490695824-c27rllyrg"
+        ],
+        "players": [
+          "1751489771390-vgylhdsyb"
+        ],
+        "npcs": [
+          "1751816902371-1ux26ezfx",
+          "1752343662740-1cu8nvg1a",
+          "1752396114161-30xe6vcsq"
+        ],
+        "quests": [],
+        "objects": [
+          "1752396249774-51duquiru",
+          "1752416365438-ljcofrsrx"
+        ]
+      },
+      "name": "Conor Galifianakis",
+      "icon": "🔧",
+      "role": "Ingeniero",
+      "location": "Desconocida",
+      "description": "Abuelo de Fin",
+      "attitude": "Neutral",
+      "createdAt": "2025-07-06T13:39:37.087Z"
+    },
+    {
+      "id": "1751816472892-ej0h0gmcd",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751809197493-imhezbocr",
+          "1751809540039-7797eyvt5"
+        ],
+        "players": [
+          "1751489694361-safztm7rx"
+        ],
+        "npcs": [
+          "1751816706968-f1s212buq"
+        ],
+        "quests": [],
+        "objects": [
+          "1751817172547-mzn5ysm1w"
+        ]
+      },
+      "name": " T'rissa Auvryndar",
+      "icon": "🪄",
+      "createdAt": "2025-07-06T15:41:30.875Z",
+      "role": "Sacerdotisa de Lolth",
+      "location": "Templo de Dumathoin (Nivel 3)",
+      "attitude": "Hostil",
+      "description": "Malvada, posee los viales de sangre de los jugadores."
+    },
+    {
+      "id": "1751816706968-f1s212buq",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751809540039-7797eyvt5"
+        ],
+        "players": [],
+        "npcs": [
+          "1751816472892-ej0h0gmcd"
+        ],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Vlonwelv Auvryndar",
+      "role": "Matriarca Drow",
+      "location": "Coto de Murial",
+      "icon": "👑",
+      "createdAt": "2025-07-06T15:45:45.217Z",
+      "attitude": "Neutral"
+    },
+    {
+      "id": "1751816902371-1ux26ezfx",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751809399948-ptbbchbri",
+          "1751809927259-psh779xjv"
+        ],
+        "players": [
+          "1751489879807-tb75qk5xo",
+          "1751489771390-vgylhdsyb",
+          "1751489817138-srz8zz8ox"
+        ],
+        "npcs": [
+          "1751809099370-3om8i1ld5",
+          "1752396757523-sc5i3cx4m"
+        ],
+        "quests": [
+          "1751808880366-mu9qymj2o"
+        ],
+        "objects": [
+          "1752416365438-ljcofrsrx"
+        ]
+      },
+      "name": "Maddgoth",
+      "icon": "🧙‍♂️",
+      "role": "Mago Asesino",
+      "location": "Desconocida",
+      "description": "",
+      "attitude": "Hostil",
+      "createdAt": "2025-07-06T15:48:49.801Z",
+      "detailedDescription": "<ul><li>Fue quién revivió a Oz y Fin del corazón maldito con la intención de asesinarlos más adelante.</li><li>Estudió en Dweomercore un tiempo, allí asesinó a Conor Galifianakis por petición del Mago Loco ya que a este no le gustaba la influencia que estaba ganando en Trobriand y su posibilidad de restablecer a los Shadowdusk.</li><li>Fue el que robó la Roca Rúnica de Hiro.</li></ul>"
+    },
+    {
+      "id": "1751822797307-gmnbbzglb",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751489971653-crel5zsgn"
+        ],
+        "players": [
+          "1751489879807-tb75qk5xo"
+        ],
+        "npcs": [],
+        "quests": [
+          "1751822607838-j5mlize84"
+        ],
+        "objects": []
+      },
+      "name": "Feldrax",
+      "icon": "🧙",
+      "role": "Harpista",
+      "location": "Fortaleza de Dalagor (Skullport)",
+      "attitude": "Amistoso",
+      "createdAt": "2025-07-06T17:28:29.419Z",
+      "description": "Mago draconico, les entrega la misión de restaurar las Calaveras Llameantes."
+    },
+    {
+      "id": "1751835845843-cbxm2quty",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751809892954-pk4953uo"
+        ],
+        "players": [
+          "1751489841870-iexefjez5"
+        ],
+        "npcs": [],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Capitan N'ghathrod",
+      "icon": "🪝",
+      "role": "Capitán del Carroñero",
+      "location": "Cavernas de Cieno (Nivel 19)",
+      "description": "Ilicido capitán del Carroñero",
+      "detailedDescription": "Desea recuperar su Timón y para ello engaña a Lola",
+      "attitude": "Hostil",
+      "createdAt": "2025-07-06T21:05:08.174Z"
+    },
+    {
+      "id": "1751836150905-7cnr0akmo",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751809197493-imhezbocr"
+        ],
+        "players": [
+          "1751489841870-iexefjez5"
+        ],
+        "npcs": [],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Ulquess",
+      "role": "Embajador de Skullport",
+      "description": "Ilicido",
+      "location": "Bastión de Azrok",
+      "attitude": "Neutral",
+      "createdAt": "2025-07-06T21:09:55.754Z",
+      "icon": "🧞‍♂️"
+    },
+    {
+      "id": "1752343662740-1cu8nvg1a",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751809197493-imhezbocr",
+          "1751809705754-qdci0iydw"
+        ],
+        "players": [
+          "1751489771390-vgylhdsyb"
+        ],
+        "npcs": [
+          "1751809099370-3om8i1ld5",
+          "1752343839405-2cf6hgvmp"
+        ],
+        "quests": [
+          "1752343921439-2pkoycglu"
+        ],
+        "objects": []
+      },
+      "icon": "🧙‍♀️",
+      "attitude": "Neutral",
+      "name": "Preeta Kreepa",
+      "role": "Maga, ex aprendiz de Arcturia",
+      "location": "Legion Azrok",
+      "description": "Anima muertos para ayudar a la Legion Azrok, fue una antigua aprendiz de Arcturia.",
+      "detailedDescription": "Conoce a Conor Galifianakis de cuando Trobiand lo trajo al Undermontain.<div>Hace mucho años que no sabe nada de él pero dice que Finn es su viva imagen.</div>",
+      "createdAt": "2025-07-12T18:09:54.765Z"
+    },
+    {
+      "id": "1752343839405-2cf6hgvmp",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751809705754-qdci0iydw",
+          "1751810051908-gmtdr9kc0"
+        ],
+        "players": [],
+        "npcs": [
+          "1752343662740-1cu8nvg1a"
+        ],
+        "quests": [
+          "1752343921439-2pkoycglu"
+        ],
+        "objects": []
+      },
+      "icon": "🧛‍♀️",
+      "attitude": "Hostil",
+      "name": "Arcturia",
+      "role": "Aprendiz de Halaster",
+      "location": "Torre de Halaster",
+      "description": "Liche aprendiz de Halaster",
+      "createdAt": "2025-07-12T18:11:18.995Z"
+    },
+    {
+      "id": "1752396114161-30xe6vcsq",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751809648746-0obnv2w44"
+        ],
+        "players": [
+          "1751489771390-vgylhdsyb"
+        ],
+        "npcs": [
+          "1751809099370-3om8i1ld5"
+        ],
+        "quests": [],
+        "objects": []
+      },
+      "icon": "🔩",
+      "attitude": "Neutral",
+      "name": "Zox Clammersham",
+      "role": "Ingeniero",
+      "location": "Chatarrería de Trobriand",
+      "description": "Gnomo",
+      "detailedDescription": "Antiguo compañero de Conor Galifianakis.",
+      "createdAt": "2025-07-13T08:43:43.953Z"
+    },
+    {
+      "id": "1752396757523-sc5i3cx4m",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751809927259-psh779xjv"
+        ],
+        "players": [
+          "1751489879807-tb75qk5xo",
+          "1751489771390-vgylhdsyb",
+          "1751489817138-srz8zz8ox"
+        ],
+        "npcs": [
+          "1751816902371-1ux26ezfx"
+        ],
+        "quests": [
+          "1751808200529-h4z8zje60",
+          "1751808880366-mu9qymj2o"
+        ],
+        "objects": []
+      },
+      "icon": "☠️",
+      "attitude": "Neutral",
+      "name": "Ezzat",
+      "role": "Liche",
+      "location": "Cavernas de Rocarrúnica",
+      "description": "",
+      "detailedDescription": "Guarda relación con Maddgoth",
+      "createdAt": "2025-07-13T08:54:22.065Z"
+    },
+    {
+      "id": "1752403689395-mf4mol4r2",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751489971653-crel5zsgn"
+        ],
+        "players": [
+          "1751489694361-safztm7rx"
+        ],
+        "npcs": [],
+        "quests": [],
+        "objects": []
+      },
+      "icon": "🕵️",
+      "attitude": "Neutral",
+      "name": "Jarlaxle Baenre",
+      "role": "Jefe de Bregan D'aerthe",
+      "location": "Skullport",
+      "createdAt": "2025-07-13T10:49:17.080Z"
+    }
+  ],
+  "objects": [
+    {
+      "id": "1751817098298-b7pzbd0ds",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751809846182-7sxi7txzk"
+        ],
+        "players": [
+          "1751489841870-iexefjez5",
+          "1751489694361-safztm7rx"
+        ],
+        "npcs": [],
+        "quests": [],
+        "objects": []
+      },
+      "name": "El símbolo de Shar",
+      "type": "Símbolo Sagrado",
+      "description": "Símbolo de Shar de Madi, la clériga asesinada.",
+      "icon": "🕯️",
+      "owner": "Lola",
+      "createdAt": "2025-07-06T15:52:37.895Z"
+    },
+    {
+      "id": "1751817172547-mzn5ysm1w",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [
+          "1751809014769-bcr00rz1i",
+          "1751809069044-1im9fio7a"
+        ],
+        "npcs": [
+          "1751816472892-ej0h0gmcd"
+        ],
+        "quests": [],
+        "objects": []
+      },
+      "name": "Viales de Sangre",
+      "icon": "💥",
+      "description": "Viales con sangre de los aventureros",
+      "location": "",
+      "owner": "T'rissa Auvryndar",
+      "createdAt": "2025-07-06T15:53:54.186Z"
+    },
+    {
+      "id": "1752396249774-51duquiru",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [
+          "1751489771390-vgylhdsyb"
+        ],
+        "npcs": [
+          "1751809099370-3om8i1ld5"
+        ],
+        "quests": [],
+        "objects": []
+      },
+      "icon": "💍",
+      "rarity": "Raro",
+      "name": "Anillo de Control (Defecturoso)",
+      "type": "Anillo de Control de Scaladars",
+      "description": "Es un anillo plateado roto.",
+      "detailedDescription": "Antiguo anillo de Conor Galifianakis para controlar Scaladars que salió defectuoso.",
+      "owner": "Fin",
+      "createdAt": "2025-07-13T08:45:24.108Z"
+    },
+    {
+      "id": "1752416365438-ljcofrsrx",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751489971653-crel5zsgn"
+        ],
+        "players": [
+          "1751489879807-tb75qk5xo",
+          "1751489771390-vgylhdsyb"
+        ],
+        "npcs": [
+          "1751809099370-3om8i1ld5",
+          "1751816902371-1ux26ezfx"
+        ],
+        "quests": [],
+        "objects": []
+      },
+      "icon": "🏮",
+      "rarity": "Común",
+      "name": "Linterna Púrpura",
+      "type": "Linterna",
+      "description": "Linterna Púrpura de Maddgoth",
+      "location": "Skullport",
+      "createdAt": "2025-07-13T14:21:22.449Z"
+    }
+  ],
+  "quests": [
+    {
+      "id": "1751490146260-9r6cja198",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751489971653-crel5zsgn"
+        ],
+        "players": [
+          "1751489879807-tb75qk5xo"
+        ],
+        "npcs": [
+          "1751807292402-ywda82aup"
+        ],
+        "quests": []
+      },
+      "detailedDescription": "Dador de la misión: Mattrim Mereg, también conocido como Threestrings\r<div>\r</div><div>Detalles del dador:\r</div><div><ul><li>Es un bardo legal bueno</li><li>Es un espía Harper que se hace pasar por un músico mediocre en el Yawning Portal</li><li>Toca un laúd de tres cuerdas</li><li>Es más talentoso de lo que aparenta</li></ul></div><div><b>Objetivo de la misión:</b> Entregar una bolsa de oro a Cal'al Claddani, una medio drow que dirige una taberna llamada Flagon and the Dragon en Skullport.\r</div><div>Razón de la deuda: Cal'al proporcionó refugio y curación a un espía Harper herido en Skullport y se le debe un pago por su apoyo.\r</div><div><b>Contenido de la bolsa:</b> Tres piedras lunares con un valor de 50 piezas de oro cada una.\r</div><div>Recompensa ofrecida: Mattrim ofrece a los personajes la posibilidad de usar un escondite Harper llamado Fortaleza de Dalagor, ubicado en el nivel superior de Skullport. Les informa que un mago draconiano llamado Felrax guarda el lugar.</div><div>\r</div><div>\r</div><div>\r</div><div>\r</div>",
+      "createdAt": "2025-07-02T21:05:35.914Z",
+      "title": "Deuda Arpista",
+      "status": "Completada",
+      "description": "Entregar una bolsa de oro a Cal'al Claddani, una medio drow que dirige una taberna llamada Flagon and the Dragon en Skullport.",
+      "location": "Flagon and the Dragon (Skullport)",
+      "reward": "Escondite en Fortaleza de Dalagor (Skullport)",
+      "priority": "Media",
+      "icon": "📜"
+    },
+    {
+      "id": "1751808105992-1vit450su",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [],
+        "npcs": [
+          "1751807897435-tqh9vidjw"
+        ],
+        "quests": [],
+        "objects": []
+      },
+      "detailedDescription": "Objetivo de la misión: Encontrar el trono de alabastro del último coronal de Illefarn, Syglaeth Audark, que se cree está oculto en Undermountain.\r<div>\r</div><div>Antecedentes:</div><div><ul><li><span style=\"background-color: initial; font-family: inherit;\">El trono desapareció de la ciudad capital de Aelinthaldaar (donde ahora se encuentra Waterdeep)</span></li><li>Se cree que un grupo de enanos lo robó para preservarlo</li><li>En realidad, el Coronal Audark mismo ordenó esconderlo en una bóveda subterránea</li></ul></div><div>Descripción del trono:\r</div><div><ul><li>Hecho de alabastro</li><li>Dañado durante la caída de Illefarn</li><li>Encontrado más tarde por los enanos Melairkyn, que planeaban repararlo y devolverlo a los elfos</li></ul></div><div>\r</div><div>\r</div>",
+      "location": "Tercer Nivel",
+      "createdAt": "2025-07-06T13:22:22.353Z",
+      "description": "Encontrar el trono de alabastro del último coronal de Illefarn, Syglaeth Audark, que se cree está oculto en Undermountain.",
+      "title": "El Trono del Coronal",
+      "priority": "Media",
+      "status": "En progreso",
+      "icon": "📜"
+    },
+    {
+      "id": "1751808200529-h4z8zje60",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751809927259-psh779xjv"
+        ],
+        "players": [
+          "1751489817138-srz8zz8ox",
+          "1751489879807-tb75qk5xo"
+        ],
+        "npcs": [
+          "1752396757523-sc5i3cx4m"
+        ],
+        "quests": [],
+        "objects": []
+      },
+      "detailedDescription": "Objetivo de la misión: Recuperar un fragmento del tamaño de un guijarro de un cristal mágico llamado Runestone\r<div>\r</div><div>Antecedentes:\r</div><div><ul><li>La magia de Laeral Silverhand está disminuyendo.</li><li>Ha investigado una forma de detener el declive temporalmente.</li><li>Necesita un fragmento de Runestone para lograrlo.</li><li>El Runestone fue creado por Halaster Blackcloak y escondido en las profundidades de Undermountain</li></ul></div><div>Descripción del Runestone:\r</div><div><ul><li>Gran gema brillante en forma de disco.</li><li>Tiene una extraña runa flotando en su interior.</li></ul></div><div>Recompensa ofrecida:\r</div><div><ul><li>Jalester ofrece su amistad duradera, lo cual puede traer muchos beneficios dada su posición en la Guardia de la Ciudad</li></ul></div><div>\r</div><div>\r</div><div>\r</div>",
+      "location": "Cavernas de Roca Rúnica (Nivel 20)",
+      "reward": "Amistad de Jalester Silvername",
+      "priority": "Alta",
+      "createdAt": "2025-07-06T13:25:23.131Z",
+      "title": "Recuperar un fragmento de Runestone",
+      "description": "Recuperar un fragmento del tamaño de un guijarro de un cristal mágico llamado Runestone.",
+      "status": "Pendiente",
+      "icon": "📜"
+    },
+    {
+      "id": "1751808424604-8hmwyj5ku",
+      "tags": [],
+      "linkedItems": {
+        "locations": [],
+        "players": [
+          "1751489694361-safztm7rx"
+        ],
+        "npcs": [],
+        "quests": [],
+        "objects": []
+      },
+      "createdAt": "2025-07-06T13:27:06.193Z",
+      "detailedDescription": "Dadora de la misión: Lady Wylynd Moonstar (a través de su sobrino-nieto, Helion Moonstar)\r<div>\r</div><div>Detalles de la dadora:\r</div><div><ul><li>Matriarca de la familia noble Moonstar de Waterdeep,</li><li>Tiene más de cien años y es senil,</li><li>Recuerda una mancha oscura en el honor de su familia,</li><li>Objetivo de la misión: Liberar al dragón Glyster (ahora conocido como Umbraxakar) de la influencia maligna de Shar, o si no es posible, acabar con su sufrimiento.</li></ul></div><div>Antecedentes:\r</div><div><ul><li>Vanrak Moonstar, un antiguo lord de la Casa Moonstar, huyó a Undermountain para escapar del castigo por sus crímenes.</li><li>Glyster, un dragón de bronce aliado de la familia Moonstar, fue enviado a buscar a Vanrak.</li><li>Glyster encontró a Vanrak pero fue corrompido por la magia de Shar y transformado en un dragón de sombras llamado Umbraxakar.</li><li>En su forma malvada, el dragón luchó junto a Vanrak durante años.</li></ul></div><div>Recompensa ofrecida:&nbsp;</div><div><ul><li>La amistad de la Casa Moonstar.\r</li></ul></div><div>Información adicional:\r</div><div><ul><li>Lady Wylynd cree que es responsabilidad de su familia liberar al dragón del control de Shar.</li></ul></div><div>\r</div><div>\r</div><div>\r</div><div>\r</div><div>\r</div>",
+      "status": "Pendiente",
+      "priority": "Media",
+      "reward": "La amistad de la Casa Moonstar.",
+      "location": "Condena de Vanrak (Nivel 18)",
+      "title": "Salvar al Dragón",
+      "description": "Liberar al dragón Glyster (ahora conocido como Umbraxakar) de la influencia maligna de Shar, o si no es posible, acabar con su sufrimiento.",
+      "icon": "📜"
+    },
+    {
+      "id": "1751808617303-986grbq7w",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751809799790-ekj77um4a"
+        ],
+        "players": [
+          "1751489879807-tb75qk5xo",
+          "1751489817138-srz8zz8ox"
+        ],
+        "npcs": [],
+        "quests": [],
+        "objects": []
+      },
+      "detailedDescription": "Dador de la misión: Durnan, propietario de la taberna Yawning Portal\r<div>\r</div><div>Detalles del dador:\r</div><div><ul><li>Dueño de la taberna Yawning Portal en Waterdeep.</li><li>Tiene conocimiento extenso sobre Undermountain.</li><li>Está preocupado por la seguridad de la ciudad</li></ul></div><div>Objetivo de la misión: Encontrar la fuente del contacto telepático, descubrir sus intenciones y, si son hostiles, eliminar la amenaza.\r</div><div>Antecedentes:\r</div><div><ul><li>Una inteligencia \"alienígena\" busca información sobre la ciudad.</li><li>Los rumores sobre estas intrusiones telepáticas se han extendido por Waterdeep.</li><li>Durnan sospecha que la fuente procede del Undermountain.</li></ul></div><div>Recompensa ofrecida:</div><div><ul><li>Durnan promete asegurarse de que la hazaña nunca sea olvidada.</li></ul></div><div>\r</div><div>\r</div><div>\r</div>",
+      "reward": "Favor de Durnan",
+      "location": "Marprofunda (Nivel 17)",
+      "status": "Pendiente",
+      "priority": "Alta",
+      "createdAt": "2025-07-06T13:32:13.063Z",
+      "title": "Descubrir al espía telepático",
+      "description": "Encontrar la fuente del contacto telepático, descubrir sus intenciones y, si son hostiles, eliminar la amenaza.",
+      "icon": "📜"
+    },
+    {
+      "id": "1751808880366-mu9qymj2o",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751809399948-ptbbchbri"
+        ],
+        "players": [
+          "1751489879807-tb75qk5xo"
+        ],
+        "npcs": [
+          "1751816902371-1ux26ezfx",
+          "1752396757523-sc5i3cx4m"
+        ],
+        "quests": [],
+        "objects": []
+      },
+      "title": "Maddgoth \"El asesino de Magos\"",
+      "detailedDescription": "<span style=\"background-color: initial; font-family: inherit;\">Dador de la misión: Mirt, el Despiadado y Viejo Lobo</span><br><div>\n</div><div>Detalles del dador:\n</div><div><ul><li>Gran fan de los aventureros.</li><li>Preocupado por la desaparición de varios magos en la región.</li><li>Tiene información sobre la existencia de Maddgoth y su ubicación Undermountain.</li></ul></div><div>Objetivo de la misión:</div><div><ul><li>Descubrir el paradero de Maddgoth, su lista de objetivos futuros y detener sus actividades asesinas.\n</li></ul></div><div>Antecedentes:\n</div><div><ul><li>Maddgoth es un mago asesino en serie que atrae a otros magos a su guarida.</li><li>Opera desde algún lugar del Undermountain</li><li>Ha estado coleccionando focos arcanos y libros de hechizos de sus víctimas.</li></ul></div><div>Detalles de la misión:\n</div><div><ul><li>Localizar el paradero de Maddgoth en Undermountain.</li><li>Buscar evidencia de futuras víctimas (posiblemente una lista o notas).</li><li>Recopilar información sobre los métodos y motivos de Maddgoth.</li><li>Si es posible, neutralizar a Maddgoth o sus medios para atraer víctimas.</li></ul></div><div>\n</div><div>\n</div><div>\n</div><div>\n</div>",
+      "createdAt": "2025-07-06T13:34:50.746Z",
+      "location": "Castillo de Maddgoth",
+      "status": "Pendiente",
+      "priority": "Crítica",
+      "description": "Descubrir el paradero de Maddgoth, su lista de objetivos futuros y detener sus actividades asesinas.",
+      "icon": "📜"
+    },
+    {
+      "id": "1751822607838-j5mlize84",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751489971653-crel5zsgn"
+        ],
+        "players": [],
+        "npcs": [
+          "1751822797307-gmnbbzglb"
+        ],
+        "quests": [],
+        "objects": []
+      },
+      "title": "Restaurar a las Calaveras Llameantes",
+      "description": "Los 13, las calaveras llameantes que durante siglos gobernaron Skullport, están ahora seniles. Restaurarlas permitirá acabar con la influencia del Xanatar y restaurar Skullport.",
+      "location": "Skullport",
+      "detailedDescription": "<br>",
+      "createdAt": "2025-07-06T17:25:53.925Z",
+      "status": "Pendiente",
+      "priority": "Media",
+      "icon": "📜"
+    },
+    {
+      "id": "1752343921439-2pkoycglu",
+      "tags": [],
+      "linkedItems": {
+        "locations": [
+          "1751809705754-qdci0iydw"
+        ],
+        "players": [],
+        "npcs": [
+          "1752343662740-1cu8nvg1a",
+          "1752343839405-2cf6hgvmp"
+        ],
+        "quests": [],
+        "objects": []
+      },
+      "icon": "📜",
+      "status": "Pendiente",
+      "priority": "Media",
+      "title": "Liberar a Alussiarr",
+      "description": "Alussiarr es un \"hombre mágico\" (Rakshasa) cautivo en el Feudo de Arcturia",
+      "location": "Feudo de Arcturia",
+      "detailedDescription": "Preeta Kreepa menciona que Arcturia utilizaba la sangre de un \"hombre mágico\" llamado Alussiar para realizar sus rituales de transformación.<div>Propone que los personajes lo liberen para evitar que la maga cree nuevas abominaciones.</div>",
+      "createdAt": "2025-07-12T18:14:32.795Z"
+    }
+  ],
+  "notes": [
+    {
+      "content": "En la sesión de hoy la party ha comprado a Hiro como esclavo por 300 monedas de oro (a parte de gastar más dinero en una armadura de placas ocre, una javalina de plata, etc.) y traer la cabeza de los líderes de los puestos de avanzadilla del Xanatar a Yek, el Jefe Goblin transformado en humano.\n<div>Los goblins han contado a la party que quieren que Yek vuelva a ser humano y que es por culpa de la diadema, pero aún no se ha hecho nada al respecto.\n</div><div>También, el redivivo luchó en un coliseo improvisado contro el enano (Copper) y lo mató. Más tarde, encontraron a Madi (la sacerdotisa de Shar) y también la han matado, redimiendo al redivivo.\n</div><div>Siguiendo el encargo de Yek, han exterminado a todo el puesto de avanzadilla del Xanatar dirigido por el Shun, el drow mutado y han llevado la cabeza a Yek. Aunque este les ha dicho que les falta otra.\n</div><div>Avances en la historia de los personajes:</div><div><ul><li><span style=\"font-family: inherit;\">Hiro ha tenido un \"cortocircuito\" al ver a Lola por primera vez. Esto es debido a que él es una \"proyección\" de los Azotamentes y Lola está bajo la influencia del Capitan (otro azotamentes).</span></li><li>El símbolo de Shar de Madi ha \"hablado\" a Lola, preguntándole si realmente su hermana (Selune) es quién la habla.</li><li>Lola ha descubierto que los devoradores de intelecto no captan su presencia (esto es debido a que sus ondas cerebrales están bajo la influencia del Capitán).</li><li>Hiro sí que es detectado por los devoradores de intelecto (su cuerpo es real aunque pueda ser \"proyectado\" por la colonia de azotamentes).</li><li>Boris ha sido tentado por Shar para ayudarle en su venganza.</li><li>Mientras el símbolo de Shar viaje con ellos (lo tiene Lola actualmente) este seguirá tentando a Boris a llevarlo y Shar pondrá en cuestión la validez de \"Selune\" para Lola.</li></ul></div>",
+      "linkedItems": {
+        "locations": [],
+        "players": [],
+        "npcs": [],
+        "quests": []
+      },
+      "createdAt": "2025-07-02T21:01:11.151Z",
+      "id": "1751490071151-et4fdllir",
+      "modifiedAt": "2025-07-04T10:40:27.927Z",
+      "title": "13/10/2024"
+    },
+    {
+      "title": "03/11/2024",
+      "content": "Han tenido múltiples sueños, Boris viéndose en los ojos del caballero de Shar, Finn visiones del Far Realm y Lola la voz de \"Selune\" (el Capitán) pidiendo que siga descendiendo.\r<div>Han pasado al Nivel 5 y Oz ha sido maldito por la primera Runa de Halaster (no puede recuperar vida), también Lola ha sido maldita por la runa que le da vulnerabilidad a todo el daño, pero esto sólo dura 24 horas.\r</div><div>Durante esta sesión el grupo ha conocido a Rizzezyl y, tras acabar con las avanzadillas del Xanatar, les ha dado unas indicaciones sobre como llegar a Skullport e información sobre las casa Freth que se encuentra más abajo en el Undermontain. Concretamente, les ha explicado que ha habido problemas en Menzoberranzan. Han terminado a buenos términos con él, por lo que Boris no ha elegido el camino de la venganza absoluta.\r</div><div>Por otra parte, también han completado la misión de enseñarle a Yek las cabezas de los líderes de la avanzadilla del Xanatar, lo que les ha convertido en invitados de honor del campamento Goblin, lo que les confiere que a partir de ahora tendrán descuento (se les venderá por el precio original) los objetos que ahí tengan.</div>",
+      "linkedItems": {
+        "locations": [],
+        "players": [],
+        "npcs": [],
+        "quests": [],
+        "objects": []
+      },
+      "createdAt": "2025-07-04T10:41:11.279Z",
+      "id": "1751625671279-ee0x2q173",
+      "modifiedAt": "2025-07-12T07:14:13.330Z"
+    },
+    {
+      "title": "17/11/2024",
+      "content": "Han luchado contra un mezoloth, varios noticos y demás enemigos generales, limpiando una parte importante de lo que quedaba de mazmorra.\r<div>Boris ha limpiado el altar del Dios de los secretos de la montaña y ha sido bendecido, cosa que le permite, durante 24 horas, ver las puertas secretas que hay en la mazmorra. A su vez, han cruzado el portal al nivel cuatro y han conocido a Melith, la sacerdotisa de la casa Auvrydar, que tras curar a Oz su afección, le ha exigido un favor que se cobrará llegado su debido momento. Esto a Boris no le gusta, y su camino de la venganza puede empezar a verse afectado si no realiza acciones en consecuencia.\r</div><div>También han conocido al mago Kalabash, que les ha explicado algo de la historía del abuelo de Finn, le ha dicho a Oz que le ve preparado para Dweomercore y han encontrado el títere de Halaster, del cual han pasado.\r</div><div>Han encontrado también el claveción de huesos y lo han tocado correctamente, obteniendo el pergamino de resucitar a los muertos.\r</div><div>Hiro tiene el control de un goblin al que le quedan 3 usos de su hechizo Augurio y que le obedece.\r</div><div>Por último, Finn ha recibido otra visión del Far Realm en los ojos de un Nótico.</div>",
+      "linkedItems": {
+        "locations": [],
+        "players": [],
+        "npcs": [],
+        "quests": []
+      },
+      "createdAt": "2025-07-04T10:41:32.644Z",
+      "id": "1751625692644-o8td4rmht"
+    },
+    {
+      "title": "16/02/2025",
+      "content": "Los aventureros han explorado la parte inferior del segundo nivel. Allí, han encontrado la cervecería de Garrux, localizando la gran colecciones de barriles de cerveza. Luego, han explorado un gran salón de los antiguos enanos que habitaron este lugar, con cinco cadáveres de dragones. Boris ha tenido una visión de Dumathoin en este lugar. La parte más importante ha sido cuando han localizado al Modron y han empezado a despetrificar cuerpos (a parte de quitar la espada maldita de Lola):<div><ul><li><span style=\"font-family: inherit;\">2 Drows: uno de la casa Auvryndar (que les acompaña) y uno de la casa Freth al que han asesinado.</span></li><li>Hiro: que al despetrificarse se ha convertido en salmuera. El Ulitharid ha hablado con Ozz pidiéndole que cuide de su \"muñeco\". Le pedirá información de Waterdeep.</li><li>Kenku: que les ha hablado de los \"Botas Veloces\" y Patrina, una aventurera que recogio un bulbo del Nivel 5 del que salió Halaster. Esta aventurera tendrá una tumba en el Nivel 5 y ese robo fue el que hizo que asesinasen a la party de Hiro.</li><li>Halaster: que ha resultado ser una estatua que había mandado un mensaje pero que no han podido oír porque Lola casteó silencio.</li></ul><div>Tras todo eso, los aventureros han bajado al Nivel 3.\r</div><div>Avances en misiones:</div><div><ul><li><span style=\"font-family: inherit;\">Lola -&gt; Selune le ha dicho \"distingue mi voz\" al tocar los tentáculos de la sala 23a -&gt; Mónica se ha quitado la espada</span></li><li>Boris -&gt; En la sala 23b, el cementerio de dragones, ve una visión del antiguo rey de Melarkin. Se ha visto avanzando hacia el símbolo de Dumathoin, siendo retenido por cadenas de tela de araña. El símbolo de Dumathoin está emborronado por sombras (Shar). Boris ha matado a Ph'yrin Freth, primer drow de la casa Freth que conoce.</li><li>Hiro -&gt; Ha encontrado su figura petrificada y al despetrificarlo, se ha convertido en \"salmuera\". Ozz se ha comunicado con el Ulitharid que le ha pedido que cuide de su \"muñeco\".</li><li>Fin -&gt; Tiene un sueño de las tres hermanas de los Shadowdusk: Arandraya, Maellweene y Yarlithra (Yarlithra es la madre de Conor) con Conor, ve a estas arder (la muerte que tuvieron), los ojos de Noticos y otros horrores del Far Realm mirando hacia el infinito, el escudo de la casa: \"Una antorcha encendida con luz púrpura y tres ascuas todas mirando hacia abajo\" y el lema de su casa \"No tememos a la oscuridad\" dicho por las hermanas mientras arden.</li></ul></div></div>",
+      "linkedItems": {
+        "locations": [],
+        "players": [],
+        "npcs": [],
+        "quests": []
+      },
+      "createdAt": "2025-07-04T10:42:45.253Z",
+      "id": "1751625765253-slc9f1262",
+      "modifiedAt": "2025-07-06T15:38:31.398Z"
+    },
+    {
+      "title": "30/03/2025",
+      "content": "Los aventureros han investigado gran parte del Nivel 3, empezando por la zona noroeste, donde se asientan los dows de la casa Auvryndar.\r<div>Después de acabar con las arañas de fase y esconderse de los Quaggoths que investigaban la zona, han bajado a la parte del poblado de&nbsp;Stromkuhldur que actualmente controlan los drows.\r</div><div>Allí, Lola ha terminado cruzándose con un drow que salía de las letrinas que ha traído a Ranaghax para que hablase con ellos. Este les ha conducido hacia el templo de Dumathoin donde T'rissa Auvryndar les esperaba con el encargo de acabar con la Legión Azrok y así cumplir la deuda que tenían con su hermana Melith.\r</div><div>Z'rees, el drown que habían despetrificado y que les acompañaba se ha quedado en la prueba de Loth, hacia la que Boris se ha visto atraído pero que ha preferido evitar.\r</div><div>T'rissa les ha hecho jurar con sangre que acabarían con la Legión Azrok, lo que finalmente ha roto el pacto de la venganza de Boris, al haberse consagrado con drows en un templo de Dumathoin corrupto por ellos (aún no lo sabe, lo conocerá cuando intente usar sus poderes de paladin).\r</div><div>Con el pacto firmado, los aventureros han avanzado hacia el territorio de la Legión. Allí se han encontrado con&nbsp;Kliyuse un capitán hobgoblin que ha mandado a dos de sus hobgoblins de su batallón a que acompañasen a la party a hacer su documentación y luego, ante la entrevista con Azrok.\r</div><div>Han jurado fidelidad hacia este, prometiendo que no harían daño a la Legión (cosa que por ahora entra en conficto con lo prometido a los drows de Auvryndar). Y, al teminar la entrevista, Lurkana les ha escoltado hasta una casa de invitados donde les ha pedido que recuperen la Daga de Visión ciega de Azrok que robaron unos duergas que cree que fueron hacia Skullport.\r</div><div>Por último, mencionar que Lola ha sentido un pitido en su mente cuando ha estado cerca de un bugbear con un devorador de intelectos implantado en su cráneo. Una vez más, el vínculo con el Capitán hacia cosas raras cerca de otros ilicidos.</div>",
+      "linkedItems": {
+        "locations": [],
+        "players": [],
+        "npcs": [],
+        "quests": []
+      },
+      "createdAt": "2025-07-04T10:43:10.678Z",
+      "id": "1751625790678-msj8cohbd"
+    }
+  ],
+  "timeline": [],
+  "tags": [],
+  "id": "1751489685647-5hrhpm50r",
+  "name": "El Mago Loco",
+  "description": "",
+  "createdAt": "2025-07-02T20:54:45.647Z",
+  "lastModified": "2025-07-13T18:23:22.561Z"
+}

@@ -1,0 +1,508 @@
+/* ====================================
+   🖼️ BASE MODAL COMPONENT
+   ==================================== */
+
+.modalOverlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem !important;
+  margin: 0 !important;
+  animation: fadeIn 0.3s ease;
+  overflow: hidden !important;
+  z-index: 999999 !important;
+  /* Complete isolation from ANY parent context */
+  isolation: isolate;
+  /* Prevent any scroll behavior */
+  overscroll-behavior: none !important;
+  /* Ensure absolute positioning context */
+  transform: translateZ(0);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ====================================
+   📦 MODAL CONTAINER
+   ==================================== */
+
+.baseModal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s ease;
+  outline: none;
+  height: 90vh;
+  width: 90vw;
+  max-width: 1200px;
+  max-height: 90vh;
+  overflow: hidden;
+  /* Modal is a self-contained viewport */
+  isolation: isolate;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ====================================
+   🔮 GLASSMORPHISM EFFECT
+   ==================================== */
+
+.glassmorphism {
+  background: rgba(31, 41, 55, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(79, 70, 229, 0.3);
+}
+
+.glassmorphism::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(59, 130, 246, 0.05));
+  border-radius: inherit;
+  z-index: -1;
+}
+
+/* Sin glassmorphism - sólido */
+.baseModal:not(.glassmorphism) {
+  background: #1f2937;
+  border: 1px solid rgba(79, 70, 229, 0.2);
+}
+
+/* ====================================
+   📏 TAMAÑOS
+   ==================================== */
+
+.sm {
+  width: 60vw;
+  height: 70vh;
+  max-width: 500px;
+}
+
+.md {
+  width: 75vw;
+  height: 80vh;
+  max-width: 700px;
+}
+
+.lg {
+  width: 90vw;
+  height: 90vh;
+  max-width: 1200px;
+}
+
+.xl {
+  width: 95vw;
+  height: 95vh;
+  max-width: 1400px;
+}
+
+.full {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  border-radius: 0;
+}
+
+/* ====================================
+   🎯 SECCIONES DEL MODAL
+   ==================================== */
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2rem 0 2rem;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(79, 70, 229, 0.1);
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+}
+
+.modalTitle {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  flex: 1;
+  background: linear-gradient(135deg, #ffffff 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.compactActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+
+.closeButton {
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+}
+
+.modalContent {
+  flex: 1;
+  padding: 0 2rem 2rem 2rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  color: white;
+  line-height: 1.6;
+  /* This is the ONLY scroll in the modal system */
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(79, 70, 229, 0.3) transparent;
+  /* Ensure content fills available space */
+  min-height: 0;
+  height: 100%;
+}
+
+/* Webkit scrollbar styling for modal content */
+.modalContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modalContent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modalContent::-webkit-scrollbar-thumb {
+  background: rgba(79, 70, 229, 0.3);
+  border-radius: 3px;
+}
+
+.modalContent::-webkit-scrollbar-thumb:hover {
+  background: rgba(79, 70, 229, 0.5);
+}
+
+.modalFooter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  flex-shrink: 0;
+  border-top: 1px solid rgba(79, 70, 229, 0.1);
+  margin-top: 1.5rem;
+}
+
+/* ====================================
+   🎨 VARIANTES ESPECIALES
+   ==================================== */
+
+/* Centrar contenido verticalmente */
+.centerContent .modalContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Modal sin header */
+.baseModal:not(:has(.modalHeader)) .modalContent {
+  padding-top: 2rem;
+}
+
+/* Modal sin footer */
+.baseModal:not(:has(.modalFooter)) .modalContent {
+  padding-bottom: 2rem;
+}
+
+/* ====================================
+   📱 RESPONSIVE DESIGN
+   ==================================== */
+
+@media (max-width: 768px) {
+  .modalOverlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+  
+  .baseModal {
+    width: 100vw;
+    height: 90vh;
+    max-width: none;
+    border-radius: 16px 16px 0 0;
+    animation: slideUpMobile 0.3s ease;
+  }
+  
+  .lg, .xl {
+    width: 100vw;
+    height: 90vh;
+    max-width: none;
+  }
+  
+  @keyframes slideUpMobile {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  
+  .modalHeader {
+    padding: 1rem 1.5rem 0 1.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+  }
+  
+  .modalTitle {
+    font-size: 1.25rem;
+  }
+  
+  .compactActions {
+    gap: 0.4rem;
+    margin-right: 0.4rem;
+  }
+  
+  .modalContent {
+    padding: 0 1.5rem 1.5rem 1.5rem;
+  }
+  
+  .modalFooter {
+    padding: 1rem 1.5rem;
+    margin-top: 1rem;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .modalFooter > * {
+    width: 100%;
+  }
+  
+  /* Tamaños móviles */
+  .sm,
+  .md,
+  .lg,
+  .xl {
+    max-width: 100%;
+  }
+  
+  .full {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .baseModal {
+    width: 95vw;
+    height: 85vh;
+  }
+  
+  .lg {
+    width: 95vw;
+    height: 90vh;
+  }
+  
+  .xl {
+    width: 98vw;
+    height: 92vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .modalOverlay {
+    padding: 0;
+  }
+  
+  .baseModal {
+    border-radius: 12px 12px 0 0;
+    max-height: 100vh;
+  }
+  
+  .modalHeader {
+    padding: 0.75rem 1rem 0 1rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+  
+  .modalTitle {
+    font-size: 1.1rem;
+  }
+  
+  .compactActions {
+    gap: 0.3rem;
+    margin-right: 0.3rem;
+  }
+  
+  .modalContent {
+    padding: 0 1rem;
+  }
+  
+  .modalFooter {
+    padding: 0.75rem 1rem;
+    margin-top: 0.75rem;
+  }
+}
+
+/* ====================================
+   ⚡ ANIMACIONES Y EFECTOS
+   ==================================== */
+
+/* Animación para modal que se cierra */
+.modalOverlay[data-closing="true"] {
+  animation: fadeOut 0.2s ease;
+}
+
+.modalOverlay[data-closing="true"] .baseModal {
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+}
+
+/* Hover effects para elementos interactivos */
+.closeButton:hover {
+  transform: scale(1.1);
+}
+
+/* ====================================
+   🎯 ACCESIBILIDAD
+   ==================================== */
+
+/* Focus styles */
+.baseModal:focus {
+  outline: 2px solid rgba(79, 70, 229, 0.6);
+  outline-offset: -2px;
+}
+
+.closeButton:focus {
+  outline: 2px solid rgba(79, 70, 229, 0.6);
+  outline-offset: 2px;
+}
+
+/* Reducir movimiento para usuarios que lo prefieren */
+@media (prefers-reduced-motion: reduce) {
+  .modalOverlay,
+  .baseModal {
+    animation: none;
+  }
+  
+  .closeButton:hover {
+    transform: none;
+  }
+}
+
+/* ====================================
+   🌈 VARIANTES DE TEMA
+   ==================================== */
+
+.baseModal[data-theme="success"] {
+  border-color: rgba(16, 185, 129, 0.5);
+}
+
+.baseModal[data-theme="success"] .modalTitle {
+  background: linear-gradient(135deg, #ffffff 0%, #10b981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.baseModal[data-theme="warning"] {
+  border-color: rgba(245, 158, 11, 0.5);
+}
+
+.baseModal[data-theme="warning"] .modalTitle {
+  background: linear-gradient(135deg, #ffffff 0%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.baseModal[data-theme="danger"] {
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.baseModal[data-theme="danger"] .modalTitle {
+  background: linear-gradient(135deg, #ffffff 0%, #ef4444 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ====================================
+   📦 MODALES ESPECIALES
+   ==================================== */
+
+/* Modal de confirmación */
+.baseModal[data-type="confirmation"] .modalContent {
+  text-align: center;
+  padding: 1rem 2rem;
+}
+
+.baseModal[data-type="confirmation"] .modalFooter {
+  justify-content: center;
+}
+
+/* Modal de loading */
+.baseModal[data-type="loading"] {
+  pointer-events: none;
+}
+
+.baseModal[data-type="loading"] .modalContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: 1rem;
+}
+
+/* Modal fullscreen en móvil */
+.baseModal[data-fullscreen-mobile="true"] {
+  @media (max-width: 768px) {
+    max-width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+}

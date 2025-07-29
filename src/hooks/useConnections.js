@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { debug } from '../utils/logger'
 
 // ✨ Función para obtener tipo de relación inversa
 const getInverseRelationship = (relationshipType) => {
@@ -26,7 +27,7 @@ export const RELATIONSHIP_TYPES = {
   general: { name: 'General', icon: '🔗', color: '#6b7280' },
   ally: { name: 'Aliado', icon: '🤝', color: '#10b981' },
   enemy: { name: 'Enemigo', icon: '⚔️', color: '#ef4444' },
-  mentor: { name: 'Mentor', icon: '🎓', color: '#8b5cf6' },
+  mentor: { name: 'Mentor', icon: '🎓', color: '#4f46e5' },
   rival: { name: 'Rival', icon: '🥊', color: '#f59e0b' },
   family: { name: 'Familia', icon: '👨‍👩‍👧‍👦', color: '#ec4899' },
   romantic: { name: 'Romance', icon: '💕', color: '#f43f5e' },
@@ -52,7 +53,7 @@ export function useConnections(campaign, updateCampaign) {
   const createConnection = useCallback((sourceItem, sourceType, targetItem, targetType, relationshipType = 'general', context = '') => {
     if (!campaign || !updateCampaign) return
 
-    console.log('Conectando:', sourceItem.name, 'con', targetItem.name)
+    debug('Conectando:', sourceItem.name, 'con', targetItem.name)
 
     const updates = { ...campaign }
 
@@ -117,7 +118,7 @@ export function useConnections(campaign, updateCampaign) {
   const removeConnection = useCallback((sourceItem, sourceType, targetItem, targetType) => {
     if (!campaign || !updateCampaign) return
 
-    console.log('Desconectando:', sourceItem.name, 'de', targetItem.name)
+    debug('Desconectando:', sourceItem.name, 'de', targetItem.name)
 
     const updates = { ...campaign }
 

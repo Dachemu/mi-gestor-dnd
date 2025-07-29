@@ -4,15 +4,35 @@
   "description": "Mi gestor de campañas de D&D",
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "lucide-react": "^0.263.1"
+    "@tiptap/extension-color": "^3.0.7",
+    "@tiptap/extension-text-style": "^3.0.7",
+    "@tiptap/pm": "^3.0.7",
+    "@tiptap/react": "^3.0.7",
+    "@tiptap/starter-kit": "^3.0.7",
+    "lucide-react": "^0.525.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.0.3",
-    "vite": "^4.4.5"
+    "@babel/core": "^7.28.0",
+    "@babel/preset-env": "^7.28.0",
+    "@babel/preset-react": "^7.27.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@vitejs/plugin-react": "^4.6.0",
+    "babel-jest": "^30.0.4",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^30.0.4",
+    "jest-environment-jsdom": "^30.0.4",
+    "sharp": "^0.34.3",
+    "vite": "^7.0.4",
+    "vite-plugin-pwa": "^1.0.2"
   }
 }

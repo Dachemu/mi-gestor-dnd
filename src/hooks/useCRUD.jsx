@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react'
-import React from 'react'
+import { generateId } from '../services/storage'
+import { useNotification } from './useNotification.jsx'
 
 /**
  * Hook personalizado para manejar operaciones CRUD de manera uniforme
  * Elimina código duplicado entre todos los gestores
  * ✅ CORREGIDO: Ahora incluye el componente de notificación
  */
-export function useCRUD(initialData = [], itemName = 'elemento') {
+export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = null) {
   // Estados principales
   const [items, setItems] = useState(initialData)
   const [showForm, setShowForm] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
   const [selectedItem, setSelectedItem] = useState(null)
-  const [notification, setNotification] = useState(null)
+  
+  // Hook de notificaciones
+  const { showNotification, NotificationComponent } = useNotification()
 
   // ✅ Sincronizar con datos externos cuando cambien
   useEffect(() => {
@@ -50,17 +53,13 @@ export function useCRUD(initialData = [], itemName = 'elemento') {
     return item
   }
 
-  // Función para mostrar notificaciones temporales
-  const showNotification = (message, type = 'success') => {
-    setNotification({ message, type })
-    setTimeout(() => setNotification(null), 3000)
-  }
+  // Función de notificaciones ahora viene del hook centralizado
 
   // Crear nuevo elemento
   const handleCreate = (itemData) => {
     const newItem = ensureLinkedItems({
       ...itemData,
-      id: Date.now(),
+      id: generateId(),
       createdAt: new Date().toISOString().split('T')[0]
     })
     
@@ -95,25 +94,42 @@ export function useCRUD(initialData = [], itemName = 'elemento') {
 
   // Guardar (crear o editar)
   const handleSave = (itemData) => {
+    // Agregar icono fijo para notas si corresponde
+    if (entityConfig && entityConfig.fixedIcon) {
+      itemData = { ...itemData, icon: entityConfig.fixedIcon }
+    }
+    
+    // Determinar si es creación o edición
+    // Primero verificar si tenemos editingItem (formulario modal)
     if (editingItem) {
       return handleEdit(itemData)
-    } else {
-      return handleCreate(itemData)
     }
+    
+    // Si no hay editingItem, verificar si el itemData tiene un ID existente
+    // Esto maneja el caso de edición inline desde UniversalDetails
+    if (itemData.id && items.some(item => item.id === itemData.id)) {
+      // Es una edición - simular editingItem temporal
+      const existingItem = items.find(item => item.id === itemData.id)
+      setEditingItem(existingItem)
+      const result = handleEdit(itemData)
+      setEditingItem(null) // Limpiar después de editar
+      return result
+    }
+    
+    // Es una creación nueva
+    return handleCreate(itemData)
   }
 
   // Eliminar elemento
   const handleDelete = (id, name) => {
-    if (window.confirm(`¿Estás seguro de que quieres eliminar "${name}"?`)) {
-      setItems(prev => prev.filter(item => item.id !== id))
-      
-      // Si el elemento eliminado estaba seleccionado, deseleccionar
-      if (selectedItem?.id === id) {
-        setSelectedItem(null)
-      }
-      
-      showNotification(`${itemName} "${name}" eliminado`)
+    setItems(prev => prev.filter(item => item.id !== id))
+    
+    // Si el elemento eliminado estaba seleccionado, deseleccionar
+    if (selectedItem?.id === id) {
+      setSelectedItem(null)
     }
+    
+    showNotification(`${itemName} "${name}" eliminado`)
   }
 
   // Seleccionar elemento para ver detalles
@@ -147,33 +163,7 @@ export function useCRUD(initialData = [], itemName = 'elemento') {
   // Estado vacío
   const isEmpty = items.length === 0
 
-  // ✅ COMPONENTE DE NOTIFICACIÓN
-  const NotificationComponent = () => {
-    if (!notification) return null
-
-    return (
-      <div style={{
-        position: 'fixed',
-        top: '2rem',
-        right: '2rem',
-        background: notification.type === 'error' 
-          ? 'rgba(239, 68, 68, 0.9)' 
-          : 'rgba(16, 185, 129, 0.9)',
-        color: 'white',
-        padding: '1rem 1.5rem',
-        borderRadius: '10px',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
-        zIndex: 1000,
-        backdropFilter: 'blur(10px)',
-        fontSize: '0.9rem',
-        fontWeight: '600',
-        maxWidth: '400px',
-        animation: 'slideInRight 0.3s ease-out'
-      }}>
-        {notification.message}
-      </div>
-    )
-  }
+  // ✅ COMPONENTE DE NOTIFICACIÓN ahora viene del hook centralizado
 
   return {
     // Estados
@@ -182,7 +172,6 @@ export function useCRUD(initialData = [], itemName = 'elemento') {
     editingItem,
     selectedItem,
     isEmpty,
-    notification,
 
     // Acciones principales
     handleSave,
