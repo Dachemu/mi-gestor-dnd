@@ -7,7 +7,7 @@
   border-radius: 12px;
   transition: all 0.3s ease;
   overflow: hidden;
-  border: 1px solid rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(79, 70, 229, 0.1);
   background: rgba(31, 41, 55, 0.5);
   
   /* Focus styles para accesibilidad */
@@ -32,7 +32,7 @@
 .campaign {
   background: rgba(31, 41, 55, 0.5);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  border: 1px solid rgba(79, 70, 229, 0.3);
   border-radius: 20px;
   padding: 2rem;
   min-height: 280px;
@@ -41,7 +41,7 @@
 /* Compact Card - Para listas compactas */
 .compact {
   background: rgba(31, 41, 55, 0.6);
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(79, 70, 229, 0.2);
   border-radius: 12px;
   padding: 1.5rem;
   position: relative;
@@ -51,7 +51,7 @@
 /* Dashboard Card - Para secciones del dashboard */
 .dashboard {
   background: rgba(31, 41, 55, 0.5);
-  border: 1px solid rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(79, 70, 229, 0.1);
   border-radius: 12px;
   padding: 1.25rem;
 }
@@ -59,7 +59,7 @@
 /* Mission Card - Para tarjetas de misiones */
 .mission {
   background: rgba(31, 41, 55, 0.6);
-  border: 2px solid var(--border-color, rgba(139, 92, 246, 0.3));
+  border: 2px solid var(--border-color, rgba(79, 70, 229, 0.3));
   border-radius: 12px;
   padding: 1.5rem;
   position: relative;
@@ -68,7 +68,7 @@
 /* Category Card - Para botones de categoría */
 .category {
   background: rgba(31, 41, 55, 0.4);
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(79, 70, 229, 0.2);
   border-radius: 12px;
   padding: 1.5rem;
   text-align: center;
@@ -92,14 +92,14 @@
 }
 
 .campaign.hoverLift:hover {
-  border-color: rgba(139, 92, 246, 0.4);
-  box-shadow: 0 16px 40px rgba(139, 92, 246, 0.2);
+  border-color: rgba(79, 70, 229, 0.4);
+  box-shadow: 0 16px 40px rgba(79, 70, 229, 0.2);
 }
 
 /* Glow Effect */
 .hoverGlow:hover {
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
-  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 0 20px rgba(79, 70, 229, 0.3);
+  border-color: rgba(79, 70, 229, 0.5);
 }
 
 /* Scale Effect */
@@ -110,7 +110,7 @@
 /* Compact specific hover */
 .compact.hoverLift:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15);
+  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.15);
 }
 
 /* ====================================
@@ -143,7 +143,7 @@
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: rgba(139, 92, 246, 0.2);
+  background: rgba(79, 70, 229, 0.2);
   color: var(--primary-light);
   padding: 0.25rem 0.5rem;
   border-radius: 6px;
@@ -208,7 +208,7 @@
 .cardFooter {
   margin-top: auto;
   padding-top: 1rem;
-  border-top: 1px solid rgba(139, 92, 246, 0.1);
+  border-top: 1px solid rgba(79, 70, 229, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -232,7 +232,7 @@
   gap: 1rem;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid rgba(139, 92, 246, 0.2);
+  border-top: 1px solid rgba(79, 70, 229, 0.2);
 }
 
 .statItem {
@@ -262,14 +262,14 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: var(--card-gradient, linear-gradient(90deg, #8b5cf6, #ec4899));
+  background: var(--card-gradient, linear-gradient(90deg, #4f46e5, #ec4899));
   z-index: 1;
 }
 
 .category .gradientOverlay {
   height: 100%;
   opacity: 0.1;
-  background: var(--card-gradient, linear-gradient(135deg, #8b5cf6, #ec4899));
+  background: var(--card-gradient, linear-gradient(135deg, #4f46e5, #ec4899));
 }
 
 /* ====================================

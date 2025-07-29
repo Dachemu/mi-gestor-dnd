@@ -321,7 +321,7 @@ function CampaignSelector({ onSelectCampaign }) {
         .main-title-compact {
           font-size: clamp(1.5rem, 4vw, 2.5rem);
           font-weight: 700;
-          background: linear-gradient(135deg, #ffffff 0%, #a78bfa 100%);
+          background: linear-gradient(135deg, #ffffff 0%, #6366f1 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -345,7 +345,7 @@ function CampaignSelector({ onSelectCampaign }) {
 
         .welcome-content {
           background: rgba(31, 41, 55, 0.3);
-          border: 1px solid rgba(139, 92, 246, 0.2);
+          border: 1px solid rgba(79, 70, 229, 0.2);
           border-radius: 20px;
           padding: 2rem;
           backdrop-filter: blur(10px);
@@ -558,7 +558,7 @@ function NewCampaignForm({ onClose, onCreateCampaign }) {
       <div style={{
         background: 'rgba(31, 41, 55, 0.95)',
         backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(139, 92, 246, 0.3)',
+        border: '1px solid rgba(79, 70, 229, 0.3)',
         borderRadius: '20px',
         padding: '2rem',
         width: '90%',

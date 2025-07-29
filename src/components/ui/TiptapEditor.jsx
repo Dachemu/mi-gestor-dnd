@@ -56,7 +56,7 @@ function TiptapEditor({
     { name: 'Amarillo', value: '#eab308' },
     { name: 'Verde', value: '#22c55e' },
     { name: 'Azul', value: '#3b82f6' },
-    { name: 'Púrpura', value: '#8b5cf6' },
+    { name: 'Púrpura', value: '#4f46e5' },
     { name: 'Rosa', value: '#ec4899' },
     { name: 'Gris', value: '#6b7280' },
   ]
@@ -87,7 +87,7 @@ function TiptapEditor({
 
   return (
     <div style={{
-      border: '1px solid rgba(139, 92, 246, 0.2)',
+      border: '1px solid rgba(79, 70, 229, 0.2)',
       borderRadius: '12px',
       background: 'rgba(31, 41, 55, 0.6)',
       overflow: 'hidden'
@@ -99,7 +99,7 @@ function TiptapEditor({
         justifyContent: 'space-between',
         padding: '0.75rem 1rem',
         background: 'rgba(31, 41, 55, 0.8)',
-        borderBottom: '1px solid rgba(139, 92, 246, 0.1)',
+        borderBottom: '1px solid rgba(79, 70, 229, 0.1)',
         flexWrap: 'wrap',
         gap: '0.5rem'
       }}>
@@ -111,8 +111,8 @@ function TiptapEditor({
             className={editor.isActive('bold') ? 'active' : ''}
             title="Negrita (Ctrl+B)"
             style={{
-              background: editor.isActive('bold') ? 'rgba(139, 92, 246, 0.3)' : 'transparent',
-              border: '1px solid rgba(139, 92, 246, 0.3)',
+              background: editor.isActive('bold') ? 'rgba(79, 70, 229, 0.3)' : 'transparent',
+              border: '1px solid rgba(79, 70, 229, 0.3)',
               borderRadius: '6px',
               color: editor.isActive('bold') ? 'white' : 'var(--text-secondary)',
               padding: '0.5rem',
@@ -124,15 +124,15 @@ function TiptapEditor({
             }}
             onMouseEnter={(e) => {
               if (!editor.isActive('bold')) {
-                e.target.style.background = 'rgba(139, 92, 246, 0.2)'
-                e.target.style.borderColor = 'rgba(139, 92, 246, 0.5)'
+                e.target.style.background = 'rgba(79, 70, 229, 0.2)'
+                e.target.style.borderColor = 'rgba(79, 70, 229, 0.5)'
                 e.target.style.color = 'white'
               }
             }}
             onMouseLeave={(e) => {
               if (!editor.isActive('bold')) {
                 e.target.style.background = 'transparent'
-                e.target.style.borderColor = 'rgba(139, 92, 246, 0.3)'
+                e.target.style.borderColor = 'rgba(79, 70, 229, 0.3)'
                 e.target.style.color = 'var(--text-secondary)'
               }
             }}
@@ -147,8 +147,8 @@ function TiptapEditor({
             className={editor.isActive('italic') ? 'active' : ''}
             title="Cursiva (Ctrl+I)"
             style={{
-              background: editor.isActive('italic') ? 'rgba(139, 92, 246, 0.3)' : 'transparent',
-              border: '1px solid rgba(139, 92, 246, 0.3)',
+              background: editor.isActive('italic') ? 'rgba(79, 70, 229, 0.3)' : 'transparent',
+              border: '1px solid rgba(79, 70, 229, 0.3)',
               borderRadius: '6px',
               color: editor.isActive('italic') ? 'white' : 'var(--text-secondary)',
               padding: '0.5rem',
@@ -160,15 +160,15 @@ function TiptapEditor({
             }}
             onMouseEnter={(e) => {
               if (!editor.isActive('italic')) {
-                e.target.style.background = 'rgba(139, 92, 246, 0.2)'
-                e.target.style.borderColor = 'rgba(139, 92, 246, 0.5)'
+                e.target.style.background = 'rgba(79, 70, 229, 0.2)'
+                e.target.style.borderColor = 'rgba(79, 70, 229, 0.5)'
                 e.target.style.color = 'white'
               }
             }}
             onMouseLeave={(e) => {
               if (!editor.isActive('italic')) {
                 e.target.style.background = 'transparent'
-                e.target.style.borderColor = 'rgba(139, 92, 246, 0.3)'
+                e.target.style.borderColor = 'rgba(79, 70, 229, 0.3)'
                 e.target.style.color = 'var(--text-secondary)'
               }
             }}
@@ -183,8 +183,8 @@ function TiptapEditor({
             className={editor.isActive('strike') ? 'active' : ''}
             title="Tachado"
             style={{
-              background: editor.isActive('strike') ? 'rgba(139, 92, 246, 0.3)' : 'transparent',
-              border: '1px solid rgba(139, 92, 246, 0.3)',
+              background: editor.isActive('strike') ? 'rgba(79, 70, 229, 0.3)' : 'transparent',
+              border: '1px solid rgba(79, 70, 229, 0.3)',
               borderRadius: '6px',
               color: editor.isActive('strike') ? 'white' : 'var(--text-secondary)',
               padding: '0.5rem',
@@ -196,15 +196,15 @@ function TiptapEditor({
             }}
             onMouseEnter={(e) => {
               if (!editor.isActive('strike')) {
-                e.target.style.background = 'rgba(139, 92, 246, 0.2)'
-                e.target.style.borderColor = 'rgba(139, 92, 246, 0.5)'
+                e.target.style.background = 'rgba(79, 70, 229, 0.2)'
+                e.target.style.borderColor = 'rgba(79, 70, 229, 0.5)'
                 e.target.style.color = 'white'
               }
             }}
             onMouseLeave={(e) => {
               if (!editor.isActive('strike')) {
                 e.target.style.background = 'transparent'
-                e.target.style.borderColor = 'rgba(139, 92, 246, 0.3)'
+                e.target.style.borderColor = 'rgba(79, 70, 229, 0.3)'
                 e.target.style.color = 'var(--text-secondary)'
               }
             }}
@@ -219,8 +219,8 @@ function TiptapEditor({
             className={editor.isActive('bulletList') ? 'active' : ''}
             title="Lista con viñetas"
             style={{
-              background: editor.isActive('bulletList') ? 'rgba(139, 92, 246, 0.3)' : 'transparent',
-              border: '1px solid rgba(139, 92, 246, 0.3)',
+              background: editor.isActive('bulletList') ? 'rgba(79, 70, 229, 0.3)' : 'transparent',
+              border: '1px solid rgba(79, 70, 229, 0.3)',
               borderRadius: '6px',
               color: editor.isActive('bulletList') ? 'white' : 'var(--text-secondary)',
               padding: '0.5rem',
@@ -232,15 +232,15 @@ function TiptapEditor({
             }}
             onMouseEnter={(e) => {
               if (!editor.isActive('bulletList')) {
-                e.target.style.background = 'rgba(139, 92, 246, 0.2)'
-                e.target.style.borderColor = 'rgba(139, 92, 246, 0.5)'
+                e.target.style.background = 'rgba(79, 70, 229, 0.2)'
+                e.target.style.borderColor = 'rgba(79, 70, 229, 0.5)'
                 e.target.style.color = 'white'
               }
             }}
             onMouseLeave={(e) => {
               if (!editor.isActive('bulletList')) {
                 e.target.style.background = 'transparent'
-                e.target.style.borderColor = 'rgba(139, 92, 246, 0.3)'
+                e.target.style.borderColor = 'rgba(79, 70, 229, 0.3)'
                 e.target.style.color = 'var(--text-secondary)'
               }
             }}
@@ -255,8 +255,8 @@ function TiptapEditor({
             className={editor.isActive('orderedList') ? 'active' : ''}
             title="Lista numerada"
             style={{
-              background: editor.isActive('orderedList') ? 'rgba(139, 92, 246, 0.3)' : 'transparent',
-              border: '1px solid rgba(139, 92, 246, 0.3)',
+              background: editor.isActive('orderedList') ? 'rgba(79, 70, 229, 0.3)' : 'transparent',
+              border: '1px solid rgba(79, 70, 229, 0.3)',
               borderRadius: '6px',
               color: editor.isActive('orderedList') ? 'white' : 'var(--text-secondary)',
               padding: '0.5rem',
@@ -268,15 +268,15 @@ function TiptapEditor({
             }}
             onMouseEnter={(e) => {
               if (!editor.isActive('orderedList')) {
-                e.target.style.background = 'rgba(139, 92, 246, 0.2)'
-                e.target.style.borderColor = 'rgba(139, 92, 246, 0.5)'
+                e.target.style.background = 'rgba(79, 70, 229, 0.2)'
+                e.target.style.borderColor = 'rgba(79, 70, 229, 0.5)'
                 e.target.style.color = 'white'
               }
             }}
             onMouseLeave={(e) => {
               if (!editor.isActive('orderedList')) {
                 e.target.style.background = 'transparent'
-                e.target.style.borderColor = 'rgba(139, 92, 246, 0.3)'
+                e.target.style.borderColor = 'rgba(79, 70, 229, 0.3)'
                 e.target.style.color = 'var(--text-secondary)'
               }
             }}
@@ -291,8 +291,8 @@ function TiptapEditor({
             className={editor.isActive('blockquote') ? 'active' : ''}
             title="Cita"
             style={{
-              background: editor.isActive('blockquote') ? 'rgba(139, 92, 246, 0.3)' : 'transparent',
-              border: '1px solid rgba(139, 92, 246, 0.3)',
+              background: editor.isActive('blockquote') ? 'rgba(79, 70, 229, 0.3)' : 'transparent',
+              border: '1px solid rgba(79, 70, 229, 0.3)',
               borderRadius: '6px',
               color: editor.isActive('blockquote') ? 'white' : 'var(--text-secondary)',
               padding: '0.5rem',
@@ -304,15 +304,15 @@ function TiptapEditor({
             }}
             onMouseEnter={(e) => {
               if (!editor.isActive('blockquote')) {
-                e.target.style.background = 'rgba(139, 92, 246, 0.2)'
-                e.target.style.borderColor = 'rgba(139, 92, 246, 0.5)'
+                e.target.style.background = 'rgba(79, 70, 229, 0.2)'
+                e.target.style.borderColor = 'rgba(79, 70, 229, 0.5)'
                 e.target.style.color = 'white'
               }
             }}
             onMouseLeave={(e) => {
               if (!editor.isActive('blockquote')) {
                 e.target.style.background = 'transparent'
-                e.target.style.borderColor = 'rgba(139, 92, 246, 0.3)'
+                e.target.style.borderColor = 'rgba(79, 70, 229, 0.3)'
                 e.target.style.color = 'var(--text-secondary)'
               }
             }}
@@ -328,7 +328,7 @@ function TiptapEditor({
               title="Color de texto"
               style={{
                 background: 'transparent',
-                border: '1px solid rgba(139, 92, 246, 0.3)',
+                border: '1px solid rgba(79, 70, 229, 0.3)',
                 borderRadius: '6px',
                 color: 'var(--text-secondary)',
                 padding: '0.5rem',
@@ -339,13 +339,13 @@ function TiptapEditor({
                 transition: 'all 0.2s ease'
               }}
               onMouseEnter={(e) => {
-                e.target.style.background = 'rgba(139, 92, 246, 0.2)'
-                e.target.style.borderColor = 'rgba(139, 92, 246, 0.5)'
+                e.target.style.background = 'rgba(79, 70, 229, 0.2)'
+                e.target.style.borderColor = 'rgba(79, 70, 229, 0.5)'
                 e.target.style.color = 'white'
               }}
               onMouseLeave={(e) => {
                 e.target.style.background = 'transparent'
-                e.target.style.borderColor = 'rgba(139, 92, 246, 0.3)'
+                e.target.style.borderColor = 'rgba(79, 70, 229, 0.3)'
                 e.target.style.color = 'var(--text-secondary)'
               }}
             >
@@ -359,7 +359,7 @@ function TiptapEditor({
                 left: 0,
                 marginTop: '0.5rem',
                 background: 'rgba(15, 15, 25, 0.98)',
-                border: '1px solid rgba(139, 92, 246, 0.3)',
+                border: '1px solid rgba(79, 70, 229, 0.3)',
                 borderRadius: '8px',
                 padding: '0.75rem',
                 zIndex: 1000,
@@ -420,7 +420,7 @@ function TiptapEditor({
       <div style={{
         padding: '0.5rem 1rem',
         background: 'rgba(15, 15, 25, 0.5)',
-        borderTop: '1px solid rgba(139, 92, 246, 0.1)',
+        borderTop: '1px solid rgba(79, 70, 229, 0.1)',
         fontSize: '0.75rem',
         color: 'var(--text-disabled)',
         display: 'flex',
@@ -462,7 +462,7 @@ function TiptapEditor({
         .tiptap-editor-content h3 {
           margin: 1rem 0 0.5rem 0;
           font-weight: bold;
-          color: var(--primary-light, #a78bfa);
+          color: var(--primary-light, #6366f1);
         }
         
         .tiptap-editor-content h1 { font-size: 1.5rem; }
@@ -483,7 +483,7 @@ function TiptapEditor({
         .tiptap-editor-content blockquote {
           margin: 1rem 0;
           padding-left: 1rem;
-          border-left: 3px solid var(--primary, #8b5cf6);
+          border-left: 3px solid var(--primary, #4f46e5);
           color: var(--text-secondary, #e5e7eb);
           font-style: italic;
         }

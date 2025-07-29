@@ -4,9 +4,9 @@
 
 :root {
   /* Colores primarios */
-  --primary: #8b5cf6;
-  --primary-dark: #7c3aed;
-  --primary-light: #a78bfa;
+  --primary: #4f46e5;
+  --primary-dark: #3730a3;
+  --primary-light: #6366f1;
   --secondary: #ec4899;
   
   /* Colores de estado */
@@ -30,7 +30,7 @@
   /* Colores para badges y estados */
   --accent-blue: #3b82f6;
   --accent-green: #10b981;
-  --accent-purple: #8b5cf6;
+  --accent-purple: #4f46e5;
   --accent-orange: #f59e0b;
   --accent-red: #ef4444;
   --accent-gray: #6b7280;
@@ -40,10 +40,10 @@
      ==================================== */
   
   /* Transparencias del color primario */
-  --primary-alpha-10: rgba(139, 92, 246, 0.1);
-  --primary-alpha-20: rgba(139, 92, 246, 0.2);
-  --primary-alpha-30: rgba(139, 92, 246, 0.3);
-  --primary-alpha-40: rgba(139, 92, 246, 0.4);
+  --primary-alpha-10: rgba(79, 70, 229, 0.1);
+  --primary-alpha-20: rgba(79, 70, 229, 0.2);
+  --primary-alpha-30: rgba(79, 70, 229, 0.3);
+  --primary-alpha-40: rgba(79, 70, 229, 0.4);
   
   /* Transparencias del fondo oscuro */
   --bg-dark-alpha-85: rgba(15, 15, 25, 0.85);
@@ -70,8 +70,8 @@
   --glass-border: var(--primary-alpha-20);
   
   /* Sombras */
-  --shadow-primary: 0 4px 12px rgba(139, 92, 246, 0.25);
-  --shadow-primary-hover: 0 6px 20px rgba(139, 92, 246, 0.35);
+  --shadow-primary: 0 4px 12px rgba(79, 70, 229, 0.25);
+  --shadow-primary-hover: 0 6px 20px rgba(79, 70, 229, 0.35);
   --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.4);
   --shadow-focus: 0 0 0 3px var(--primary-alpha-10);
   

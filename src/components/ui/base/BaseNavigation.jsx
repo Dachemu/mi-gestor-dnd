@@ -183,7 +183,7 @@ const BaseNavigation = ({
               className={styles.categoryCard}
               onClick={() => onItemClick(item)}
               style={{
-                '--gradient': item.gradient || 'linear-gradient(135deg, #8b5cf6, #ec4899)'
+                '--gradient': item.gradient || 'linear-gradient(135deg, #4f46e5, #ec4899)'
               }}
             >
               {item.icon && (

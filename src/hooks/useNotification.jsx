@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import React from 'react'
 
 /**
  * Hook personalizado para manejar notificaciones de manera uniforme

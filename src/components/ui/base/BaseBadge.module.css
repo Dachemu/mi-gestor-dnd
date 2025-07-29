@@ -121,9 +121,9 @@
 
 /* Purple - Para roles, magia, especial */
 .purple {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  background: linear-gradient(135deg, #4f46e5, #3730a3);
   color: white;
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
 }
 
 /* Orange - Para en progreso, advertencias */
@@ -307,9 +307,9 @@
 
 /* Count badge special styling */
 .count {
-  background: rgba(139, 92, 246, 0.2);
-  color: #8b5cf6;
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: rgba(79, 70, 229, 0.2);
+  color: #4f46e5;
+  border: 1px solid rgba(79, 70, 229, 0.3);
   text-shadow: none;
   font-weight: 700;
 }

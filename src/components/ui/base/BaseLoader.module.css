@@ -87,8 +87,8 @@
    ==================================== */
 
 .primary {
-  --loader-color: #8b5cf6;
-  --loader-bg: rgba(139, 92, 246, 0.2);
+  --loader-color: #4f46e5;
+  --loader-bg: rgba(79, 70, 229, 0.2);
 }
 
 .secondary {
@@ -262,7 +262,7 @@
 
 .progressFill {
   height: 100%;
-  background: linear-gradient(90deg, var(--loader-color), rgba(139, 92, 246, 0.8));
+  background: linear-gradient(90deg, var(--loader-color), rgba(79, 70, 229, 0.8));
   border-radius: 3px;
   transition: width 0.3s ease;
   animation: progressShine 2s ease-in-out infinite;
@@ -387,7 +387,7 @@
 .baseLoader[data-background="true"] {
   background: rgba(31, 41, 55, 0.9);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(79, 70, 229, 0.2);
   border-radius: 12px;
   padding: 1.5rem;
 }

@@ -105,7 +105,7 @@ function CreateCampaignForm({ onClose, onCreateCampaign }) {
               style={{
                 width: '100%',
                 background: 'rgba(31, 41, 55, 0.5)',
-                border: `1px solid ${errors.name ? '#ef4444' : 'rgba(139, 92, 246, 0.2)'}`,
+                border: `1px solid ${errors.name ? '#ef4444' : 'rgba(79, 70, 229, 0.2)'}`,
                 borderRadius: '10px',
                 padding: 'clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 2vw, 1rem)',
                 color: 'white',
@@ -157,7 +157,7 @@ function CreateCampaignForm({ onClose, onCreateCampaign }) {
               style={{
                 width: '100%',
                 background: 'rgba(31, 41, 55, 0.5)',
-                border: '1px solid rgba(139, 92, 246, 0.2)',
+                border: '1px solid rgba(79, 70, 229, 0.2)',
                 borderRadius: '10px',
                 padding: 'clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 2vw, 1rem)',
                 color: 'white',
@@ -194,7 +194,7 @@ function CreateCampaignForm({ onClose, onCreateCampaign }) {
                 padding: 'clamp(0.5rem, 2vw, 0.75rem) clamp(1rem, 3vw, 1.5rem)',
                 borderRadius: '10px',
                 fontWeight: '500',
-                border: '1px solid rgba(139, 92, 246, 0.3)',
+                border: '1px solid rgba(79, 70, 229, 0.3)',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease'
               }}

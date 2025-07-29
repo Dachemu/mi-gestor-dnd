@@ -303,7 +303,7 @@ colors: {
   level: (level) => {
     const levelNum = parseInt(level)
     if (levelNum >= 15) return '#ff6b35'    // Legendario
-    if (levelNum >= 10) return '#8b5cf6'    // Épico
+    if (levelNum >= 10) return '#4f46e5'    // Épico
     if (levelNum >= 5) return '#3b82f6'     // Raro
     return '#10b981'                        // Común
   },

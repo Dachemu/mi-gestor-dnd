@@ -7,6 +7,23 @@ import { BaseCard, BaseBadge } from '../ui/base'
  * Elimina el scroll excesivo y mejora la experiencia visual
  */
 
+// Helper para extraer texto plano de HTML y limitarlo
+const extractTextFromHTML = (html, maxLength = 120) => {
+  if (!html) return ''
+  
+  // Crear un elemento temporal para extraer texto
+  const tempDiv = document.createElement('div')
+  tempDiv.innerHTML = html
+  const textContent = tempDiv.textContent || tempDiv.innerText || ''
+  
+  // Limitar longitud y añadir ellipsis si es necesario
+  if (textContent.length > maxLength) {
+    return textContent.substring(0, maxLength).trim() + '...'
+  }
+  
+  return textContent
+}
+
 // Helper para crear botones con estilo consistente
 const createActionButton = (color, hoverColor, shadowColor) => ({
   background: `linear-gradient(135deg, var(--accent-${color}), ${hoverColor})`,
@@ -69,7 +86,7 @@ function CompactList({
             hoverEffect="lift"
             icon={item.icon || '📝'}
             badge={connectionCount > 0 ? connectionCount : null}
-            gradient="linear-gradient(90deg, #8b5cf6, #3b82f6, #10b981, #f59e0b, #ec4899)"
+            gradient="linear-gradient(90deg, #4f46e5, #3b82f6, #10b981, #f59e0b, #ec4899)"
             className="compact-card"
           >
             <BaseCard.Title style={{ textAlign: 'center' }}>
@@ -116,7 +133,7 @@ function CompactList({
             {/* Descripción usando BaseCard.Description */}
             {(item.description || item.content) && (
               <BaseCard.Description>
-                {item.description || item.content}
+                {item.description || extractTextFromHTML(item.content)}
               </BaseCard.Description>
             )}
 
@@ -128,10 +145,6 @@ function CompactList({
               </div>
             )}
 
-            {/* Indicador de click */}
-            <BaseCard.Footer>
-              <span style={{ margin: '0 auto', opacity: 0.7 }}>Clic para abrir</span>
-            </BaseCard.Footer>
           </BaseCard>
         )
       })}
@@ -149,10 +162,16 @@ function CompactList({
           align-items: start;
         }
 
+        .compact-card {
+          min-height: 200px;
+          display: flex;
+          flex-direction: column;
+        }
+
         .compact-card:hover {
           transform: translateY(-8px) scale(1.02);
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(139, 92, 246, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-          border-color: rgba(139, 92, 246, 0.8);
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(79, 70, 229, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+          border-color: rgba(79, 70, 229, 0.8);
         }
         
         .action-button:hover {
@@ -167,7 +186,7 @@ function CompactList({
           left: 0;
           right: 0;
           bottom: 0;
-          background: linear-gradient(135deg, rgba(139, 92, 246, 0.03), rgba(59, 130, 246, 0.03));
+          background: linear-gradient(135deg, rgba(79, 70, 229, 0.03), rgba(59, 130, 246, 0.03));
           opacity: 0;
           transition: opacity 0.3s ease;
           border-radius: 16px;

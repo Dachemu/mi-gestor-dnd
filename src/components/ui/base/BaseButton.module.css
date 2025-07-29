@@ -77,17 +77,17 @@
 .primary {
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   color: white;
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
 }
 
 .primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35);
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
 }
 
 .primary:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
 }
 
 /* Secondary Button */
@@ -98,13 +98,13 @@
 }
 
 .secondary:hover:not(:disabled) {
-  background: rgba(139, 92, 246, 0.1);
+  background: rgba(79, 70, 229, 0.1);
   border-color: var(--primary);
   color: var(--text-primary);
 }
 
 .secondary:active:not(:disabled) {
-  background: rgba(139, 92, 246, 0.15);
+  background: rgba(79, 70, 229, 0.15);
 }
 
 /* Danger Button */
@@ -145,14 +145,14 @@
 
 /* Compact Button (para acciones rápidas) */
 .baseButton.compact.primary {
-  background: rgba(139, 92, 246, 0.2);
-  color: #a78bfa;
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: rgba(79, 70, 229, 0.2);
+  color: #6366f1;
+  border: 1px solid rgba(79, 70, 229, 0.3);
   box-shadow: none;
 }
 
 .baseButton.compact.primary:hover:not(:disabled) {
-  background: rgba(139, 92, 246, 0.3);
+  background: rgba(79, 70, 229, 0.3);
   transform: translateY(-1px);
 }
 
@@ -178,14 +178,14 @@
 }
 
 .tab:hover:not(:disabled):not(.active) {
-  background: rgba(139, 92, 246, 0.1);
+  background: rgba(79, 70, 229, 0.1);
   color: #e5e7eb;
 }
 
 .tab.active {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  background: linear-gradient(135deg, #4f46e5, #3730a3);
   color: white;
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
 }
 
 /* ====================================

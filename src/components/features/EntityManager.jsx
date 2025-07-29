@@ -120,10 +120,10 @@ function UniversalManager({
                       padding: 'clamp(0.5rem, 2vw, 0.75rem) clamp(1rem, 3vw, 1.5rem)',
                       borderRadius: '12px',
                       border: filters[filterKey] === value || (!filters[filterKey] && value === 'Todas')
-                        ? '1px solid rgba(139, 92, 246, 0.5)'
-                        : '1px solid rgba(139, 92, 246, 0.2)',
+                        ? '1px solid rgba(79, 70, 229, 0.5)'
+                        : '1px solid rgba(79, 70, 229, 0.2)',
                       background: filters[filterKey] === value || (!filters[filterKey] && value === 'Todas')
-                        ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(139, 92, 246, 0.1))' 
+                        ? 'linear-gradient(135deg, rgba(79, 70, 229, 0.3), rgba(79, 70, 229, 0.1))' 
                         : 'rgba(31, 41, 55, 0.5)',
                       color: filters[filterKey] === value || (!filters[filterKey] && value === 'Todas')
                         ? '#ffffff' 
@@ -133,7 +133,7 @@ function UniversalManager({
                       fontSize: 'clamp(0.8rem, 2vw, 0.9rem)',
                       fontWeight: '600',
                       boxShadow: filters[filterKey] === value || (!filters[filterKey] && value === 'Todas')
-                        ? '0 4px 12px rgba(139, 92, 246, 0.3)'
+                        ? '0 4px 12px rgba(79, 70, 229, 0.3)'
                         : 'none',
                       backdropFilter: 'blur(10px)'
                     }}

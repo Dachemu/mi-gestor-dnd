@@ -27,7 +27,7 @@ export const RELATIONSHIP_TYPES = {
   general: { name: 'General', icon: '🔗', color: '#6b7280' },
   ally: { name: 'Aliado', icon: '🤝', color: '#10b981' },
   enemy: { name: 'Enemigo', icon: '⚔️', color: '#ef4444' },
-  mentor: { name: 'Mentor', icon: '🎓', color: '#8b5cf6' },
+  mentor: { name: 'Mentor', icon: '🎓', color: '#4f46e5' },
   rival: { name: 'Rival', icon: '🥊', color: '#f59e0b' },
   family: { name: 'Familia', icon: '👨‍👩‍👧‍👦', color: '#ec4899' },
   romantic: { name: 'Romance', icon: '💕', color: '#f43f5e' },

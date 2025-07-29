@@ -222,7 +222,7 @@ function EmojiSelector({ value, onChange, name, entityType }) {
                 }}
                 onMouseEnter={(e) => {
                   if (selectedCategory !== key) {
-                    e.target.style.background = 'rgba(139, 92, 246, 0.1)'
+                    e.target.style.background = 'rgba(79, 70, 229, 0.1)'
                     e.target.style.color = 'rgba(203, 213, 225, 1)'
                   }
                 }}
@@ -269,7 +269,7 @@ function EmojiSelector({ value, onChange, name, entityType }) {
                   justifyContent: 'center'
                 }}
                 onMouseEnter={(e) => {
-                  e.target.style.background = 'rgba(139, 92, 246, 0.2)'
+                  e.target.style.background = 'rgba(79, 70, 229, 0.2)'
                   e.target.style.transform = 'scale(1.1)'
                 }}
                 onMouseLeave={(e) => {

@@ -22,7 +22,7 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
   const categoryConfig = {
     locations: { name: 'Lugares', icon: '📍', color: '#3b82f6', colorEnd: '#2563eb' },
     players: { name: 'Jugadores', icon: '👥', color: '#10b981', colorEnd: '#059669' },
-    npcs: { name: 'NPCs', icon: '🧙', color: '#8b5cf6', colorEnd: '#7c3aed' },
+    npcs: { name: 'NPCs', icon: '🧙', color: '#4f46e5', colorEnd: '#3730a3' },
     objects: { name: 'Objetos', icon: '📦', color: '#06b6d4', colorEnd: '#0891b2' },
     quests: { name: 'Misiones', icon: '📜', color: '#f97316', colorEnd: '#ea580c' },
     notes: { name: 'Notas', icon: '📝', color: '#ec4899', colorEnd: '#db2777' }
@@ -178,8 +178,7 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
       <style jsx>{`
         .dashboard-container {
           padding: 1rem;
-          max-width: 1400px;
-          margin: 0 auto;
+          width: 100%;
           animation: fadeIn 0.5s ease-out;
         }
 
@@ -192,7 +191,7 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
         .campaign-title {
           font-size: 2rem;
           font-weight: 700;
-          background: linear-gradient(135deg, #ffffff 0%, #a78bfa 100%);
+          background: linear-gradient(135deg, #ffffff 0%, #6366f1 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -239,7 +238,7 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
           margin-bottom: 1rem;
           border-radius: 12px;
           overflow: hidden;
-          border: 1px solid rgba(139, 92, 246, 0.2);
+          border: 1px solid rgba(79, 70, 229, 0.2);
         }
 
         .mission-section {
@@ -247,7 +246,7 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
           max-height: 350px;
           display: flex;
           flex-direction: column;
-          border-right: 1px solid rgba(139, 92, 246, 0.2);
+          border-right: 1px solid rgba(79, 70, 229, 0.2);
           background: rgba(31, 41, 55, 0.3);
           padding: 1rem;
         }
@@ -262,7 +261,7 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
           justify-content: space-between;
           margin-bottom: 1rem;
           padding-bottom: 0.75rem;
-          border-bottom: 1px solid rgba(139, 92, 246, 0.15);
+          border-bottom: 1px solid rgba(79, 70, 229, 0.15);
           flex-shrink: 0;
         }
 
@@ -289,7 +288,7 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
           padding-right: 0.25rem;
           /* Mejor scrollbar */
           scrollbar-width: thin;
-          scrollbar-color: rgba(139, 92, 246, 0.3) transparent;
+          scrollbar-color: rgba(79, 70, 229, 0.3) transparent;
         }
 
         .mission-list::-webkit-scrollbar {
@@ -301,19 +300,19 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
         }
 
         .mission-list::-webkit-scrollbar-thumb {
-          background: rgba(139, 92, 246, 0.3);
+          background: rgba(79, 70, 229, 0.3);
           border-radius: 2px;
         }
 
         .mission-list::-webkit-scrollbar-thumb:hover {
-          background: rgba(139, 92, 246, 0.5);
+          background: rgba(79, 70, 229, 0.5);
         }
 
         .mission-item-card {
           margin-bottom: 0;
           padding: 0.4rem 0.6rem;
           background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(139, 92, 246, 0.1);
+          border: 1px solid rgba(79, 70, 229, 0.1);
           border-radius: 6px;
           cursor: pointer;
           transition: all 0.2s ease;
@@ -326,8 +325,8 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
         }
 
         .mission-item-card:hover {
-          background: rgba(139, 92, 246, 0.1);
-          border-color: rgba(139, 92, 246, 0.3);
+          background: rgba(79, 70, 229, 0.1);
+          border-color: rgba(79, 70, 229, 0.3);
           transform: translateY(-1px);
         }
 
@@ -376,7 +375,7 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
         .mission-more {
           text-align: center;
           padding: 0.5rem;
-          background: rgba(139, 92, 246, 0.1);
+          background: rgba(79, 70, 229, 0.1);
           border-radius: 6px;
           margin-top: 0.25rem;
           cursor: pointer;
@@ -384,13 +383,13 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
         }
 
         .mission-more:hover {
-          background: rgba(139, 92, 246, 0.2);
+          background: rgba(79, 70, 229, 0.2);
         }
 
         .mission-more p {
           margin: 0;
           font-size: 0.75rem;
-          color: #8b5cf6;
+          color: #4f46e5;
           font-weight: 500;
         }
 
@@ -405,7 +404,7 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
             min-height: 280px;
             max-height: 280px;
             border-right: none;
-            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+            border-bottom: 1px solid rgba(79, 70, 229, 0.2);
           }
 
           .mission-section:last-child {

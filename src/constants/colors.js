@@ -1,9 +1,9 @@
 // Colores y estilos centralizados para toda la aplicación
 export const COLORS = {
   // Colores principales
-  primary: '#8b5cf6',
-  primaryLight: '#a78bfa',
-  primaryDark: '#7c3aed',
+  primary: '#4f46e5',
+  primaryLight: '#6366f1',
+  primaryDark: '#3730a3',
   
   // Colores secundarios
   secondary: '#3b82f6',
@@ -20,9 +20,9 @@ export const COLORS = {
   bgHover: 'rgba(31, 41, 55, 0.7)',
   
   // Colores de borde
-  borderPrimary: 'rgba(139, 92, 246, 0.3)',
-  borderSecondary: 'rgba(139, 92, 246, 0.2)',
-  borderHover: 'rgba(139, 92, 246, 0.5)',
+  borderPrimary: 'rgba(79, 70, 229, 0.3)',
+  borderSecondary: 'rgba(79, 70, 229, 0.2)',
+  borderHover: 'rgba(79, 70, 229, 0.5)',
   
   // Colores de texto
   textPrimary: '#ffffff',
@@ -32,21 +32,21 @@ export const COLORS = {
   
   // Colores con transparencia
   glass: {
-    border: 'rgba(139, 92, 246, 0.3)',
-    bg: 'rgba(139, 92, 246, 0.1)',
-    bgHover: 'rgba(139, 92, 246, 0.2)',
-    shadow: 'rgba(139, 92, 246, 0.3)'
+    border: 'rgba(79, 70, 229, 0.3)',
+    bg: 'rgba(79, 70, 229, 0.1)',
+    bgHover: 'rgba(79, 70, 229, 0.2)',
+    shadow: 'rgba(79, 70, 229, 0.3)'
   }
 }
 
 // Gradientes comunes
 export const GRADIENTS = {
-  primary: 'linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(139, 92, 246, 0.1))',
+  primary: 'linear-gradient(135deg, rgba(79, 70, 229, 0.3), rgba(79, 70, 229, 0.1))',
   secondary: 'linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.1))',
   modal: 'linear-gradient(135deg, rgba(15, 15, 25, 0.98) 0%, rgba(26, 26, 46, 0.95) 100%)',
-  modalHeader: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)',
-  text: 'linear-gradient(135deg, #ffffff 0%, #a78bfa 100%)',
-  rainbow: 'linear-gradient(90deg, #8b5cf6, #3b82f6, #10b981, #f59e0b, #ec4899)'
+  modalHeader: 'linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)',
+  text: 'linear-gradient(135deg, #ffffff 0%, #6366f1 100%)',
+  rainbow: 'linear-gradient(90deg, #4f46e5, #3b82f6, #10b981, #f59e0b, #ec4899)'
 }
 
 // Estilos comunes de botones

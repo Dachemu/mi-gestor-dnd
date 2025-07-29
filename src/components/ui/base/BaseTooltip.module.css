@@ -63,7 +63,7 @@
 .dark {
   background: rgba(31, 41, 55, 0.95);
   color: white;
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  border: 1px solid rgba(79, 70, 229, 0.3);
   backdrop-filter: blur(10px);
 }
 
@@ -76,9 +76,9 @@
 }
 
 .primary {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.95), rgba(59, 130, 246, 0.95));
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.95), rgba(59, 130, 246, 0.95));
   color: white;
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  border: 1px solid rgba(79, 70, 229, 0.3);
   backdrop-filter: blur(10px);
 }
 
@@ -192,19 +192,19 @@
 
 /* Flechas para tema primary */
 .primary.top.withArrow .tooltipArrow {
-  border-top: 6px solid rgba(139, 92, 246, 0.95);
+  border-top: 6px solid rgba(79, 70, 229, 0.95);
 }
 
 .primary.bottom.withArrow .tooltipArrow {
-  border-bottom: 6px solid rgba(139, 92, 246, 0.95);
+  border-bottom: 6px solid rgba(79, 70, 229, 0.95);
 }
 
 .primary.left.withArrow .tooltipArrow {
-  border-left: 6px solid rgba(139, 92, 246, 0.95);
+  border-left: 6px solid rgba(79, 70, 229, 0.95);
 }
 
 .primary.right.withArrow .tooltipArrow {
-  border-right: 6px solid rgba(139, 92, 246, 0.95);
+  border-right: 6px solid rgba(79, 70, 229, 0.95);
 }
 
 /* ====================================
@@ -324,7 +324,7 @@
 
 /* Focus para elementos que pueden recibir focus */
 .tooltipTrigger:focus {
-  outline: 2px solid rgba(139, 92, 246, 0.6);
+  outline: 2px solid rgba(79, 70, 229, 0.6);
   outline-offset: 2px;
   border-radius: 4px;
 }

@@ -103,7 +103,7 @@ export const ENTITY_SCHEMAS = {
       defaultValue: 'General',
       options: ['General', 'Sesión', 'Trama', 'Personajes', 'Mundo', 'Reglas']
     },
-    content: { type: 'richtext', label: 'Contenido', placeholder: 'Escribe el contenido de tu nota aquí...', minHeight: '300px' },
+    content: { type: 'richtext', label: 'Contenido', placeholder: 'Escribe el contenido de tu nota aquí...', minHeight: '200px', maxHeight: '400px' },
     modifiedAt: { type: 'datetime', label: 'Fecha de modificación', readOnly: true }
   }
 }
@@ -207,7 +207,7 @@ export const ENTITY_CONFIGS = {
     colors: {
       rarity: {
         'Legendario': '#ff6b35',
-        'Épico': '#8b5cf6',
+        'Épico': '#4f46e5',
         'Raro': '#3b82f6',
         'Poco común': '#10b981',
         'Común': '#6b7280'
@@ -244,7 +244,7 @@ export const ENTITY_CONFIGS = {
       attitude: {
         'Amistoso': '#10b981',
         'Hostil': '#ef4444',
-        'Neutral': '#8b5cf6'
+        'Neutral': '#4f46e5'
       }
     }
   },
@@ -309,7 +309,7 @@ export const ENTITY_CONFIGS = {
       category: {
         'General': '#6b7280',
         'Sesión': '#3b82f6',
-        'Trama': '#8b5cf6',
+        'Trama': '#4f46e5',
         'Personajes': '#10b981',
         'Mundo': '#f59e0b',
         'Reglas': '#ef4444'

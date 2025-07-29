@@ -55,7 +55,7 @@ function UniversalDetails({
               background: 'rgba(31, 41, 55, 0.3)',
               padding: '1.5rem',
               borderRadius: '12px',
-              border: '1px solid rgba(139, 92, 246, 0.1)',
+              border: '1px solid rgba(79, 70, 229, 0.1)',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
             }}
             dangerouslySetInnerHTML={{ __html: value }}
@@ -359,10 +359,10 @@ function UniversalDetails({
     editButton.innerHTML = '✏️'
     editButton.title = 'Editar'
     editButton.style.cssText = `
-      background: rgba(139, 92, 246, 0.2);
-      border: 1px solid rgba(139, 92, 246, 0.3);
+      background: rgba(79, 70, 229, 0.2);
+      border: 1px solid rgba(79, 70, 229, 0.3);
       border-radius: 6px;
-      color: #a78bfa;
+      color: #6366f1;
       padding: 0.5rem;
       cursor: pointer;
       font-size: 0.9rem;
@@ -374,12 +374,12 @@ function UniversalDetails({
       height: 32px;
     `
     editButton.addEventListener('mouseenter', () => {
-      editButton.style.background = 'rgba(139, 92, 246, 0.3)'
-      editButton.style.borderColor = 'rgba(139, 92, 246, 0.5)'
+      editButton.style.background = 'rgba(79, 70, 229, 0.3)'
+      editButton.style.borderColor = 'rgba(79, 70, 229, 0.5)'
     })
     editButton.addEventListener('mouseleave', () => {
-      editButton.style.background = 'rgba(139, 92, 246, 0.2)'
-      editButton.style.borderColor = 'rgba(139, 92, 246, 0.3)'
+      editButton.style.background = 'rgba(79, 70, 229, 0.2)'
+      editButton.style.borderColor = 'rgba(79, 70, 229, 0.3)'
     })
     editButton.addEventListener('click', handleStartEdit)
     actionContainer.appendChild(editButton)

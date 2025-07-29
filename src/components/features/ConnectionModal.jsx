@@ -5,7 +5,7 @@ import { BaseModal } from '../ui/base'
 const CONNECTION_TYPES = {
   locations: { name: 'Lugares', icon: '📍', color: '#3b82f6' },
   players: { name: 'Jugadores', icon: '👥', color: '#10b981' },
-  npcs: { name: 'NPCs', icon: '🧙', color: '#8b5cf6' },
+  npcs: { name: 'NPCs', icon: '🧙', color: '#4f46e5' },
   quests: { name: 'Misiones', icon: '📜', color: '#f59e0b' },
   objects: { name: 'Objetos', icon: '📦', color: '#06b6d4' },
   notes: { name: 'Notas', icon: '📝', color: '#ef4444' }
@@ -240,12 +240,12 @@ function ConnectionTypeContent({
           style={{
             background: allSelected 
               ? 'rgba(239, 68, 68, 0.2)' 
-              : 'rgba(139, 92, 246, 0.2)',
+              : 'rgba(79, 70, 229, 0.2)',
             border: `1px solid ${allSelected 
               ? 'rgba(239, 68, 68, 0.3)' 
-              : 'rgba(139, 92, 246, 0.3)'}`,
+              : 'rgba(79, 70, 229, 0.3)'}`,
             borderRadius: '8px',
-            color: allSelected ? '#ef4444' : '#8b5cf6',
+            color: allSelected ? '#ef4444' : '#4f46e5',
             padding: '0.5rem 0.75rem',
             cursor: 'pointer',
             fontSize: '0.8rem',
@@ -276,7 +276,7 @@ function ConnectionTypeContent({
                   : 'rgba(31, 41, 55, 0.3)',
                 border: `1px solid ${isSelected 
                   ? config.color 
-                  : 'rgba(139, 92, 246, 0.2)'}`,
+                  : 'rgba(79, 70, 229, 0.2)'}`,
                 borderRadius: '12px',
                 padding: '1rem',
                 cursor: 'pointer',

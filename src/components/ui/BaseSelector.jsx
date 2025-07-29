@@ -53,8 +53,8 @@ function BaseSelector({
           type="button"
           onClick={() => handleSelect(option)}
           style={{
-            background: value === option ? 'rgba(139, 92, 246, 0.3)' : 'rgba(31, 41, 55, 0.6)',
-            border: value === option ? '2px solid rgba(139, 92, 246, 0.6)' : '1px solid rgba(139, 92, 246, 0.2)',
+            background: value === option ? 'rgba(79, 70, 229, 0.3)' : 'rgba(31, 41, 55, 0.6)',
+            border: value === option ? '2px solid rgba(79, 70, 229, 0.6)' : '1px solid rgba(79, 70, 229, 0.2)',
             borderRadius: '8px',
             padding: '0.5rem',
             cursor: 'pointer',
@@ -69,15 +69,15 @@ function BaseSelector({
           }}
           onMouseEnter={(e) => {
             if (value !== option) {
-              e.target.style.background = 'rgba(139, 92, 246, 0.2)'
-              e.target.style.borderColor = 'rgba(139, 92, 246, 0.5)'
+              e.target.style.background = 'rgba(79, 70, 229, 0.2)'
+              e.target.style.borderColor = 'rgba(79, 70, 229, 0.5)'
               e.target.style.transform = 'scale(1.05)'
             }
           }}
           onMouseLeave={(e) => {
             if (value !== option) {
               e.target.style.background = 'rgba(31, 41, 55, 0.6)'
-              e.target.style.borderColor = 'rgba(139, 92, 246, 0.2)'
+              e.target.style.borderColor = 'rgba(79, 70, 229, 0.2)'
               e.target.style.transform = 'scale(1)'
             }
           }}
@@ -111,7 +111,7 @@ function BaseSelector({
           style={{
             width: '100%',
             background: 'rgba(31, 41, 55, 0.6)',
-            border: '1px solid rgba(139, 92, 246, 0.2)',
+            border: '1px solid rgba(79, 70, 229, 0.2)',
             borderRadius: '10px',
             padding: '0.75rem 1rem',
             color: 'white',
@@ -125,14 +125,14 @@ function BaseSelector({
           }}
           onMouseEnter={(e) => {
             e.target.style.background = 'rgba(31, 41, 55, 0.8)'
-            e.target.style.borderColor = 'rgba(139, 92, 246, 0.4)'
+            e.target.style.borderColor = 'rgba(79, 70, 229, 0.4)'
           }}
           onMouseLeave={(e) => {
             e.target.style.background = 'rgba(31, 41, 55, 0.6)'
-            e.target.style.borderColor = 'rgba(139, 92, 246, 0.2)'
+            e.target.style.borderColor = 'rgba(79, 70, 229, 0.2)'
           }}
           onFocus={(e) => {
-            e.target.style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.1)'
+            e.target.style.boxShadow = '0 0 0 3px rgba(79, 70, 229, 0.1)'
           }}
           onBlur={(e) => {
             e.target.style.boxShadow = 'none'
@@ -146,7 +146,7 @@ function BaseSelector({
               justifyContent: 'center',
               width: '28px',
               height: '28px',
-              background: 'rgba(139, 92, 246, 0.2)',
+              background: 'rgba(79, 70, 229, 0.2)',
               borderRadius: '6px',
               flexShrink: 0
             }}>
@@ -169,7 +169,7 @@ function BaseSelector({
               right: 0,
               background: 'rgba(15, 15, 25, 0.98)',
               backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(139, 92, 246, 0.3)',
+              border: '1px solid rgba(79, 70, 229, 0.3)',
               borderRadius: '12px',
               padding: '1rem',
               maxHeight: '300px',
@@ -185,7 +185,7 @@ function BaseSelector({
                 <div key={groupIndex} style={{ marginBottom: '1rem' }}>
                   {group.title && (
                     <div style={{
-                      color: '#8b5cf6',
+                      color: '#4f46e5',
                       fontSize: '0.8rem',
                       fontWeight: '600',
                       marginBottom: '0.5rem',
@@ -230,12 +230,12 @@ function BaseSelector({
         }
 
         .base-selector div::-webkit-scrollbar-thumb {
-          background: rgba(139, 92, 246, 0.3);
+          background: rgba(79, 70, 229, 0.3);
           border-radius: 3px;
         }
 
         .base-selector div::-webkit-scrollbar-thumb:hover {
-          background: rgba(139, 92, 246, 0.5);
+          background: rgba(79, 70, 229, 0.5);
         }
 
         @media (max-width: 768px) {

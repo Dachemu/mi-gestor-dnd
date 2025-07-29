@@ -377,7 +377,7 @@ const QuestStatusCard = React.memo(function QuestStatusCard({
           justify-content: space-between;
           margin-bottom: 1rem;
           padding-bottom: 0.75rem;
-          border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+          border-bottom: 1px solid rgba(79, 70, 229, 0.2);
         }
 
         .quest-status-header h4 {
@@ -417,8 +417,8 @@ const QuestStatusCard = React.memo(function QuestStatusCard({
         }
 
         .quest-item:hover {
-          background: rgba(139, 92, 246, 0.15);
-          border-color: rgba(139, 92, 246, 0.3);
+          background: rgba(79, 70, 229, 0.15);
+          border-color: rgba(79, 70, 229, 0.3);
           transform: translateX(2px);
         }
 
@@ -450,16 +450,16 @@ const QuestStatusCard = React.memo(function QuestStatusCard({
 
         .more-quests {
           font-weight: 600;
-          color: #8b5cf6;
-          border-color: rgba(139, 92, 246, 0.3);
+          color: #4f46e5;
+          border-color: rgba(79, 70, 229, 0.3);
         }
 
         .more-quests .quest-name {
-          color: #8b5cf6;
+          color: #4f46e5;
         }
 
         .more-quests:hover {
-          background: rgba(139, 92, 246, 0.2);
+          background: rgba(79, 70, 229, 0.2);
         }
 
         .no-quests {

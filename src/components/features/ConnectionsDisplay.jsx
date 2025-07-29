@@ -4,7 +4,7 @@ import React from 'react'
 const CONNECTION_TYPES = {
   locations: { name: 'Lugares', icon: '📍', color: '#3b82f6' },
   players: { name: 'Jugadores', icon: '👥', color: '#10b981' },
-  npcs: { name: 'NPCs', icon: '🧙', color: '#8b5cf6' },
+  npcs: { name: 'NPCs', icon: '🧙', color: '#4f46e5' },
   quests: { name: 'Misiones', icon: '📜', color: '#f59e0b' },
   objects: { name: 'Objetos', icon: '📦', color: '#06b6d4' },
   notes: { name: 'Notas', icon: '📝', color: '#ec4899' }
@@ -32,7 +32,7 @@ function ConnectionsDisplay({
     return (
       <div style={{
         background: 'rgba(31, 41, 55, 0.3)',
-        border: '1px solid rgba(139, 92, 246, 0.2)',
+        border: '1px solid rgba(79, 70, 229, 0.2)',
         borderRadius: '12px',
         padding: '1.5rem',
         textAlign: 'center'
@@ -46,10 +46,10 @@ function ConnectionsDisplay({
         <button
           onClick={() => onOpenConnectionModal(item, itemType)}
           style={{
-            background: 'rgba(139, 92, 246, 0.2)',
-            border: '1px solid rgba(139, 92, 246, 0.3)',
+            background: 'rgba(79, 70, 229, 0.2)',
+            border: '1px solid rgba(79, 70, 229, 0.3)',
             borderRadius: '8px',
-            color: '#a78bfa',
+            color: '#6366f1',
             padding: '0.5rem 1rem',
             cursor: 'pointer',
             fontSize: '0.9rem',
@@ -101,7 +101,7 @@ function ConnectionsDisplay({
       <style jsx>{`
         .connections-container {
           background: rgba(31, 41, 55, 0.3);
-          border: 1px solid rgba(139, 92, 246, 0.2);
+          border: 1px solid rgba(79, 70, 229, 0.2);
           border-radius: 12px;
           padding: 1rem;
         }
@@ -112,7 +112,7 @@ function ConnectionsDisplay({
           justify-content: space-between;
           margin-bottom: 1rem;
           padding-bottom: 0.5rem;
-          border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+          border-bottom: 1px solid rgba(79, 70, 229, 0.1);
         }
 
         .connections-title {
@@ -126,10 +126,10 @@ function ConnectionsDisplay({
         }
 
         .connect-btn {
-          background: rgba(139, 92, 246, 0.2);
-          border: 1px solid rgba(139, 92, 246, 0.3);
+          background: rgba(79, 70, 229, 0.2);
+          border: 1px solid rgba(79, 70, 229, 0.3);
           border-radius: 6px;
-          color: #a78bfa;
+          color: #6366f1;
           padding: 0.4rem 0.6rem;
           cursor: pointer;
           font-size: 0.8rem;
@@ -138,7 +138,7 @@ function ConnectionsDisplay({
         }
 
         .connect-btn:hover {
-          background: rgba(139, 92, 246, 0.3);
+          background: rgba(79, 70, 229, 0.3);
         }
 
         .connections-grid {
@@ -173,9 +173,12 @@ function ConnectionsDisplay({
 
 // Sección para mostrar conexiones de un tipo específico - VERSION COMPACTA
 function ConnectionTypeSection({ type, config, items, onRemove, onNavigate }) {
+  // Estado para controlar la expansión de conexiones
+  const [isExpanded, setIsExpanded] = React.useState(false);
+  
   // Limitar a mostrar máximo 3 elementos para compactación
   const maxItems = 3;
-  const displayItems = items.slice(0, maxItems);
+  const displayItems = isExpanded ? items : items.slice(0, maxItems);
   const hasMore = items.length > maxItems;
 
   return (
@@ -200,9 +203,22 @@ function ConnectionTypeSection({ type, config, items, onRemove, onNavigate }) {
             compact={true}
           />
         ))}
-        {hasMore && (
-          <div className="connection-more">
+        {hasMore && !isExpanded && (
+          <div 
+            className="connection-more clickable"
+            onClick={() => setIsExpanded(true)}
+            title="Click para ver todas las conexiones"
+          >
             + {items.length - maxItems} más...
+          </div>
+        )}
+        {isExpanded && hasMore && (
+          <div 
+            className="connection-more clickable"
+            onClick={() => setIsExpanded(false)}
+            title="Click para ocultar conexiones adicionales"
+          >
+            ▲ Mostrar menos
           </div>
         )}
       </div>
@@ -211,7 +227,7 @@ function ConnectionTypeSection({ type, config, items, onRemove, onNavigate }) {
       <style jsx>{`
         .connection-type-section {
           background: rgba(31, 41, 55, 0.4);
-          border: 1px solid rgba(139, 92, 246, 0.15);
+          border: 1px solid rgba(79, 70, 229, 0.15);
           border-radius: 8px;
           padding: 0.75rem;
         }
@@ -222,7 +238,7 @@ function ConnectionTypeSection({ type, config, items, onRemove, onNavigate }) {
           gap: 0.5rem;
           margin-bottom: 0.75rem;
           padding-bottom: 0.5rem;
-          border-bottom: 1px solid rgba(139, 92, 246, 0.08);
+          border-bottom: 1px solid rgba(79, 70, 229, 0.08);
         }
 
         .connection-type-icon {
@@ -243,12 +259,29 @@ function ConnectionTypeSection({ type, config, items, onRemove, onNavigate }) {
 
         .connection-more {
           font-size: 0.75rem;
-          color: #8b5cf6;
+          color: #4f46e5;
           text-align: center;
           padding: 0.25rem;
-          background: rgba(139, 92, 246, 0.1);
+          background: rgba(79, 70, 229, 0.1);
           border-radius: 4px;
           font-weight: 500;
+        }
+
+        .connection-more.clickable {
+          cursor: pointer;
+          transition: all 0.2s ease;
+          border: 1px solid rgba(79, 70, 229, 0.2);
+        }
+
+        .connection-more.clickable:hover {
+          background: rgba(79, 70, 229, 0.2);
+          color: #6366f1;
+          transform: translateY(-1px);
+          border-color: rgba(79, 70, 229, 0.4);
+        }
+
+        .connection-more.clickable:active {
+          transform: translateY(0);
         }
 
         @media (max-width: 768px) {
@@ -318,7 +351,7 @@ function ConnectionItem({ item, config, onRemove, onNavigate, compact = false })
       <style jsx>{`
         .connection-item {
           background: rgba(31, 41, 55, 0.5);
-          border: 1px solid rgba(139, 92, 246, 0.08);
+          border: 1px solid rgba(79, 70, 229, 0.08);
           border-radius: 6px;
           padding: 0.5rem;
           display: flex;
@@ -328,8 +361,8 @@ function ConnectionItem({ item, config, onRemove, onNavigate, compact = false })
         }
 
         .connection-item:hover {
-          background: rgba(139, 92, 246, 0.1);
-          border-color: rgba(139, 92, 246, 0.2);
+          background: rgba(79, 70, 229, 0.1);
+          border-color: rgba(79, 70, 229, 0.2);
           transform: translateY(-1px);
         }
 
