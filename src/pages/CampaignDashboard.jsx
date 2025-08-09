@@ -94,20 +94,19 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
   const navigateToItem = useCallback((item, itemType) => {
     debug('Navegando a:', itemType, item.name || item.title)
     
-    // Switch to correct tab
+    // Navegación fluida unificada - sin diferencia entre mismo tab u otro
     setActiveTab(itemType)
-    
-    // Select specific element
     setSelectedItemForNavigation({
       item,
       type: itemType,
       timestamp: Date.now()
     })
     
-    // Limpiar la selección después de un momento
+    // Limpiar la selección después de que la navegación haya tenido efecto
+    // Tiempo reducido para navegación más ágil
     setTimeout(() => {
       setSelectedItemForNavigation(null)
-    }, 100)
+    }, 150)
   }, [])
 
   // ✅ Función para manejar click en resultado de búsqueda

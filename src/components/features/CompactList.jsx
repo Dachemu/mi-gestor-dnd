@@ -88,6 +88,7 @@ function CompactList({
             badge={connectionCount > 0 ? connectionCount : null}
             gradient="linear-gradient(90deg, #4f46e5, #3b82f6, #10b981, #f59e0b, #ec4899)"
             className="compact-card"
+            data-item-id={item.id}
           >
             <BaseCard.Title style={{ textAlign: 'center' }}>
               {item.name || item.title}

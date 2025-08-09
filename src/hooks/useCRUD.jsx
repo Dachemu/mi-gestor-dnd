@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { generateId } from '../services/storage'
 import { useNotification } from './useNotification.jsx'
 
@@ -7,7 +7,7 @@ import { useNotification } from './useNotification.jsx'
  * Elimina código duplicado entre todos los gestores
  * ✅ CORREGIDO: Ahora incluye el componente de notificación
  */
-export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = null) {
+export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = null, entityType = '', updateCampaign = null) {
   // Estados principales
   const [items, setItems] = useState(initialData)
   const [showForm, setShowForm] = useState(false)
@@ -19,7 +19,18 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
 
   // ✅ Sincronizar con datos externos cuando cambien
   useEffect(() => {
-    setItems(initialData || [])
+    // Solo actualizar si realmente ha cambiado para evitar loops infinitos
+    const newData = initialData || []
+    setItems(prevItems => {
+      // Comparar por longitud y IDs para evitar actualizaciones innecesarias
+      if (prevItems.length !== newData.length) return newData
+      if (newData.length === 0) return newData
+      
+      const prevIds = prevItems.map(item => item.id).sort().join(',')
+      const newIds = newData.map(item => item.id).sort().join(',')
+      
+      return prevIds !== newIds ? newData : prevItems
+    })
   }, [initialData])
 
   // ✅ Separar la sincronización del selectedItem para evitar bucles
@@ -93,7 +104,7 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
   }
 
   // Guardar (crear o editar)
-  const handleSave = (itemData) => {
+  const handleSave = useCallback((itemData) => {
     // Agregar icono fijo para notas si corresponde
     if (entityConfig && entityConfig.fixedIcon) {
       itemData = { ...itemData, icon: entityConfig.fixedIcon }
@@ -108,17 +119,25 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
     // Si no hay editingItem, verificar si el itemData tiene un ID existente
     // Esto maneja el caso de edición inline desde UniversalDetails
     if (itemData.id && items.some(item => item.id === itemData.id)) {
-      // Es una edición - simular editingItem temporal
-      const existingItem = items.find(item => item.id === itemData.id)
-      setEditingItem(existingItem)
-      const result = handleEdit(itemData)
-      setEditingItem(null) // Limpiar después de editar
-      return result
+      // Es una edición - llamar directamente handleEdit sin cambiar editingItem
+      // Esto evita race conditions en el estado
+      const updatedItems = items.map(item => 
+        item.id === itemData.id 
+          ? { ...item, ...itemData, modifiedAt: new Date().toISOString() }
+          : item
+      )
+      
+      setItems(updatedItems)
+      updateCampaign?.(entityType, updatedItems)
+      setShowForm(false)
+      showNotification(`${itemName} "${itemData.name || itemData.title}" actualizado`)
+      
+      return updatedItems.find(item => item.id === itemData.id)
     }
     
     // Es una creación nueva
     return handleCreate(itemData)
-  }
+  }, [editingItem, items, entityConfig, entityType, itemName, handleEdit, handleCreate, updateCampaign, setShowForm, showNotification])
 
   // Eliminar elemento
   const handleDelete = (id, name) => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import ReactDOM from 'react-dom/client'
 import { validateEntity } from '../../config/entityTypes.js'
 import TiptapEditor from '../ui/TiptapEditor'
@@ -35,22 +35,39 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showCompactBut
   const [formData, setFormData] = useState(initializeFormData)
   const [errors, setErrors] = useState({})
   
+  // Estado para prevenir múltiples clics
+  const [isSaving, setIsSaving] = useState(false)
+  
   // Función para manejar el guardado desde botones compactos
-  const handleCompactSave = () => {
-    // Crear evento sintético que handleSubmit espera
-    const syntheticEvent = {
-      preventDefault: () => {},
-      target: {
-        elements: Object.keys(formData).reduce((acc, key) => {
-          acc[key] = { value: formData[key] }
-          return acc
-        }, {})
-      }
-    }
+  const handleCompactSave = useCallback(async () => {
+    // Prevenir dobles clics
+    if (isSaving) return
     
-    // Llamar directamente a handleSubmit
-    handleSubmit(syntheticEvent)
-  }
+    setIsSaving(true)
+    
+    try {
+      // Validar usando la función centralizada
+      const validation = validateEntity(entityType, formData)
+      
+      if (!validation.isValid) {
+        setErrors(validation.errors)
+        return
+      }
+
+      // Preparar datos para guardar directamente
+      const dataToSave = {
+        ...formData,
+        // Agregar timestamps si es necesario
+        ...(item ? { modifiedAt: new Date().toISOString() } : {})
+      }
+      
+      // Llamar directamente a onSave evitando el flujo de handleSubmit
+      await onSave(dataToSave)
+    } finally {
+      // Pequeña pausa para prevenir clics múltiples
+      setTimeout(() => setIsSaving(false), 300)
+    }
+  }, [entityType, formData, item, onSave, isSaving])
 
   // Renderizar botones compactos en el header del modal
   useEffect(() => {
@@ -80,32 +97,38 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showCompactBut
         <button
           type="button"
           onClick={handleCompactSave}
+          disabled={isSaving}
           onMouseEnter={(e) => {
-            e.target.style.background = 'rgba(16, 185, 129, 0.3)'
-            e.target.style.borderColor = 'rgba(16, 185, 129, 0.5)'
+            if (!isSaving) {
+              e.target.style.background = 'rgba(16, 185, 129, 0.3)'
+              e.target.style.borderColor = 'rgba(16, 185, 129, 0.5)'
+            }
           }}
           onMouseLeave={(e) => {
-            e.target.style.background = 'rgba(16, 185, 129, 0.2)'
-            e.target.style.borderColor = 'rgba(16, 185, 129, 0.3)'
+            if (!isSaving) {
+              e.target.style.background = 'rgba(16, 185, 129, 0.2)'
+              e.target.style.borderColor = 'rgba(16, 185, 129, 0.3)'
+            }
           }}
           style={{
-            background: 'rgba(16, 185, 129, 0.2)',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
+            background: isSaving ? 'rgba(107, 114, 128, 0.2)' : 'rgba(16, 185, 129, 0.2)',
+            border: `1px solid ${isSaving ? 'rgba(107, 114, 128, 0.3)' : 'rgba(16, 185, 129, 0.3)'}`,
             borderRadius: '6px',
-            color: '#10b981',
+            color: isSaving ? '#6b7280' : '#10b981',
             padding: '0.5rem',
-            cursor: 'pointer',
+            cursor: isSaving ? 'not-allowed' : 'pointer',
             fontSize: '0.9rem',
             transition: 'all 0.2s ease',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             minWidth: '32px',
-            height: '32px'
+            height: '32px',
+            opacity: isSaving ? 0.6 : 1
           }}
-          title="Guardar"
+          title={isSaving ? "Guardando..." : "Guardar"}
         >
-          💾
+          {isSaving ? '⏳' : '💾'}
         </button>
         <button
           type="button"
@@ -156,7 +179,7 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showCompactBut
         actionContainer.innerHTML = ''
       }
     }
-  }, [showCompactButtons, onClose, handleCompactSave])
+  }, [showCompactButtons, onClose, handleCompactSave, isSaving])
   
   // ✅ Efecto para re-inicializar formData cuando cambian item o config
   React.useEffect(() => {
@@ -175,27 +198,37 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showCompactBut
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault()
     
-    // Validar usando la función centralizada
-    const validation = validateEntity(entityType, formData)
+    // Prevenir dobles clics también en el formulario estándar
+    if (isSaving) return
     
-    if (!validation.isValid) {
-      setErrors(validation.errors)
-      return
-    }
+    setIsSaving(true)
+    
+    try {
+      // Validar usando la función centralizada
+      const validation = validateEntity(entityType, formData)
+      
+      if (!validation.isValid) {
+        setErrors(validation.errors)
+        return
+      }
 
-    // Preparar datos para guardar
-    const dataToSave = {
-      ...formData,
-      // Agregar timestamps si es necesario
-      ...(item ? { modifiedAt: new Date().toISOString() } : {})
-    }
+      // Preparar datos para guardar
+      const dataToSave = {
+        ...formData,
+        // Agregar timestamps si es necesario
+        ...(item ? { modifiedAt: new Date().toISOString() } : {})
+      }
 
-    // Llamar a la función de guardado
-    onSave(dataToSave)
-  }
+      // Llamar a la función de guardado
+      await onSave(dataToSave)
+    } finally {
+      // Pequeña pausa para prevenir clics múltiples
+      setTimeout(() => setIsSaving(false), 300)
+    }
+  }, [entityType, formData, item, onSave, isSaving])
 
   const renderField = (fieldName, fieldConfig) => {
     const baseProps = {

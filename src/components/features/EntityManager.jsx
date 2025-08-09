@@ -34,50 +34,39 @@ function UniversalManager({
     editingItem,
     selectedItem,
     isEmpty,
-    handleSave: handleSaveInternal,
-    handleDelete: handleDeleteInternal,
+    handleSave,
+    handleDelete,
     selectItem,
     openCreateForm,
     openEditForm,
     closeForm,
     closeDetails,
     NotificationComponent
-  } = useCRUD(campaign[entityType] || [], config.name, config)
+  } = useCRUD(campaign[entityType] || [], config.name, config, entityType, updateCampaign)
 
   // Estado para filtros (solo si la entidad los soporta)
   const [filters, setFilters] = useState({})
 
-  // Función mejorada para guardar que actualiza la campaña
-  const handleSave = (itemData) => {
-    const savedItem = handleSaveInternal(itemData)
-    if (savedItem && updateCampaign) {
-      const updatedItems = editingItem 
-        ? campaign[entityType].map(item => item.id === savedItem.id ? savedItem : item)
-        : [...(campaign[entityType] || []), savedItem]
-      
-      updateCampaign({
-        [entityType]: updatedItems
-      })
-    }
-    return savedItem
-  }
-
-  // Función mejorada para eliminar que actualiza la campaña
-  const handleDelete = (id, name) => {
-    handleDeleteInternal(id, name)
-    if (updateCampaign) {
-      updateCampaign({
-        [entityType]: (campaign[entityType] || []).filter(item => item.id !== id)
-      })
-    }
-  }
 
   // Efecto para seleccionar automáticamente un elemento cuando se navega desde conexiones
   useEffect(() => {
     if (selectedItemForNavigation && selectedItemForNavigation.type === entityType) {
       const itemToSelect = items.find(item => item.id === selectedItemForNavigation.item.id)
       if (itemToSelect) {
+        // Navegación inmediata sin delays
         selectItem(itemToSelect)
+        
+        // Scroll suave al elemento después de que se haya seleccionado
+        requestAnimationFrame(() => {
+          const element = document.querySelector(`[data-item-id="${itemToSelect.id}"]`)
+          if (element) {
+            element.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center',
+              inline: 'nearest'
+            })
+          }
+        })
       }
     }
   }, [selectedItemForNavigation, items, selectItem, entityType])

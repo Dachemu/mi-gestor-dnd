@@ -301,6 +301,29 @@
   /* Custom scrollbar */
   scrollbar-width: thin;
   scrollbar-color: rgba(79, 70, 229, 0.2) transparent;
+  /* Transiciones fluidas para navegación */
+  transition: all 0.2s ease-out;
+}
+
+/* Transiciones para el contenido que cambia */
+.campaignContent > * {
+  transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
+}
+
+/* Animación de entrada fluida */
+@keyframes contentFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.campaignContent .fade-in {
+  animation: contentFadeIn 0.2s ease-out;
 }
 
 /* Custom webkit scrollbar for campaign content */
