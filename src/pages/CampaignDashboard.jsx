@@ -1,17 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, Suspense } from 'react'
 import { SearchIcon, BackIcon, MenuIcon, CloseIcon } from '../components/ui/icons'
 import { useLogger } from '../hooks/useLogger.js'
-import UniversalManager from '../components/features/EntityManager'
-import ConnectionModal from '../components/features/ConnectionModal'
-import SearchDropdown from '../components/features/GlobalSearchDropdown'
 import { ImprovedSearchBox } from '../components/features/ImprovedSearchBox'
-import Dashboard from '../components/features/Dashboard'
 import { useConnections } from '../hooks/useConnections.js'
 import { useSearch } from '../hooks/useSearch.js'
 import { saveCampaigns, loadCampaigns, exportCampaign } from '../services'
 import { Download } from 'lucide-react'
 import styles from './CampaignDashboard.module.css'
-import { BaseButton, BaseInput, BaseBadge } from '../components/ui/base'
+import { BaseButton, BaseInput, BaseBadge, BaseLoader } from '../components/ui/base'
+
+// Lazy loading para componentes pesados que se usan condicionalmente
+const UniversalManager = React.lazy(() => import('../components/features/EntityManager'))
+const ConnectionModal = React.lazy(() => import('../components/features/ConnectionModal'))
+const Dashboard = React.lazy(() => import('../components/features/Dashboard'))
 
 // Tabs configuration
 const TABS = [
@@ -24,7 +25,7 @@ const TABS = [
   { id: 'notes', name: 'Notas', icon: '📝' }
 ]
 
-function CampaignDashboard({ campaign, onBackToSelector }) {
+const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBackToSelector }) {
   const { debug, logError } = useLogger()
   const [activeTab, setActiveTab] = useState('dashboard')
   const [currentCampaign, setCurrentCampaign] = useState(campaign)
@@ -263,20 +264,22 @@ function CampaignDashboard({ campaign, onBackToSelector }) {
 
       {/* Modal de conexiones */}
       {connections.showConnectionModal && connections.connectionSource && (
-        <ConnectionModal
-          sourceItem={connections.connectionSource.item}
-          sourceType={connections.connectionSource.type}
-          campaign={currentCampaign}
-          onConnect={connections.createConnection}
-          onRemove={connections.removeConnection}
-          onClose={connections.closeConnectionModal}
-          getLinkedItems={connections.getLinkedItems}
-          getAvailableItems={connections.getAvailableItems}
-        />
+        <Suspense fallback={<BaseLoader />}>
+          <ConnectionModal
+            sourceItem={connections.connectionSource.item}
+            sourceType={connections.connectionSource.type}
+            campaign={currentCampaign}
+            onConnect={connections.createConnection}
+            onRemove={connections.removeConnection}
+            onClose={connections.closeConnectionModal}
+            getLinkedItems={connections.getLinkedItems}
+            getAvailableItems={connections.getAvailableItems}
+          />
+        </Suspense>
       )}
     </div>
   )
-}
+})
 
 // ✅ Componente mejorado para renderizar el contenido de cada pestaña
 function TabContent({ 
@@ -299,19 +302,31 @@ function TabContent({
     updateCampaign
   }
 
-  // Dynamic entity managers using UniversalManager
+  // Dynamic entity managers using UniversalManager con Suspense
   if (activeTab === 'dashboard') {
-    return <Dashboard campaign={campaign} onTabChange={onTabChange} onNavigateToItem={onNavigateToItem} />
+    return (
+      <Suspense fallback={<BaseLoader />}>
+        <Dashboard campaign={campaign} onTabChange={onTabChange} onNavigateToItem={onNavigateToItem} />
+      </Suspense>
+    )
   }
 
   // All entity types use UniversalManager directly
   const entityTypes = ['locations', 'players', 'npcs', 'objects', 'quests', 'notes']
   if (entityTypes.includes(activeTab)) {
-    return <UniversalManager entityType={activeTab} {...commonProps} />
+    return (
+      <Suspense fallback={<BaseLoader />}>
+        <UniversalManager entityType={activeTab} {...commonProps} />
+      </Suspense>
+    )
   }
 
   // Default fallback
-  return <Dashboard campaign={campaign} onTabChange={onTabChange} onNavigateToItem={onNavigateToItem} />
+  return (
+    <Suspense fallback={<BaseLoader />}>
+      <Dashboard campaign={campaign} onTabChange={onTabChange} onNavigateToItem={onNavigateToItem} />
+    </Suspense>
+  )
 }
 
 // ✅ Componente para las tarjetas de estado de misiones

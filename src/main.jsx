@@ -1,9 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState, Suspense } from 'react'
 import ReactDOM from 'react-dom/client'
 import BackgroundParticles from './components/layout/BackgroundParticles'
-import CampaignSelector from './pages/CampaignSelector'
-import CampaignDashboard from './pages/CampaignDashboard'
+import { BaseLoader } from './components/ui/base'
 import './App.css'
+
+// Lazy loading de páginas principales para code splitting
+const CampaignSelector = React.lazy(() => import('./pages/CampaignSelector'))
+const CampaignDashboard = React.lazy(() => import('./pages/CampaignDashboard'))
 
 function App() {
   // Estado para la navegación
@@ -26,17 +29,20 @@ function App() {
     <>
       <BackgroundParticles />
       
-      {/* Mostrar componente según la vista actual */}
-      {currentView === 'selector' && (
-        <CampaignSelector onSelectCampaign={goToCampaign} />
-      )}
-      
-      {currentView === 'campaign' && selectedCampaign && (
-        <CampaignDashboard 
-          campaign={selectedCampaign} 
-          onBackToSelector={goToSelector}
-        />
-      )}
+      {/* Suspense wrapper para lazy loading con loader consistente */}
+      <Suspense fallback={<BaseLoader />}>
+        {/* Mostrar componente según la vista actual */}
+        {currentView === 'selector' && (
+          <CampaignSelector onSelectCampaign={goToCampaign} />
+        )}
+        
+        {currentView === 'campaign' && selectedCampaign && (
+          <CampaignDashboard 
+            campaign={selectedCampaign} 
+            onBackToSelector={goToSelector}
+          />
+        )}
+      </Suspense>
     </>
   )
 }

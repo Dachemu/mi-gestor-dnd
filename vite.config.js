@@ -53,6 +53,26 @@ export default defineConfig({
       }
     })
   ],
+  build: {
+    // Optimización de chunks para mejor performance
+    rollupOptions: {
+      output: {
+        // Manual chunking para librerías pesadas
+        manualChunks: {
+          // Librerías de UI pesadas en chunk separado
+          'editor-libs': ['@tiptap/react', '@tiptap/starter-kit', '@tiptap/extension-color', '@tiptap/extension-text-style'],
+          // Iconos en chunk separado
+          'icon-libs': ['lucide-react'],
+          // Chunk para React y dependencias core
+          'react-vendor': ['react', 'react-dom']
+        }
+      }
+    },
+    // Incrementar límite de warnings para chunks grandes
+    chunkSizeWarningLimit: 600,
+    // Optimizar assets
+    assetsInlineLimit: 4096
+  },
   server: {
     port: 4000,
     host: '127.0.0.1',    // ← IPv4 explícito
