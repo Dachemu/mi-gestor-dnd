@@ -177,7 +177,8 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
           <div className={`${styles.navSection} ${styles.navRight}`}>
             <ImprovedSearchBox 
               search={search} 
-              navigateToItem={handleSearchItemClick} 
+              navigateToItem={handleSearchItemClick}
+              activeTab={activeTab}
             />
             {/* Botón de exportar */}
             {!isMobile && (
@@ -298,7 +299,7 @@ function TabContent({
       navigateToItem: onNavigateToItem
     },
     selectedItemForNavigation,
-    updateCampaign
+    updateCampaign,
   }
 
   // Dynamic entity managers using UniversalManager con Suspense

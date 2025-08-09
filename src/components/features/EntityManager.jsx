@@ -17,7 +17,7 @@ function UniversalManager({
   campaign, 
   connections, 
   selectedItemForNavigation, 
-  updateCampaign 
+  updateCampaign
 }) {
   // Obtener configuración del tipo de entidad
   const config = getEntityConfig(entityType)
@@ -43,6 +43,7 @@ function UniversalManager({
     closeDetails,
     NotificationComponent
   } = useCRUD(campaign[entityType] || [], config.name, config, entityType, updateCampaign)
+
 
   // Estado para filtros (solo si la entidad los soporta)
   const [filters, setFilters] = useState({})
@@ -73,6 +74,7 @@ function UniversalManager({
 
   // Función para aplicar filtros
   const getFilteredItems = () => {
+    // Aplicar filtros de categoría si existen
     if (!config.filters || Object.keys(filters).length === 0) {
       return items
     }

@@ -8,7 +8,7 @@ import styles from '../../pages/CampaignDashboard.module.css'
  * SearchBox mejorado con mejor manejo de eventos
  * Soluciona el problema del dropdown que no se cierra
  */
-export function ImprovedSearchBox({ search, navigateToItem }) {
+export function ImprovedSearchBox({ search, navigateToItem, activeTab = 'dashboard' }) {
   const searchBoxRef = useRef(null)
 
   // Manejar clicks fuera del componente
@@ -44,7 +44,7 @@ export function ImprovedSearchBox({ search, navigateToItem }) {
   }, [search.showSearchDropdown, search])
 
   const handleFocus = () => {
-    if (search.searchTerm && search.searchTerm.length >= 2) {
+    if (search.searchTerm && search.searchTerm.length >= 1) {
       search.handleSearchFocus()
     }
   }
@@ -52,6 +52,27 @@ export function ImprovedSearchBox({ search, navigateToItem }) {
   const handleChange = (e) => {
     const value = e.target.value
     search.handleSearchChange(value)
+  }
+
+  // Determinar si debemos mostrar el dropdown
+  // En Dashboard siempre mostramos el dropdown
+  // En otras pestañas también mostramos el dropdown para búsqueda global
+  const shouldShowDropdown = search.showSearchDropdown && search.searchResults.length > 0
+
+  // Placeholder dinámico según la pestaña
+  const getPlaceholder = () => {
+    if (activeTab === 'dashboard') {
+      return 'Buscar en campaña...'
+    }
+    const tabNames = {
+      'locations': 'Buscar lugares...',
+      'players': 'Buscar jugadores...',
+      'npcs': 'Buscar NPCs...',
+      'objects': 'Buscar objetos...',
+      'quests': 'Buscar misiones...',
+      'notes': 'Buscar notas...'
+    }
+    return tabNames[activeTab] || 'Buscar...'
   }
 
   const handleItemClick = (item, itemType) => {
@@ -64,17 +85,17 @@ export function ImprovedSearchBox({ search, navigateToItem }) {
       <BaseInput
         type="text"
         size="sm"
-        placeholder="Buscar..."
+        placeholder={getPlaceholder()}
         value={search.searchTerm}
         onChange={handleChange}
         onFocus={handleFocus}
         icon={<SearchIcon size={16} />}
-        aria-label="Buscar en la campaña"
+        aria-label={`Buscar en ${activeTab === 'dashboard' ? 'la campaña' : 'la sección actual'}`}
         className={styles.searchInput}
         autoComplete="off"
       />
       
-      {search.showSearchDropdown && search.searchResults.length > 0 && (
+      {shouldShowDropdown && (
         <SearchDropdown
           searchTerm={search.searchTerm}
           results={search.searchResults}
