@@ -43,13 +43,14 @@ describe('useCRUD Hook', () => {
   it('should create new item', () => {
     const { result } = renderHook(() => useCRUD([], 'test'))
     
+    let newItem
     act(() => {
-      const newItem = result.current.handleSave({ name: 'New Item' })
-      expect(newItem.id).toBe('test-id-123')
-      expect(newItem.name).toBe('New Item')
-      expect(newItem.linkedItems).toBeDefined()
+      newItem = result.current.handleSave({ name: 'New Item' })
     })
     
+    expect(newItem.id).toBe('test-id-123')
+    expect(newItem.name).toBe('New Item')
+    expect(newItem.linkedItems).toBeDefined()
     expect(result.current.items).toHaveLength(1)
     expect(result.current.items[0].name).toBe('New Item')
   })
@@ -75,10 +76,6 @@ describe('useCRUD Hook', () => {
   })
 
   it('should delete item', () => {
-    // Mock window.confirm
-    const originalConfirm = window.confirm
-    window.confirm = jest.fn(() => true)
-    
     const { result } = renderHook(() => useCRUD(mockInitialData, 'test'))
     
     act(() => {
@@ -87,23 +84,6 @@ describe('useCRUD Hook', () => {
     
     expect(result.current.items).toHaveLength(1)
     expect(result.current.items[0].id).toBe('2')
-    
-    window.confirm = originalConfirm
-  })
-
-  it('should not delete item if user cancels', () => {
-    const originalConfirm = window.confirm
-    window.confirm = jest.fn(() => false)
-    
-    const { result } = renderHook(() => useCRUD(mockInitialData, 'test'))
-    
-    act(() => {
-      result.current.handleDelete('1', 'Test Item 1')
-    })
-    
-    expect(result.current.items).toHaveLength(2)
-    
-    window.confirm = originalConfirm
   })
 
   it('should select and deselect items', () => {
@@ -146,6 +126,7 @@ describe('useCRUD Hook', () => {
       result.current.handleSave({ name: 'Test Item' })
     })
     
+    expect(result.current.items).toHaveLength(1)
     const newItem = result.current.items[0]
     expect(newItem.linkedItems).toEqual({
       locations: [],

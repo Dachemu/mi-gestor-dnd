@@ -1,5 +1,6 @@
 // Servicio para manejar la persistencia local de campañas
 // Este archivo se encarga de guardar y cargar datos del navegador
+import { error as logError } from '../utils/logger'
 
 const STORAGE_KEY = 'dnd-campaigns';
 
@@ -12,7 +13,7 @@ export const loadCampaigns = () => {
     }
     return [];
   } catch (error) {
-    console.error('Error al cargar campañas:', error);
+    logError('Error al cargar campañas:', error);
     return [];
   }
 };
@@ -23,7 +24,7 @@ export const saveCampaigns = (campaigns) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(campaigns));
     return true;
   } catch (error) {
-    console.error('Error al guardar campañas:', error);
+    logError('Error al guardar campañas:', error);
     return false;
   }
 };
@@ -51,7 +52,7 @@ export const saveCampaign = (campaign) => {
     
     return saveCampaigns(campaigns);
   } catch (error) {
-    console.error('Error al guardar campaña:', error);
+    logError('Error al guardar campaña:', error);
     return false;
   }
 };
@@ -63,7 +64,7 @@ export const deleteCampaign = (campaignId) => {
     const filtered = campaigns.filter(c => c.id !== campaignId);
     return saveCampaigns(filtered);
   } catch (error) {
-    console.error('Error al eliminar campaña:', error);
+    logError('Error al eliminar campaña:', error);
     return false;
   }
 };
@@ -94,7 +95,7 @@ export const exportCampaign = (campaign) => {
     URL.revokeObjectURL(url);
     return true;
   } catch (error) {
-    console.error('Error al exportar campaña:', error);
+    logError('Error al exportar campaña:', error);
     return false;
   }
 };

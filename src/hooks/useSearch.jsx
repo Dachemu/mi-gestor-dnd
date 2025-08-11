@@ -14,7 +14,7 @@ export function useSearch(campaign) {
 
   // Función que realiza la búsqueda en todos los elementos
   const searchResults = useMemo(() => {
-    if (!debouncedSearchTerm || debouncedSearchTerm.length < 1) {
+    if (!debouncedSearchTerm || debouncedSearchTerm.length < 2) {
       return []
     }
 

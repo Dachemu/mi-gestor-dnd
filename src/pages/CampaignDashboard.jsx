@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react'
 import { SearchIcon, BackIcon, MenuIcon, CloseIcon } from '../components/ui/icons'
-import { useLogger } from '../hooks/useLogger.js'
+import { debug, error as logError } from '../utils/logger'
 import { ImprovedSearchBox } from '../components/features/ImprovedSearchBox'
-import { useConnections } from '../hooks/useConnections.js'
-import { useSearch } from '../hooks/useSearch.js'
+import { useConnections } from '../hooks/useConnections.jsx'
+import { useSearch } from '../hooks/useSearch.jsx'
 import { saveCampaigns, loadCampaigns, exportCampaign } from '../services'
 import { Download } from 'lucide-react'
 import styles from './CampaignDashboard.module.css'
@@ -26,7 +26,7 @@ const TABS = [
 ]
 
 const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBackToSelector }) {
-  const { debug, logError } = useLogger()
+  // Logger functions imported directly from utils
   const [activeTab, setActiveTab] = useState('dashboard')
   const [currentCampaign, setCurrentCampaign] = useState(campaign)
   const [selectedItemForNavigation, setSelectedItemForNavigation] = useState(null)

@@ -1,15 +1,15 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { generateId } from '../services/storage'
 import { useNotification } from './useNotification.jsx'
 
 /**
  * Hook personalizado para manejar operaciones CRUD de manera uniforme
  * Elimina código duplicado entre todos los gestores
- * ✅ CORREGIDO: Ahora incluye el componente de notificación
+ * ✅ SIMPLIFICADO: Versión más estable sin optimizaciones complejas
  */
 export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = null, entityType = '', updateCampaign = null) {
   // Estados principales
-  const [items, setItems] = useState(initialData)
+  const [items, setItems] = useState(initialData || [])
   const [showForm, setShowForm] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
   const [selectedItem, setSelectedItem] = useState(null)
@@ -17,36 +17,14 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
   // Hook de notificaciones
   const { showNotification, NotificationComponent } = useNotification()
 
-  // ✅ Sincronizar con datos externos cuando cambien
+  // Sincronizar SOLO cuando initialData cambie externamente (ej. cambio de campaña)
   useEffect(() => {
-    // Solo actualizar si realmente ha cambiado para evitar loops infinitos
-    const newData = initialData || []
-    setItems(prevItems => {
-      // Comparar por longitud y IDs para evitar actualizaciones innecesarias
-      if (prevItems.length !== newData.length) return newData
-      if (newData.length === 0) return newData
-      
-      const prevIds = prevItems.map(item => item.id).sort().join(',')
-      const newIds = newData.map(item => item.id).sort().join(',')
-      
-      return prevIds !== newIds ? newData : prevItems
-    })
+    if (initialData && initialData.length > 0) {
+      setItems(initialData)
+    }
   }, [initialData])
 
-  // ✅ Separar la sincronización del selectedItem para evitar bucles
-  useEffect(() => {
-    if (selectedItem && initialData) {
-      const updatedSelectedItem = initialData.find(item => item.id === selectedItem.id)
-      if (updatedSelectedItem && JSON.stringify(updatedSelectedItem) !== JSON.stringify(selectedItem)) {
-        setSelectedItem(updatedSelectedItem)
-      } else if (!updatedSelectedItem) {
-        // El elemento seleccionado ya no existe, deseleccionar
-        setSelectedItem(null)
-      }
-    }
-  }, [initialData, selectedItem?.id]) // Solo depender del ID para evitar bucles
-
-  // ✅ Función para inicializar linkedItems si no existe
+  // Función para inicializar linkedItems si no existe
   const ensureLinkedItems = (item) => {
     if (!item.linkedItems || typeof item.linkedItems !== 'object') {
       return {
@@ -66,61 +44,39 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
 
   // Función de notificaciones ahora viene del hook centralizado
 
-  // Crear nuevo elemento
-  const handleCreate = (itemData) => {
-    const newItem = ensureLinkedItems({
-      ...itemData,
-      id: generateId(),
-      createdAt: new Date().toISOString().split('T')[0]
-    })
-    
-    setItems(prev => [...prev, newItem])
-    setShowForm(false)
-    showNotification(`${itemName} "${newItem.name || newItem.title}" creado exitosamente`)
-    return newItem
-  }
-
-  // Editar elemento existente
-  const handleEdit = (itemData) => {
-    const updatedItem = ensureLinkedItems({
-      ...itemData,
-      id: editingItem.id,
-      createdAt: editingItem.createdAt
-    })
-    
-    setItems(prev => prev.map(item => 
-      item.id === editingItem.id ? updatedItem : item
-    ))
-    
-    // Actualizar selectedItem si es el mismo que se está editando
-    if (selectedItem?.id === editingItem.id) {
-      setSelectedItem(updatedItem)
-    }
-    
-    setEditingItem(null)
-    setShowForm(false)
-    showNotification(`${itemName} "${itemData.name || itemData.title}" actualizado`)
-    return updatedItem
-  }
-
-  // Guardar (crear o editar)
-  const handleSave = useCallback((itemData) => {
+  // Guardar (crear o editar) - simplificado para evitar problemas con useCallback
+  const handleSave = (itemData) => {
     // Agregar icono fijo para notas si corresponde
     if (entityConfig && entityConfig.fixedIcon) {
       itemData = { ...itemData, icon: entityConfig.fixedIcon }
     }
     
     // Determinar si es creación o edición
-    // Primero verificar si tenemos editingItem (formulario modal)
+    // Caso 1: Modo edición (formulario modal)
     if (editingItem) {
-      return handleEdit(itemData)
+      const updatedItem = ensureLinkedItems({
+        ...itemData,
+        id: editingItem.id,
+        createdAt: editingItem.createdAt
+      })
+      
+      setItems(prev => prev.map(item => 
+        item.id === editingItem.id ? updatedItem : item
+      ))
+      
+      // Actualizar selectedItem si es el mismo que se está editando
+      if (selectedItem?.id === editingItem.id) {
+        setSelectedItem(updatedItem)
+      }
+      
+      setEditingItem(null)
+      setShowForm(false)
+      showNotification(`${itemName} "${itemData.name || itemData.title}" actualizado`)
+      return updatedItem
     }
     
-    // Si no hay editingItem, verificar si el itemData tiene un ID existente
-    // Esto maneja el caso de edición inline desde UniversalDetails
+    // Caso 2: Edición inline (itemData tiene ID existente)
     if (itemData.id && items.some(item => item.id === itemData.id)) {
-      // Es una edición - llamar directamente handleEdit sin cambiar editingItem
-      // Esto evita race conditions en el estado
       const updatedItems = items.map(item => 
         item.id === itemData.id 
           ? { ...item, ...itemData, modifiedAt: new Date().toISOString() }
@@ -135,9 +91,18 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
       return updatedItems.find(item => item.id === itemData.id)
     }
     
-    // Es una creación nueva
-    return handleCreate(itemData)
-  }, [editingItem, items, entityConfig, entityType, itemName, handleEdit, handleCreate, updateCampaign, setShowForm, showNotification])
+    // Caso 3: Creación nueva
+    const newItem = ensureLinkedItems({
+      ...itemData,
+      id: generateId(),
+      createdAt: new Date().toISOString().split('T')[0]
+    })
+    
+    setItems(prev => [...prev, newItem])
+    setShowForm(false)
+    showNotification(`${itemName} "${newItem.name || newItem.title}" creado exitosamente`)
+    return newItem
+  }
 
   // Eliminar elemento
   const handleDelete = (id, name) => {

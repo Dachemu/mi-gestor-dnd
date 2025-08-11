@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react'
-import { useSearch } from '../useSearch.js'
+import { useSearch } from '../useSearch.jsx'
 
 // Mock debounce utility
 jest.mock('../../utils/debounce', () => ({
@@ -49,11 +49,19 @@ describe('useSearch Hook', () => {
   it('should return empty results for short search terms', () => {
     const { result } = renderHook(() => useSearch(mockCampaign))
     
+    // Test with 1 character (should return empty)
     act(() => {
       result.current.handleSearchChange('a')
     })
     
     expect(result.current.searchResults).toEqual([])
+
+    // Test with 2 characters (should return results)
+    act(() => {
+      result.current.handleSearchChange('Ta')
+    })
+    
+    expect(result.current.searchResults.length).toBeGreaterThan(0)
   })
 
   it('should search across all entity types', () => {

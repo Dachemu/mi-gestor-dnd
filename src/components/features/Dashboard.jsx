@@ -1,5 +1,5 @@
 import React from 'react'
-import { COLORS, GRADIENTS } from '../../constants/colors'
+import { COLORS, GRADIENTS } from '../../utils/styleHelpers'
 import { BaseCard, BaseButton, BaseBadge } from '../ui/base'
 
 /**

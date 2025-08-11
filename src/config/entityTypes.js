@@ -6,38 +6,124 @@
 // Esquemas de formulario para cada tipo de entidad
 export const ENTITY_SCHEMAS = {
   players: {
-    name: { type: 'text', required: true, label: 'Nombre del personaje', placeholder: 'Ej: Aragorn' },
-    player: { type: 'text', label: 'Jugador real', placeholder: 'Nombre del jugador' },
+    name: { 
+      type: 'text', 
+      required: true, 
+      label: 'Nombre del personaje', 
+      placeholder: 'Ej: Aragorn',
+      minLength: 2,
+      maxLength: 50
+    },
+    player: { 
+      type: 'text', 
+      label: 'Jugador real', 
+      placeholder: 'Nombre del jugador',
+      maxLength: 50
+    },
     class: { 
       type: 'select', 
       label: 'Clase',
+      required: true,
       options: ['Bárbaro', 'Bardo', 'Brujo', 'Clérigo', 'Druida', 'Explorador', 'Guerrero', 'Hechicero', 'Mago', 'Monje', 'Paladín', 'Pícaro', 'Artificiero']
     },
-    background: { type: 'text', label: 'Trasfondo', placeholder: 'Ej: Noble, Forajido, Ermitaño...' },
-    description: { type: 'textarea', label: 'Descripción del personaje', placeholder: 'Apariencia, personalidad, historia personal...' },
-    backstory: { type: 'richtext', label: 'Historia del personaje', placeholder: 'Historia completa del personaje, conexiones con la trama, motivaciones...' },
+    race: { 
+      type: 'select', 
+      label: 'Raza',
+      options: ['Humano', 'Elfo', 'Enano', 'Mediano', 'Dracoborn', 'Gnomo', 'Semielfo', 'Semiorco', 'Tiefling', 'Aasimar', 'Genasi', 'Tabaxi', 'Otro']
+    },
+    level: {
+      type: 'number',
+      label: 'Nivel',
+      defaultValue: 1,
+      min: 1,
+      max: 20
+    },
+    background: { 
+      type: 'text', 
+      label: 'Trasfondo', 
+      placeholder: 'Ej: Noble, Forajido, Ermitaño...',
+      maxLength: 100
+    },
+    description: { 
+      type: 'textarea', 
+      label: 'Descripción del personaje', 
+      placeholder: 'Apariencia, personalidad, historia personal...',
+      maxLength: 500
+    },
+    backstory: { 
+      type: 'richtext', 
+      label: 'Historia del personaje', 
+      placeholder: 'Historia completa del personaje, conexiones con la trama, motivaciones...' 
+    },
+    hitPoints: {
+      type: 'number',
+      label: 'Puntos de vida',
+      min: 1,
+      max: 1000
+    },
+    armorClass: {
+      type: 'number',
+      label: 'Clase de armadura',
+      min: 1,
+      max: 30
+    },
+    speed: {
+      type: 'number',
+      label: 'Velocidad (pies)',
+      defaultValue: 30,
+      min: 0,
+      max: 120
+    },
     avatar: { type: 'text', label: 'Avatar', defaultValue: '⚔️' },
     icon: { type: 'text', label: 'Icono', defaultValue: '⚔️' }
   },
 
   quests: {
-    title: { type: 'text', required: true, label: 'Título de la misión', placeholder: 'Ej: Recuperar el Amuleto Perdido' },
-    description: { type: 'textarea', label: 'Descripción', placeholder: 'Describe la misión: objetivos, contexto, lo que deben hacer los jugadores...' },
+    title: { 
+      type: 'text', 
+      required: true, 
+      label: 'Título de la misión', 
+      placeholder: 'Ej: Recuperar el Amuleto Perdido',
+      minLength: 3,
+      maxLength: 100
+    },
+    description: { 
+      type: 'textarea', 
+      label: 'Descripción', 
+      placeholder: 'Describe la misión: objetivos, contexto, lo que deben hacer los jugadores...',
+      maxLength: 1000
+    },
     status: { 
       type: 'select', 
       label: 'Estado', 
       defaultValue: 'Pendiente',
+      required: true,
       options: ['Pendiente', 'En progreso', 'Completada', 'Fallida']
     },
     priority: { 
       type: 'select', 
       label: 'Prioridad', 
       defaultValue: 'Media',
+      required: true,
       options: ['Crítica', 'Alta', 'Media', 'Baja']
     },
-    location: { type: 'text', label: 'Ubicación', placeholder: '¿Dónde tiene lugar esta misión?' },
-    reward: { type: 'text', label: 'Recompensa', placeholder: 'Ej: 1000 monedas de oro + Espada mágica' },
-    detailedDescription: { type: 'richtext', label: 'Descripción detallada', placeholder: 'Información adicional, pistas, secretos, detalles para el DM...' },
+    location: { 
+      type: 'text', 
+      label: 'Ubicación', 
+      placeholder: '¿Dónde tiene lugar esta misión?',
+      maxLength: 100
+    },
+    reward: { 
+      type: 'text', 
+      label: 'Recompensa', 
+      placeholder: 'Ej: 1000 monedas de oro + Espada mágica',
+      maxLength: 200
+    },
+    detailedDescription: { 
+      type: 'richtext', 
+      label: 'Descripción detallada', 
+      placeholder: 'Información adicional, pistas, secretos, detalles para el DM...' 
+    },
     icon: { type: 'text', label: 'Icono', defaultValue: '📜' }
   },
 
@@ -335,11 +421,48 @@ export function validateEntity(entityType, data) {
   const config = getEntityConfig(entityType)
   if (!config) return { isValid: false, errors: ['Tipo de entidad no válido'] }
 
+  // Validación básica sin dependencias externas para evitar ciclos circulares
   const errors = {}
   
   Object.entries(config.schema).forEach(([fieldName, fieldConfig]) => {
     if (fieldConfig.required && (!data[fieldName] || !data[fieldName].toString().trim())) {
       errors[fieldName] = `${fieldConfig.label} es obligatorio`
+    }
+    
+    // Validación de longitud mínima
+    if (fieldConfig.minLength && data[fieldName]) {
+      if (data[fieldName].toString().trim().length < fieldConfig.minLength) {
+        errors[fieldName] = `${fieldConfig.label} debe tener al menos ${fieldConfig.minLength} caracteres`
+      }
+    }
+    
+    // Validación de longitud máxima
+    if (fieldConfig.maxLength && data[fieldName]) {
+      if (data[fieldName].toString().length > fieldConfig.maxLength) {
+        errors[fieldName] = `${fieldConfig.label} no puede exceder ${fieldConfig.maxLength} caracteres`
+      }
+    }
+    
+    // Validación de rango numérico
+    if (fieldConfig.type === 'number' && data[fieldName] !== undefined && data[fieldName] !== '') {
+      const numValue = parseFloat(data[fieldName])
+      if (isNaN(numValue)) {
+        errors[fieldName] = `${fieldConfig.label} debe ser un número válido`
+      } else {
+        if (fieldConfig.min !== undefined && numValue < fieldConfig.min) {
+          errors[fieldName] = `${fieldConfig.label} debe ser mayor o igual a ${fieldConfig.min}`
+        }
+        if (fieldConfig.max !== undefined && numValue > fieldConfig.max) {
+          errors[fieldName] = `${fieldConfig.label} debe ser menor o igual a ${fieldConfig.max}`
+        }
+      }
+    }
+    
+    // Validación de opciones (select)
+    if (fieldConfig.options && data[fieldName]) {
+      if (!fieldConfig.options.includes(data[fieldName])) {
+        errors[fieldName] = `${fieldConfig.label} debe ser una de las opciones válidas`
+      }
     }
   })
 

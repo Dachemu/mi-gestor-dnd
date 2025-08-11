@@ -7,23 +7,27 @@
   --primary: #4f46e5;
   --primary-dark: #3730a3;
   --primary-light: #6366f1;
-  --secondary: #ec4899;
+  --secondary: #3b82f6;
+  --pink: #ec4899;
   
   /* Colores de estado */
   --success: #10b981;
   --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #3b82f6;
+  --error: #ef4444;
+  --danger: #ef4444; /* Alias para mantener compatibilidad */
+  --info: #06b6d4;
   
   /* Fondos */
   --bg-dark: #0a0a0f;
   --bg-darker: #050508;
-  --bg-primary: #0f0f23;
-  --bg-secondary: #1a1a2e;
+  --bg-primary: rgba(15, 15, 25, 0.98);
+  --bg-secondary: rgba(26, 26, 46, 0.95);
+  --bg-card: rgba(31, 41, 55, 0.5);
+  --bg-hover: rgba(31, 41, 55, 0.7);
   
   /* Colores de texto */
   --text-primary: #ffffff;
-  --text-secondary: #e5e7eb;
+  --text-secondary: #d1d5db;
   --text-muted: #9ca3af;
   --text-disabled: #6b7280;
   
@@ -61,13 +65,26 @@
   --blue-alpha-30: rgba(59, 130, 246, 0.3);
   
   /* Borders comunes */
-  --border-primary: 1px solid var(--primary-alpha-20);
-  --border-primary-hover: 1px solid var(--primary-alpha-30);
-  --border-secondary: 1px solid rgba(255, 255, 255, 0.1);
+  --border-primary: rgba(79, 70, 229, 0.3);
+  --border-secondary: rgba(79, 70, 229, 0.2);
+  --border-hover: rgba(79, 70, 229, 0.5);
+  --border-primary-solid: 1px solid var(--border-primary);
+  --border-secondary-solid: 1px solid var(--border-secondary);
+  --border-hover-solid: 1px solid var(--border-hover);
   
   /* Glass morphism */
   --glass-bg: var(--bg-dark-alpha-85);
   --glass-border: var(--primary-alpha-20);
+  --glass-bg-hover: rgba(79, 70, 229, 0.2);
+  --glass-shadow: rgba(79, 70, 229, 0.3);
+  
+  /* Gradientes comunes */
+  --gradient-primary: linear-gradient(135deg, rgba(79, 70, 229, 0.3), rgba(79, 70, 229, 0.1));
+  --gradient-secondary: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.1));
+  --gradient-modal: linear-gradient(135deg, rgba(15, 15, 25, 0.98) 0%, rgba(26, 26, 46, 0.95) 100%);
+  --gradient-modal-header: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+  --gradient-text: linear-gradient(135deg, #ffffff 0%, #6366f1 100%);
+  --gradient-rainbow: linear-gradient(90deg, #4f46e5, #3b82f6, #10b981, #f59e0b, #ec4899);
   
   /* Sombras */
   --shadow-primary: 0 4px 12px rgba(79, 70, 229, 0.25);
