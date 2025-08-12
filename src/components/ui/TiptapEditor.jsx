@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { TextStyle } from '@tiptap/extension-text-style'
@@ -61,11 +61,11 @@ function TiptapEditor({
     { name: 'Gris', value: '#6b7280' },
   ]
 
-  const [showColorPicker, setShowColorPicker] = React.useState(false)
-  const colorPickerRef = React.useRef(null)
+  const [showColorPicker, setShowColorPicker] = useState(false)
+  const colorPickerRef = useRef(null)
 
   // Cerrar color picker al hacer clic fuera
-  React.useEffect(() => {
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (colorPickerRef.current && !colorPickerRef.current.contains(event.target)) {
         setShowColorPicker(false)

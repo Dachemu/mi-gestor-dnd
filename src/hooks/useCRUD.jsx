@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { generateId } from '../services/storage'
 import { useNotification } from './useNotification.jsx'
+import syncService from '../services/syncService'
+import changeTracker from '../services/changeTracker'
 
 /**
  * Hook personalizado para manejar operaciones CRUD de manera uniforme
@@ -44,6 +46,21 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
 
   // Función de notificaciones ahora viene del hook centralizado
 
+  // Marcar cambios pendientes cuando hay modificaciones
+  const markSyncChanges = (campaignData = null) => {
+    try {
+      syncService.markPendingChanges()
+      
+      // Si tenemos datos de campaña completos, detectar cambios incrementales
+      if (campaignData) {
+        changeTracker.detectChanges(campaignData)
+      }
+    } catch (error) {
+      // Silenciar errores de sync para no interrumpir el flujo normal
+      console.debug('Sync service not available:', error.message)
+    }
+  }
+
   // Guardar (crear o editar) - simplificado para evitar problemas con useCallback
   const handleSave = (itemData) => {
     // Agregar icono fijo para notas si corresponde
@@ -57,7 +74,8 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
       const updatedItem = ensureLinkedItems({
         ...itemData,
         id: editingItem.id,
-        createdAt: editingItem.createdAt
+        createdAt: editingItem.createdAt,
+        lastModified: new Date().toISOString()
       })
       
       setItems(prev => prev.map(item => 
@@ -71,6 +89,7 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
       
       setEditingItem(null)
       setShowForm(false)
+      markSyncChanges()
       showNotification(`${itemName} "${itemData.name || itemData.title}" actualizado`)
       return updatedItem
     }
@@ -79,13 +98,14 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
     if (itemData.id && items.some(item => item.id === itemData.id)) {
       const updatedItems = items.map(item => 
         item.id === itemData.id 
-          ? { ...item, ...itemData, modifiedAt: new Date().toISOString() }
+          ? { ...item, ...itemData, lastModified: new Date().toISOString() }
           : item
       )
       
       setItems(updatedItems)
       updateCampaign?.(entityType, updatedItems)
       setShowForm(false)
+      markSyncChanges()
       showNotification(`${itemName} "${itemData.name || itemData.title}" actualizado`)
       
       return updatedItems.find(item => item.id === itemData.id)
@@ -95,11 +115,13 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
     const newItem = ensureLinkedItems({
       ...itemData,
       id: generateId(),
-      createdAt: new Date().toISOString().split('T')[0]
+      createdAt: new Date().toISOString().split('T')[0],
+      lastModified: new Date().toISOString()
     })
     
     setItems(prev => [...prev, newItem])
     setShowForm(false)
+    markSyncChanges()
     showNotification(`${itemName} "${newItem.name || newItem.title}" creado exitosamente`)
     return newItem
   }
@@ -113,6 +135,7 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
       setSelectedItem(null)
     }
     
+    markSyncChanges()
     showNotification(`${itemName} "${name}" eliminado`)
   }
 

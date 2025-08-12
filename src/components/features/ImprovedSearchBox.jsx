@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react'
 import { Search as SearchIcon } from 'lucide-react'
-import { BaseInput } from '../ui/base'
+import BaseInput from '../ui/base/BaseInput'
 import SearchDropdown from './GlobalSearchDropdown'
 import styles from '../../pages/CampaignDashboard.module.css'
 

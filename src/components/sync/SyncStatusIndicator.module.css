@@ -1,0 +1,138 @@
+.indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: var(--font-size-sm);
+  border: 1px solid transparent;
+  position: relative;
+}
+
+.indicator:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Estados de conexión */
+.statusConnected {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: var(--color-success);
+}
+
+.statusDisconnected {
+  background: rgba(249, 115, 22, 0.1);
+  border-color: rgba(249, 115, 22, 0.3);
+  color: var(--color-warning);
+}
+
+.statusError {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--color-danger);
+}
+
+.statusDisabled {
+  background: rgba(107, 114, 128, 0.1);
+  border-color: rgba(107, 114, 128, 0.3);
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+.statusDisabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Iconos */
+.iconConnected {
+  width: 16px;
+  height: 16px;
+  color: var(--color-success);
+}
+
+.iconDisconnected {
+  width: 16px;
+  height: 16px;
+  color: var(--color-warning);
+}
+
+.iconError {
+  width: 16px;
+  height: 16px;
+  color: var(--color-danger);
+}
+
+.iconDisabled {
+  width: 16px;
+  height: 16px;
+  color: var(--text-secondary);
+}
+
+/* Texto de estado */
+.statusText {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Badge de modo mock */
+.mockBadge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--color-primary);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.conflictsBadge {
+  position: absolute;
+  top: -8px;
+  right: 16px;
+  background: var(--color-danger);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 4px;
+  border-radius: 50%;
+  line-height: 1;
+  min-width: 16px;
+  text-align: center;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .statusText {
+    display: none;
+  }
+
+  .indicator {
+    padding: var(--spacing-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  .mockBadge {
+    display: none;
+  }
+}

@@ -2,6 +2,7 @@ import React, { useState, Suspense } from 'react'
 import ReactDOM from 'react-dom/client'
 import BackgroundParticles from './components/layout/BackgroundParticles'
 import { BaseLoader } from './components/ui/base'
+import GlobalProgressManager from './components/common/GlobalProgressManager'
 import './App.css'
 
 // Lazy loading de páginas principales para code splitting
@@ -43,6 +44,13 @@ function App() {
           />
         )}
       </Suspense>
+      
+      {/* Gestor global de progreso */}
+      <GlobalProgressManager 
+        position="bottom-right"
+        maxVisible={3}
+        showInModal={true}
+      />
     </>
   )
 }

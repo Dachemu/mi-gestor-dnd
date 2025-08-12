@@ -182,7 +182,7 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showCompactBut
   }, [showCompactButtons, onClose, handleCompactSave, isSaving])
   
   // ✅ Efecto para re-inicializar formData cuando cambian item o config
-  React.useEffect(() => {
+  useEffect(() => {
     const newFormData = initializeFormData()
     setFormData(newFormData)
     setErrors({}) // Limpiar errores al cambiar el item

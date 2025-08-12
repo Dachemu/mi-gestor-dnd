@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { BaseModal } from '../ui/base'
+import BaseModal from '../ui/base/BaseModal'
 
 // Configuración de tipos disponibles para conexiones
 const CONNECTION_TYPES = {

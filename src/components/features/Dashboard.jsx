@@ -1,6 +1,7 @@
 import React from 'react'
 import { COLORS, GRADIENTS } from '../../utils/styleHelpers'
 import { BaseCard, BaseButton, BaseBadge } from '../ui/base'
+import { SyncStatusIndicator } from '../sync/SyncStatusIndicator'
 
 /**
  * Dashboard Component - Réplica exacta del archivo de referencia
@@ -113,12 +114,17 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
     <div className="dashboard-container">
       {/* Header del Dashboard */}
       <div className="dashboard-header">
-        <h1 className="campaign-title">
-          {campaign.name}
-        </h1>
-        <p className="campaign-description">
-          {campaign.description || 'Tu mundo de aventuras te espera'}
-        </p>
+        <div className="campaign-info">
+          <h1 className="campaign-title">
+            {campaign.name}
+          </h1>
+          <p className="campaign-description">
+            {campaign.description || 'Tu mundo de aventuras te espera'}
+          </p>
+        </div>
+        <div className="dashboard-sync">
+          <SyncStatusIndicator />
+        </div>
       </div>
 
       {/* Category Navigation - Using BaseCard */}
@@ -183,9 +189,21 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
         }
 
         .dashboard-header {
-          text-align: left;
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
           margin-bottom: 1.5rem;
           padding: 0 0.5rem;
+          gap: 1rem;
+        }
+
+        .campaign-info {
+          flex: 1;
+        }
+
+        .dashboard-sync {
+          flex-shrink: 0;
+          min-width: 280px;
         }
 
         .campaign-title {
@@ -395,6 +413,16 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
 
         /* Responsive Design */
         @media (max-width: 1024px) {
+          .dashboard-header {
+            flex-direction: column;
+            align-items: stretch;
+          }
+
+          .dashboard-sync {
+            min-width: auto;
+            margin-top: 1rem;
+          }
+
           .missions-grid {
             grid-template-columns: 1fr;
             gap: 1px;

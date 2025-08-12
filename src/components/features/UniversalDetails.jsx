@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import ConnectionsDisplay from './ConnectionsDisplay'
 import DynamicForm from './DynamicForm'
 // TiptapEditor ya genera HTML, no necesitamos formatear markdown
-import { BaseBadge } from '../ui/base'
+import BaseBadge from '../ui/base/BaseBadge'
 import { validateEntity } from '../../config/entityTypes.js'
 
 /**

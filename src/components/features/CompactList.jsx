@@ -1,6 +1,7 @@
 import React from 'react'
 import { Eye, Edit, Trash2, Link2 } from 'lucide-react'
-import { BaseCard, BaseBadge } from '../ui/base'
+import BaseCard from '../ui/base/BaseCard'
+import BaseBadge from '../ui/base/BaseBadge'
 
 /**
  * Componente para mostrar listas de elementos en formato compacto tipo cards
