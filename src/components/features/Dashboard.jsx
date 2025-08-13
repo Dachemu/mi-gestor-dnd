@@ -1,7 +1,6 @@
 import React from 'react'
 import { COLORS, GRADIENTS } from '../../utils/styleHelpers'
 import { BaseCard, BaseButton, BaseBadge } from '../ui/base'
-import { SyncStatusIndicator } from '../sync/SyncStatusIndicator'
 
 /**
  * Dashboard Component - Réplica exacta del archivo de referencia
@@ -121,9 +120,6 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
           <p className="campaign-description">
             {campaign.description || 'Tu mundo de aventuras te espera'}
           </p>
-        </div>
-        <div className="dashboard-sync">
-          <SyncStatusIndicator />
         </div>
       </div>
 

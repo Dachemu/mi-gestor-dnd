@@ -4,6 +4,7 @@ import { Upload, Download, Trash2 } from 'lucide-react'
 import { loadCampaigns, saveCampaigns, generateId } from '../services/storage'
 import { useNotification } from '../hooks/useNotification.jsx'
 import { BaseButton, BaseInput, BaseCard } from '../components/ui/base'
+import { CompactDriveButton } from '../components/sync/CompactDriveButton'
 
 // Datos iniciales mínimos para nuevas campañas
 const INITIAL_CAMPAIGN_DATA = {
@@ -280,8 +281,45 @@ function CampaignSelector({ onSelectCampaign }) {
             >
               📥 Importar
             </BaseButton>
+            {/* Google Drive Button */}
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.15)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              borderRadius: '12px',
+              padding: '8px 16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              minWidth: '140px'
+            }}>
+              <span style={{ 
+                color: 'rgba(255, 255, 255, 0.9)',
+                fontSize: '14px',
+                fontWeight: '500'
+              }}>
+                ☁️
+              </span>
+              <CompactDriveButton 
+                onCampaignLoaded={(name, data) => {
+                  setCampaigns(prevCampaigns => {
+                    const newCampaign = {
+                      ...data,
+                      id: generateId(),
+                      name: name,
+                      lastModified: new Date().toISOString().split('T')[0]
+                    }
+                    const newCampaigns = [...prevCampaigns, newCampaign]
+                    saveCampaigns(newCampaigns)
+                    showNotification(`¡Campaña "${name}" cargada desde Drive! 🎉`)
+                    return newCampaigns
+                  })
+                }}
+              />
+            </div>
           </div>
         </div>
+
 
         {/* Lista de campañas o mensaje de bienvenida - más compacta */}
         {campaigns.length === 0 ? (

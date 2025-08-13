@@ -37,6 +37,7 @@ export const ListOrdered = (props) => <LazyIcon name="ListOrdered" fallback="1."
 export const Quote = (props) => <LazyIcon name="Quote" fallback="❝" {...props} />
 export const Palette = (props) => <LazyIcon name="Palette" fallback="🎨" {...props} />
 export const Download = (props) => <LazyIcon name="Download" fallback="⬇" {...props} />
+export const Save = (props) => <LazyIcon name="Save" fallback="💾" {...props} />
 export const SearchIcon = (props) => <LazyIcon name="Search" fallback="🔍" {...props} />
 export const BackIcon = (props) => <LazyIcon name="ArrowLeft" fallback="←" {...props} />
 export const MenuIcon = (props) => <LazyIcon name="Menu" fallback="≡" {...props} />
