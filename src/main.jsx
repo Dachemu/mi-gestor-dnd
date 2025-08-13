@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import BackgroundParticles from './components/layout/BackgroundParticles'
 import { BaseLoader } from './components/ui/base'
 import GlobalProgressManager from './components/common/GlobalProgressManager'
+import ErrorBoundary from './utils/errorBoundary'
 import './App.css'
 
 // Lazy loading de páginas principales para code splitting
@@ -27,7 +28,7 @@ function App() {
   }
 
   return (
-    <>
+    <ErrorBoundary>
       <BackgroundParticles />
       
       {/* Suspense wrapper para lazy loading con loader consistente */}
@@ -51,7 +52,7 @@ function App() {
         maxVisible={3}
         showInModal={true}
       />
-    </>
+    </ErrorBoundary>
   )
 }
 

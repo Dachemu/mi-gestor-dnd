@@ -255,18 +255,30 @@ function CampaignSelector({ onSelectCampaign }) {
           <div className="header-actions fade-in">
             <BaseButton
               variant="primary"
-              size="sm"
+              size="lg"
               onClick={() => setShowNewCampaignForm(true)}
+              style={{
+                padding: '12px 24px',
+                fontSize: '16px',
+                fontWeight: '600',
+                minWidth: '140px',
+                gap: '8px'
+              }}
             >
-              ➕ Nueva
+              ✨ Nueva Campaña
             </BaseButton>
             <BaseButton
               variant="secondary"
-              size="sm"
+              size="lg"
               onClick={handleImportCampaign}
-              icon={<Upload size={14} />}
+              style={{
+                padding: '12px 24px',
+                fontSize: '16px',
+                fontWeight: '600',
+                minWidth: '140px'
+              }}
             >
-              Importar
+              📥 Importar
             </BaseButton>
           </div>
         </div>
@@ -283,8 +295,15 @@ function CampaignSelector({ onSelectCampaign }) {
               </p>
               <BaseButton
                 variant="primary"
+                size="lg"
                 onClick={() => setShowNewCampaignForm(true)}
-                style={{ marginTop: '1rem' }}
+                style={{ 
+                  marginTop: '1.5rem',
+                  padding: '16px 32px',
+                  fontSize: '18px',
+                  fontWeight: '700',
+                  minWidth: '220px'
+                }}
               >
                 🚀 Crear Mi Primera Campaña
               </BaseButton>
@@ -450,8 +469,25 @@ function CampaignSelector({ onSelectCampaign }) {
   )
 }
 
+// Iconos para campañas - se asigna uno basado en el hash del nombre
+const CAMPAIGN_ICONS = ['🐉', '⚔️', '🏰', '🧙‍♂️', '🗡️', '🛡️', '⭐', '🔮', '🏺', '📜', '👑', '🌟', '🦅', '🐺', '🌙', '☀️', '⚡', '🔥', '💎', '🍃']
+
+// Función para obtener icono de campaña
+const getCampaignIcon = (campaignName) => {
+  if (!campaignName) return '🎲'
+  let hash = 0
+  for (let i = 0; i < campaignName.length; i++) {
+    const char = campaignName.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash // Convert to 32-bit integer
+  }
+  return CAMPAIGN_ICONS[Math.abs(hash) % CAMPAIGN_ICONS.length]
+}
+
 // 🎯 Componente para cada tarjeta de campaña
 function CampaignCard({ campaign, onSelect, onDelete, onExport }) {
+  const campaignIcon = getCampaignIcon(campaign.name)
+  
   return (
     <BaseCard
       variant="campaign"
@@ -471,9 +507,26 @@ function CampaignCard({ campaign, onSelect, onDelete, onExport }) {
         alignItems: 'flex-start',
         marginBottom: '1rem'
       }}>
-        <BaseCard.Title>
-          {campaign.name}
-        </BaseCard.Title>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+          <div style={{
+            fontSize: '32px',
+            lineHeight: '1',
+            background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2))',
+            borderRadius: '12px',
+            padding: '8px',
+            border: '1px solid rgba(99, 102, 241, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minWidth: '48px',
+            height: '48px'
+          }}>
+            {campaignIcon}
+          </div>
+          <BaseCard.Title style={{ margin: 0, flex: 1 }}>
+            {campaign.name}
+          </BaseCard.Title>
+        </div>
         
         <BaseCard.Actions>
           <BaseButton

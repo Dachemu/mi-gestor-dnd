@@ -248,15 +248,34 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
           font-weight: 500;
         }
 
-        /* Missions Grid - Three Equal Rectangular Sections */
+        /* Missions Grid - Responsive Three Equal Rectangular Sections */
         .missions-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
           gap: 0;
           margin-bottom: 1rem;
           border-radius: 12px;
           overflow: hidden;
           border: 1px solid rgba(79, 70, 229, 0.2);
+          width: 100%;
+          max-width: 100%;
+        }
+
+        @media (min-width: 768px) and (max-width: 1199px) {
+          .missions-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+          
+          .mission-section {
+            min-height: 300px;
+            max-height: 400px;
+          }
+        }
+
+        @media (min-width: 1200px) {
+          .missions-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
         }
 
         .mission-section {
@@ -267,6 +286,7 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
           border-right: 1px solid rgba(79, 70, 229, 0.2);
           background: rgba(31, 41, 55, 0.3);
           padding: 1rem;
+          width: 100%;
         }
 
         .mission-section:last-child {

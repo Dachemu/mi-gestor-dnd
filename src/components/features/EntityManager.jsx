@@ -247,6 +247,7 @@ function UniversalManager({
           item={editingItem}
           onSave={handleSave}
           onClose={closeForm}
+          showCompactButtons={true}
         />
         </BaseModal>
       )}
