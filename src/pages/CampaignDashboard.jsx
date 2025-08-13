@@ -136,21 +136,50 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
   }, [currentCampaign])
 
   // ✅ Función para guardar en Google Drive
+  const [isSavingToDrive, setIsSavingToDrive] = useState(false)
+  
   const handleSaveToGoogleDrive = useCallback(async () => {
+    if (isSavingToDrive) return // Prevenir múltiples clicks
+    
     try {
+      setIsSavingToDrive(true)
       const status = zeroConfigGoogleDrive.getStatus()
       
       if (!status.connected || !status.folderSelected) {
         debug('Google Drive no está conectado o configurado')
+        alert('Google Drive no está conectado. Ve al selector de campañas para configurarlo.')
         return
       }
       
+      if (!currentCampaign?.name) {
+        debug('No hay campaña activa para guardar')
+        alert('No hay campaña activa para guardar')
+        return
+      }
+      
+      debug(`💾 Guardando manualmente: ${currentCampaign.name}`)
       await zeroConfigGoogleDrive.saveCampaign(currentCampaign.name, currentCampaign)
-      debug('Campaña guardada en Google Drive exitosamente')
+      debug('✅ Campaña guardada manualmente en Google Drive')
+      
+      // Mostrar confirmación visual temporal
+      const originalText = document.querySelector('.driveText')?.textContent
+      if (originalText) {
+        const driveText = document.querySelector('.driveText')
+        if (driveText) {
+          driveText.textContent = '✅ Guardado'
+          setTimeout(() => {
+            driveText.textContent = originalText
+          }, 2000)
+        }
+      }
+      
     } catch (error) {
-      logError('Error al guardar en Google Drive:', error)
+      logError('❌ Error al guardar en Google Drive:', error)
+      alert(`Error al guardar en Google Drive: ${error.message}`)
+    } finally {
+      setIsSavingToDrive(false)
     }
-  }, [currentCampaign])
+  }, [currentCampaign, isSavingToDrive])
 
   // ✅ Estado de Google Drive
   const [driveStatus, setDriveStatus] = useState({
@@ -164,7 +193,17 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
     const updateDriveStatus = () => {
       const status = zeroConfigGoogleDrive.getStatus()
       setDriveStatus(status)
-      debug('Drive Status:', status) // Debug temporal
+      
+      // Debug más detallado
+      if (status.pendingChanges > 0) {
+        debug(`📋 Estado Drive:`, {
+          connected: status.connected,
+          folderSelected: status.folderSelected,
+          autoSaveEnabled: status.autoSaveEnabled,
+          pendingChanges: status.pendingChanges,
+          user: status.user
+        })
+      }
     }
     
     updateDriveStatus()
@@ -175,7 +214,19 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
   // ✅ Auto-marcar campaña para guardado automático cuando cambie
   useEffect(() => {
     if (driveStatus.connected && driveStatus.folderSelected && currentCampaign) {
+      debug(`🔄 Marcando para auto-guardado: ${currentCampaign.name}`, {
+        connected: driveStatus.connected,
+        folderSelected: driveStatus.folderSelected,
+        autoSaveEnabled: driveStatus.autoSaveEnabled,
+        pendingChanges: driveStatus.pendingChanges
+      })
       zeroConfigGoogleDrive.markForAutoSave(currentCampaign.name, currentCampaign)
+    } else {
+      debug('❌ No se puede marcar para auto-guardado:', {
+        connected: driveStatus.connected,
+        folderSelected: driveStatus.folderSelected,
+        hasCampaign: !!currentCampaign
+      })
     }
   }, [currentCampaign, driveStatus.connected, driveStatus.folderSelected])
 
@@ -231,21 +282,23 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
                 variant="compact"
                 onClick={handleSaveToGoogleDrive}
                 icon={<Save size={16} />}
-                title={driveStatus.connected && driveStatus.folderSelected ? "Guardar en Google Drive" : "Google Drive no configurado"}
+                title={driveStatus.connected && driveStatus.folderSelected ? "Guardar campaña manualmente en Google Drive" : "Google Drive no configurado"}
                 aria-label="Guardar en Google Drive"
                 className={styles.driveButton}
-                disabled={!driveStatus.connected || !driveStatus.folderSelected}
+                disabled={!driveStatus.connected || !driveStatus.folderSelected || isSavingToDrive}
                 style={{
                   background: driveStatus.connected && driveStatus.folderSelected 
-                    ? (driveStatus.autoSaveEnabled ? '#10b981' : '#6b7280')
+                    ? (isSavingToDrive ? '#f59e0b' : driveStatus.autoSaveEnabled ? '#10b981' : '#6b7280')
                     : '#4a5568',
                   color: 'white',
                   border: 'none',
-                  opacity: driveStatus.connected && driveStatus.folderSelected ? 1 : 0.6
+                  opacity: driveStatus.connected && driveStatus.folderSelected ? 1 : 0.6,
+                  cursor: isSavingToDrive ? 'wait' : 'pointer'
                 }}
               >
-                <span className={styles.driveText}>
-                  {driveStatus.connected && driveStatus.folderSelected
+                <span className="driveText">
+                  {isSavingToDrive ? '💾 Guardando...' :
+                   driveStatus.connected && driveStatus.folderSelected
                     ? (driveStatus.autoSaveEnabled ? '☁️ Auto' : '☁️ Drive')
                     : '☁️ Off'}
                 </span>

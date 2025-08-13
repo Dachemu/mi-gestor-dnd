@@ -303,15 +303,29 @@ function CampaignSelector({ onSelectCampaign }) {
               <CompactDriveButton 
                 onCampaignLoaded={(name, data) => {
                   setCampaigns(prevCampaigns => {
-                    const newCampaign = {
+                    // Verificar si ya existe una campaña con el mismo nombre
+                    const existingIndex = prevCampaigns.findIndex(c => c.name === name)
+                    
+                    const campaignData = {
                       ...data,
-                      id: generateId(),
+                      id: data.id || generateId(),
                       name: name,
                       lastModified: new Date().toISOString().split('T')[0]
                     }
-                    const newCampaigns = [...prevCampaigns, newCampaign]
+                    
+                    let newCampaigns
+                    if (existingIndex >= 0) {
+                      // Actualizar campaña existente
+                      newCampaigns = [...prevCampaigns]
+                      newCampaigns[existingIndex] = campaignData
+                      showNotification(`¡Campaña "${name}" actualizada desde Drive! 🔄`)
+                    } else {
+                      // Añadir nueva campaña
+                      newCampaigns = [...prevCampaigns, campaignData]
+                      showNotification(`¡Campaña "${name}" cargada desde Drive! 🎉`)
+                    }
+                    
                     saveCampaigns(newCampaigns)
-                    showNotification(`¡Campaña "${name}" cargada desde Drive! 🎉`)
                     return newCampaigns
                   })
                 }}
