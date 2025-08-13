@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react'
-import { SearchIcon, BackIcon, MenuIcon, CloseIcon } from '../components/ui/icons'
+import { SearchIcon, BackIcon, MenuIcon, CloseIcon } from '../components/ui/LazyIcons'
 import { debug, error as logError } from '../utils/logger'
 import { ImprovedSearchBox } from '../components/features/ImprovedSearchBox'
 import { useConnections } from '../hooks/useConnections.jsx'
 import { useSearch } from '../hooks/useSearch.jsx'
 import { saveCampaigns, loadCampaigns, exportCampaign } from '../services'
-import { Download } from 'lucide-react'
+import { Download } from '../components/ui/LazyIcons'
 import styles from './CampaignDashboard.module.css'
 import { BaseButton, BaseInput, BaseBadge, BaseLoader } from '../components/ui/base'
 
@@ -65,7 +65,7 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
     })
   }, [])
 
-  // Function to save changes to localStorage
+  // Function to save changes to localStorage - memoized to prevent re-renders
   const saveChanges = useCallback((campaignToSave) => {
     if (isSaving) return
     
@@ -84,7 +84,7 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
     } finally {
       setIsSaving(false)
     }
-  }, [isSaving])
+  }, [])
 
   // Hooks
   const connections = useConnections(currentCampaign, updateCampaign)
@@ -109,11 +109,11 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
     }, 150)
   }, [])
 
-  // ✅ Función para manejar click en resultado de búsqueda
+  // ✅ Función para manejar click en resultado de búsqueda - memoized
   const handleSearchItemClick = useCallback((item, type) => {
     navigateToItem(item, type)
     search.closeSearch()
-  }, [navigateToItem, search])
+  }, [navigateToItem, search.closeSearch])
 
   // ✅ Función para cambiar de pestaña
   const handleTabChange = useCallback((tabId) => {
@@ -132,7 +132,7 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
     } catch (error) {
       logError('Error al exportar campaña:', error)
     }
-  }, [currentCampaign, debug, logError])
+  }, [currentCampaign])
 
   return (
     <div className={styles.campaignManager}>

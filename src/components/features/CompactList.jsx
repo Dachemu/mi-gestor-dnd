@@ -1,5 +1,5 @@
 import React from 'react'
-import { Eye, Edit, Trash2, Link2 } from 'lucide-react'
+import { Eye, Edit, Trash2, Link2 } from '../ui/LazyIcons'
 import BaseCard from '../ui/base/BaseCard'
 import BaseBadge from '../ui/base/BaseBadge'
 

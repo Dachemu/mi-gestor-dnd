@@ -4,7 +4,7 @@
  */
 
 // Storage services
-export { loadCampaigns, saveCampaigns, exportCampaigns, importCampaigns, exportCampaign } from './storage'
+export { loadCampaigns, saveCampaigns, exportCampaign, importCampaign } from './storage'
 
 // Sync services
 export { default as syncService } from './syncService'
