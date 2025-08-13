@@ -5,6 +5,7 @@ import { loadCampaigns, saveCampaigns, generateId } from '../services/storage'
 import { useNotification } from '../hooks/useNotification.jsx'
 import { BaseButton, BaseInput, BaseCard } from '../components/ui/base'
 import { CompactDriveButton } from '../components/sync/CompactDriveButton'
+import { zeroConfigGoogleDrive } from '../services/zeroConfigGoogleDrive'
 
 // Datos iniciales mínimos para nuevas campañas
 const INITIAL_CAMPAIGN_DATA = {
@@ -134,6 +135,54 @@ function CampaignSelector({ onSelectCampaign }) {
     setCampaigns(savedCampaigns) // Si está vacío, queda vacío
     setIsLoading(false)
   }, [])
+
+  // 🎯 Escuchar cuando se cargan campañas desde Google Drive
+  useEffect(() => {
+    const handleGoogleDriveCampaigns = async (event) => {
+      const { campaigns: driveCampaigns, folder } = event.detail
+      
+      try {
+        setIsLoading(true)
+        showNotification(`📁 Encontradas ${driveCampaigns.length} campañas en "${folder.name}"`, 'info')
+        
+        // Cargar las campañas desde Drive y sincronizar con local
+        const loadedCampaigns = []
+        
+        for (const driveCampaign of driveCampaigns) {
+          try {
+            const campaignData = await zeroConfigGoogleDrive.loadCampaign(driveCampaign.name)
+            loadedCampaigns.push(campaignData)
+          } catch (error) {
+            logError(`Error cargando campaña ${driveCampaign.name}:`, error)
+          }
+        }
+        
+        if (loadedCampaigns.length > 0) {
+          // Actualizar estado local
+          setCampaigns(loadedCampaigns)
+          
+          // Guardar en localStorage también
+          saveCampaigns(loadedCampaigns)
+          
+          showNotification(`✅ ${loadedCampaigns.length} campañas cargadas desde Google Drive`, 'success')
+        }
+        
+      } catch (error) {
+        logError('Error procesando campañas de Drive:', error)
+        showNotification('❌ Error cargando campañas desde Drive', 'error')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    // Agregar listener para campañas de Google Drive
+    window.addEventListener('googleDriveCampaignsLoaded', handleGoogleDriveCampaigns)
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('googleDriveCampaignsLoaded', handleGoogleDriveCampaigns)
+    }
+  }, [showNotification])
 
   // Función de notificaciones ahora viene del hook centralizado
 

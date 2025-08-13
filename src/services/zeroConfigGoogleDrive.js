@@ -17,12 +17,19 @@ class ZeroConfigGoogleDrive {
     this.autoSaveInterval = null
     this.pendingChanges = new Map()
     
-    // TUS CREDENCIALES DE GOOGLE DRIVE
+    // Credenciales desde variables de entorno
     this.config = {
-      // Tu Client ID personal de Google Cloud Console
-      clientId: '683709048927-3ddtv1b059ir0tupu0aqmdep6c949pd6.apps.googleusercontent.com',
+      // Client ID desde .env
+      clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+      // App ID (solo números) desde .env
+      appId: import.meta.env.VITE_GOOGLE_APP_ID,
       // Scope para acceder a archivos de Drive que la app crea/modifica
       scope: 'https://www.googleapis.com/auth/drive.file'
+    }
+    
+    // Validar credenciales
+    if (!this.config.clientId || !this.config.appId) {
+      logError('⚠️ Credenciales de Google no configuradas. Verifica tu archivo .env')
     }
   }
 
@@ -32,12 +39,20 @@ class ZeroConfigGoogleDrive {
    */
   async connect() {
     try {
-      debug('🚀 Conectando con Google Drive (zero config)...')
+      debug('🚀 Conectando con Google Drive...')
+      
+      // Verificar credenciales
+      if (!this.config.clientId || !this.config.appId) {
+        throw new Error('Credenciales de Google no configuradas. Verifica tu archivo .env')
+      }
       
       // Paso 1: Cargar Google Identity
       await this.loadGoogleAPI()
       
-      // Paso 2: Autenticación OAuth
+      // Paso 2: Limpiar sesiones previas (forzar selector de cuenta)
+      await this.clearGoogleSession()
+      
+      // Paso 3: Autenticación OAuth
       const authResult = await this.authenticate()
       
       if (authResult) {
@@ -95,6 +110,33 @@ class ZeroConfigGoogleDrive {
   }
 
   /**
+   * Limpiar sesión de Google para forzar selector de cuenta
+   */
+  async clearGoogleSession() {
+    try {
+      debug('🧹 Limpiando sesión de Google...')
+      
+      // Revocar tokens previos si existen usando Google Identity Services
+      if (this.accessToken && window.google?.accounts?.oauth2) {
+        try {
+          window.google.accounts.oauth2.revoke(this.accessToken)
+        } catch (e) {
+          debug('Token ya revocado o inválido')
+        }
+      }
+      
+      // Limpiar token local
+      this.accessToken = null
+      this.isConnected = false
+      
+      debug('✅ Sesión limpiada')
+    } catch (error) {
+      debug('⚠️ Error limpiando sesión:', error)
+      // No fallar por esto
+    }
+  }
+
+  /**
    * Autenticación con popup de Google mejorado
    */
   authenticate() {
@@ -133,6 +175,7 @@ class ZeroConfigGoogleDrive {
         'copyhistory=no'
       ].join(',')
 
+      // Configuración simple y directa
       const tokenClient = window.google.accounts.oauth2.initTokenClient({
         client_id: this.config.clientId,
         scope: this.config.scope,
@@ -140,11 +183,8 @@ class ZeroConfigGoogleDrive {
           if (response.access_token) {
             resolve(response)
           } else {
-            reject(new Error('No se obtuvo token'))
+            reject(new Error('No se obtuvo token de acceso'))
           }
-        },
-        error_callback: (error) => {
-          reject(new Error(`Error: ${error.type}`))
         }
       })
       
@@ -157,10 +197,10 @@ class ZeroConfigGoogleDrive {
         return originalWindowOpen.call(this, url, name, features)
       }
       
-      // Abrir popup de autenticación
+      // Solicitar token con forzar selector de cuenta
       try {
         tokenClient.requestAccessToken({
-          prompt: 'consent'
+          prompt: 'select_account'
         })
       } finally {
         // Restaurar window.open original después de un momento
@@ -210,6 +250,10 @@ class ZeroConfigGoogleDrive {
         if (appFolder) {
           this.selectedFolder = appFolder
           this.startAutoSave()
+          
+          // Cargar campañas automáticamente después de seleccionar carpeta
+          setTimeout(() => this.loadCampaignsAfterSync(), 1000)
+          
           return appFolder
         }
       }
@@ -290,7 +334,7 @@ class ZeroConfigGoogleDrive {
         const picker = new window.google.picker.PickerBuilder()
           .enableFeature(window.google.picker.Feature.SUPPORT_DRIVES)
           .enableFeature(window.google.picker.Feature.SIMPLE_UPLOAD_ENABLED)
-          .setAppId('683709048927')
+          .setAppId(this.config.appId)
           .setOAuthToken(this.accessToken)
           .setSize(pickerWidth, pickerHeight)
           .setTitle('Seleccionar carpeta para Mi Gestor D&D')
@@ -310,6 +354,10 @@ class ZeroConfigGoogleDrive {
                 this.selectedFolder = selectedFolder
                 this.startAutoSave()
                 debug(`✅ Carpeta existente seleccionada: ${selectedFolder.name}`)
+                
+                // Cargar campañas automáticamente después de seleccionar carpeta
+                setTimeout(() => this.loadCampaignsAfterSync(), 1000)
+                
                 resolve(selectedFolder)
               } else if (useExisting === 'create') {
                 // Crear subcarpeta "Mi Gestor DnD" dentro de la seleccionada
@@ -317,6 +365,10 @@ class ZeroConfigGoogleDrive {
                 this.selectedFolder = newFolder
                 this.startAutoSave()
                 debug(`✅ Nueva carpeta creada: ${newFolder.name}`)
+                
+                // Cargar campañas automáticamente después de seleccionar carpeta
+                setTimeout(() => this.loadCampaignsAfterSync(), 1000)
+                
                 resolve(newFolder)
               } else {
                 reject(new Error('Selección cancelada por el usuario'))
@@ -717,6 +769,38 @@ class ZeroConfigGoogleDrive {
     this.userInfo = null
     this.pendingChanges.clear()
     debug('👋 Desconectado')
+  }
+
+  /**
+   * Cargar campañas automáticamente después de sincronizar
+   */
+  async loadCampaignsAfterSync() {
+    try {
+      debug('🔄 Cargando campañas desde Google Drive...')
+      
+      // Listar campañas disponibles
+      const campaigns = await this.listCampaigns()
+      
+      if (campaigns.length > 0) {
+        debug(`📋 Encontradas ${campaigns.length} campañas en Drive`)
+        
+        // Crear evento personalizado para notificar a la UI
+        const event = new CustomEvent('googleDriveCampaignsLoaded', {
+          detail: { campaigns, folder: this.selectedFolder }
+        })
+        window.dispatchEvent(event)
+        
+        // También intentar notificar directamente si hay un callback global
+        if (window.onGoogleDriveCampaignsLoaded) {
+          window.onGoogleDriveCampaignsLoaded(campaigns)
+        }
+      } else {
+        debug('📭 No se encontraron campañas en la carpeta seleccionada')
+      }
+      
+    } catch (error) {
+      logError('Error cargando campañas:', error)
+    }
   }
 
   /**
