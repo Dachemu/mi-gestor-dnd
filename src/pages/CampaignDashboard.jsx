@@ -281,7 +281,7 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
               <BaseButton
                 variant="compact"
                 onClick={handleSaveToGoogleDrive}
-                icon={<Save size={16} />}
+                icon={<Save size={isMobile ? 14 : 16} />}
                 title={driveStatus.connected && driveStatus.folderSelected ? "Guardar campaña manualmente en Google Drive" : "Google Drive no configurado"}
                 aria-label="Guardar en Google Drive"
                 className={styles.driveButton}
@@ -310,7 +310,7 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
               <BaseButton
                 variant="compact"
                 onClick={handleExportCampaign}
-                icon={<Download size={16} />}
+                icon={<Download size={isMobile ? 14 : 16} />}
                 title="Exportar campaña"
                 aria-label="Exportar campaña"
                 className={styles.exportButton}
