@@ -308,23 +308,31 @@ function ConnectionItem({ item, config, onRemove, onNavigate, compact = false })
   const displayDetail = item.role || item.class || item.status || item.type;
   
   return (
-    <div className="connection-item">
+    <div 
+      className="connection-item"
+      onClick={onNavigate}
+      onMouseEnter={(e) => {
+        // Cambiar color de todo el texto al hacer hover
+        const nameElement = e.currentTarget.querySelector('.connection-item-name')
+        const detailElement = e.currentTarget.querySelector('.connection-item-detail')
+        if (nameElement) nameElement.style.color = config.color
+        if (detailElement) detailElement.style.color = config.color
+      }}
+      onMouseLeave={(e) => {
+        // Restaurar colores originales
+        const nameElement = e.currentTarget.querySelector('.connection-item-name')
+        const detailElement = e.currentTarget.querySelector('.connection-item-detail')
+        if (nameElement) nameElement.style.color = 'white'
+        if (detailElement) detailElement.style.color = '#9ca3af'
+      }}
+    >
       {/* Icono del elemento */}
       <span className="connection-item-icon">
         {item.icon || item.avatar || config.icon}
       </span>
 
-      {/* Información del elemento - CLICKEABLE para navegar */}
-      <div 
-        onClick={onNavigate}
-        className="connection-item-info"
-        onMouseEnter={(e) => {
-          e.currentTarget.style.color = config.color
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.color = 'white'
-        }}
-      >
+      {/* Información del elemento */}
+      <div className="connection-item-info">
         <div className="connection-item-name">
           {displayName}
         </div>
@@ -358,6 +366,7 @@ function ConnectionItem({ item, config, onRemove, onNavigate, compact = false })
           align-items: center;
           gap: 0.5rem;
           transition: all 0.2s ease;
+          cursor: pointer;
         }
 
         .connection-item:hover {
@@ -373,7 +382,6 @@ function ConnectionItem({ item, config, onRemove, onNavigate, compact = false })
 
         .connection-item-info {
           flex: 1;
-          cursor: pointer;
           transition: color 0.2s ease;
           min-width: 0;
         }
