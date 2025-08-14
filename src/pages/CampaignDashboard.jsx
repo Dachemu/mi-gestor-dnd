@@ -201,33 +201,30 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
               navigateToItem={handleSearchItemClick}
               activeTab={activeTab}
             />
-            {/* Indicador de estado de Google Drive */}
+            {/* Indicador de estado de Google Drive - Punto discreto */}
             {!isMobile && (
               <div
-                className={styles.driveIndicator}
-                title={driveStatus.connected && driveStatus.folderSelected ? "Google Drive conectado - Guardado automático activo" : "Google Drive no configurado"}
+                className={styles.driveStatusDot}
+                title={isSaving ? 'Guardando...' :
+                       driveStatus.connected && driveStatus.folderSelected
+                       ? 'Drive On'
+                       : 'Drive Off'}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '8px 12px',
-                  borderRadius: '8px',
-                  fontSize: '0.85rem',
-                  fontWeight: '500',
-                  background: driveStatus.connected && driveStatus.folderSelected 
-                    ? (isSaving ? '#f59e0b' : '#10b981')
-                    : '#4a5568',
-                  color: 'white',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  opacity: driveStatus.connected && driveStatus.folderSelected ? 1 : 0.6
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '50%',
+                  backgroundColor: isSaving ? '#f59e0b' :
+                                   driveStatus.connected && driveStatus.folderSelected
+                                   ? '#10b981'  // Verde si conectado
+                                   : '#6b7280', // Gris si desconectado
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  opacity: driveStatus.connected && driveStatus.folderSelected ? 1 : 0.7,
+                  boxShadow: driveStatus.connected && driveStatus.folderSelected 
+                    ? '0 0 8px rgba(16, 185, 129, 0.4)' 
+                    : 'none'
                 }}
-              >
-                <span>
-                  {isSaving ? '💾 Guardando...' :
-                   driveStatus.connected && driveStatus.folderSelected
-                    ? '☁️ Conectado'
-                    : '☁️ Desconectado'}
-                </span>
-              </div>
+              />
             )}
 
             {/* Botón de exportar */}
