@@ -76,48 +76,25 @@ const EMOJI_CATEGORIES = {
 function EmojiSelector({ value, onChange, name, entityType }) {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('personas')
-  const [dropdownPosition, setDropdownPosition] = useState('bottom')
-  const dropdownRef = useRef(null)
-  const buttonRef = useRef(null)
-  
-  // Calcular posición óptima del dropdown
-  const calculateDropdownPosition = () => {
-    if (!buttonRef.current) return
-    
-    const buttonRect = buttonRef.current.getBoundingClientRect()
-    const viewport = {
-      width: window.innerWidth,
-      height: window.innerHeight
-    }
-    
-    // Altura estimada del dropdown
-    const dropdownHeight = 500 // altura aproximada del dropdown
-    const spaceBelow = viewport.height - buttonRect.bottom
-    const spaceAbove = buttonRect.top
-    
-    // Si hay más espacio arriba y poco espacio abajo, abrir hacia arriba
-    if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
-      setDropdownPosition('top')
-    } else {
-      setDropdownPosition('bottom')
-    }
-  }
+  const modalRef = useRef(null)
 
-  // Cerrar dropdown al hacer clic fuera
+  // Cerrar modal con tecla Escape
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const handleEscapeKey = (event) => {
+      if (event.key === 'Escape' && isOpen) {
         setIsOpen(false)
       }
     }
 
     if (isOpen) {
-      calculateDropdownPosition()
-      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('keydown', handleEscapeKey)
+      // Prevenir scroll en el body
+      document.body.style.overflow = 'hidden'
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleEscapeKey)
+      document.body.style.overflow = 'unset'
     }
   }, [isOpen])
 
@@ -136,10 +113,9 @@ function EmojiSelector({ value, onChange, name, entityType }) {
   const currentEmoji = value || '🐉'
 
   return (
-    <div className="emoji-selector-container" ref={dropdownRef} style={{ position: 'relative' }}>
+    <div className="emoji-selector-container" style={{ position: 'relative' }}>
       {/* Botón para abrir el selector */}
       <button
-        ref={buttonRef}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         style={{
@@ -168,39 +144,100 @@ function EmojiSelector({ value, onChange, name, entityType }) {
         {currentEmoji}
       </button>
 
-      {/* Dropdown desplegable */}
+      {/* Modal overlay para emoticonos */}
       {isOpen && (
         <div
           style={{
-            position: 'absolute',
-            ...(dropdownPosition === 'top' 
-              ? { bottom: '100%', marginBottom: '0.5rem' } 
-              : { top: '100%', marginTop: '0.5rem' }
-            ),
-            right: '0', // Alinear a la derecha para evitar salirse del modal
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
             zIndex: 1000,
-            background: 'rgba(31, 41, 55, 0.95)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(107, 114, 128, 0.3)',
-            borderRadius: '12px',
-            padding: '1rem',
-            minWidth: '520px',
-            maxWidth: '600px',
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
-            // Asegurar que no se salga del viewport
-            transform: 'translateX(-50px)' // Offset hacia la izquierda para evitar desbordamiento
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1rem'
           }}
         >
-          {/* Pestañas de categorías */}
+          {/* Backdrop */}
           <div
             style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0, 0, 0, 0.5)',
+              backdropFilter: 'blur(4px)'
+            }}
+            onClick={() => setIsOpen(false)}
+          />
+          
+          {/* Modal content */}
+          <div
+            style={{
+              position: 'relative',
+              background: 'rgba(31, 41, 55, 0.95)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(107, 114, 128, 0.3)',
+              borderRadius: '12px',
+              padding: 'clamp(1rem, 3vw, 1.5rem)',
+              width: '100%',
+              maxWidth: 'min(600px, 90vw)',
+              maxHeight: '80vh',
+              overflow: 'hidden',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4)'
+            }}
+          >
+            {/* Título del modal */}
+            <div style={{
               display: 'flex',
-              gap: '0.25rem',
-              marginBottom: '0.75rem',
-              padding: '0.25rem',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '1rem',
+              paddingBottom: '0.75rem',
+              borderBottom: '1px solid rgba(107, 114, 128, 0.2)'
+            }}>
+              <h3 style={{
+                margin: 0,
+                fontSize: 'clamp(1rem, 3vw, 1.25rem)',
+                fontWeight: '600',
+                color: 'white'
+              }}>
+                🎭 Elige un emoji
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'rgba(156, 163, 175, 1)',
+                  fontSize: '1.5rem',
+                  cursor: 'pointer',
+                  padding: '0.25rem',
+                  borderRadius: '4px',
+                  transition: 'color 0.2s ease'
+                }}
+                onMouseEnter={(e) => e.target.style.color = 'white'}
+                onMouseLeave={(e) => e.target.style.color = 'rgba(156, 163, 175, 1)'}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Pestañas de categorías */}
+            <div
+            style={{
+              display: 'flex',
+              gap: 'clamp(0.125rem, 1vw, 0.25rem)',
+              marginBottom: 'clamp(0.5rem, 2vw, 0.75rem)',
+              padding: 'clamp(0.125rem, 1vw, 0.25rem)',
               background: 'rgba(17, 24, 39, 0.5)',
               borderRadius: '8px',
-              overflowX: 'auto'
+              overflowX: 'auto',
+              flexWrap: 'wrap'
             }}
           >
             {Object.entries(EMOJI_CATEGORIES).map(([key, category]) => (
@@ -209,16 +246,17 @@ function EmojiSelector({ value, onChange, name, entityType }) {
                 type="button"
                 onClick={() => setSelectedCategory(key)}
                 style={{
-                  padding: '0.375rem 0.75rem',
+                  padding: 'clamp(0.25rem, 1.5vw, 0.375rem) clamp(0.5rem, 2vw, 0.75rem)',
                   borderRadius: '6px',
-                  fontSize: '0.75rem',
+                  fontSize: 'clamp(0.65rem, 2vw, 0.8rem)',
                   fontWeight: '500',
                   whiteSpace: 'nowrap',
                   cursor: 'pointer',
                   border: 'none',
                   transition: 'all 0.15s ease',
                   background: selectedCategory === key ? 'var(--primary)' : 'transparent',
-                  color: selectedCategory === key ? 'white' : 'rgba(156, 163, 175, 1)'
+                  color: selectedCategory === key ? 'white' : 'rgba(156, 163, 175, 1)',
+                  minHeight: '32px'
                 }}
                 onMouseEnter={(e) => {
                   if (selectedCategory !== key) {
@@ -242,9 +280,9 @@ function EmojiSelector({ value, onChange, name, entityType }) {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(12, 1fr)',
-              gap: '0.2rem',
-              maxHeight: '400px',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(50px, 1fr))',
+              gap: 'clamp(0.25rem, 1.5vw, 0.5rem)',
+              maxHeight: 'clamp(300px, 60vh, 450px)',
               overflowY: 'auto',
               scrollbarWidth: 'thin',
               scrollbarColor: 'rgba(107, 114, 128, 0.5) transparent'
@@ -257,16 +295,18 @@ function EmojiSelector({ value, onChange, name, entityType }) {
                 onClick={() => handleEmojiSelect(emoji)}
                 style={{
                   aspectRatio: '1',
-                  padding: '0.375rem',
-                  borderRadius: '6px',
-                  fontSize: '1.25rem',
+                  padding: 'clamp(0.375rem, 2vw, 0.625rem)',
+                  borderRadius: '10px',
+                  fontSize: 'clamp(1.25rem, 4vw, 2rem)',
                   cursor: 'pointer',
-                  transition: 'all 0.15s ease',
+                  transition: 'all 0.2s ease',
                   background: 'transparent',
                   border: 'none',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  minHeight: '50px',
+                  minWidth: '50px'
                 }}
                 onMouseEnter={(e) => {
                   e.target.style.background = 'rgba(79, 70, 229, 0.2)'
@@ -280,6 +320,7 @@ function EmojiSelector({ value, onChange, name, entityType }) {
                 {emoji}
               </button>
             ))}
+            </div>
           </div>
         </div>
       )}

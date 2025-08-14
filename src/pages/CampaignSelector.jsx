@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { debug, error as logError } from '../utils/logger'
-import { Upload, Download, Trash2 } from 'lucide-react'
+import { Upload, Download, Trash2, Edit2 } from 'lucide-react'
 import { loadCampaigns, saveCampaigns, generateId } from '../services/storage'
 import { useNotification } from '../hooks/useNotification.jsx'
 import { BaseButton, BaseCard } from '../components/ui/base'
 import { CompactDriveButton } from '../components/sync/CompactDriveButton'
 import { zeroConfigGoogleDrive } from '../services/zeroConfigGoogleDrive'
 import CreateCampaignForm from './CreateCampaignForm'
+import EditCampaignForm from './EditCampaignForm'
 
 // Datos iniciales mínimos para nuevas campañas
 const INITIAL_CAMPAIGN_DATA = {
@@ -124,6 +125,7 @@ function CampaignSelector({ onSelectCampaign }) {
   // 🎯 Estado - ARRANCA VACÍO
   const [campaigns, setCampaigns] = useState([])
   const [showNewCampaignForm, setShowNewCampaignForm] = useState(false)
+  const [editingCampaign, setEditingCampaign] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   
   // Hook de notificaciones
@@ -243,6 +245,27 @@ function CampaignSelector({ onSelectCampaign }) {
       });
       showNotification('Campaña eliminada exitosamente')
     }
+  }
+
+
+  // 🎯 Función para editar campaña
+  const handleEditCampaign = (campaign) => {
+    setEditingCampaign(campaign)
+  }
+
+  // 🎯 Función para actualizar campaña
+  const handleUpdateCampaign = (updatedCampaign) => {
+    setCampaigns(prevCampaigns => {
+      const newCampaigns = prevCampaigns.map(campaign => 
+        campaign.id === updatedCampaign.id 
+          ? { ...updatedCampaign, lastModified: new Date().toISOString().split('T')[0] }
+          : campaign
+      );
+      saveCampaigns(newCampaigns);
+      return newCampaigns;
+    });
+    showNotification(`¡Campaña "${updatedCampaign.name}" actualizada exitosamente! ✨`)
+    setEditingCampaign(null)
   }
 
   // 🎯 Función para exportar campaña
@@ -420,6 +443,7 @@ function CampaignSelector({ onSelectCampaign }) {
                 onSelect={() => onSelectCampaign(campaign)}
                 onDelete={() => handleDeleteCampaign(campaign.id)}
                 onExport={() => handleExportCampaign(campaign)}
+                onEdit={() => handleEditCampaign(campaign)}
               />
             ))}
           </div>
@@ -560,6 +584,15 @@ function CampaignSelector({ onSelectCampaign }) {
         }
       `}</style>
 
+      {/* Modal para editar campaña */}
+      {editingCampaign && (
+        <EditCampaignForm
+          campaign={editingCampaign}
+          onClose={() => setEditingCampaign(null)}
+          onUpdateCampaign={handleUpdateCampaign}
+        />
+      )}
+
       {/* Modal para nueva campaña */}
       {showNewCampaignForm && (
         <CreateCampaignForm
@@ -587,7 +620,7 @@ const getCampaignIcon = (campaignName) => {
 }
 
 // 🎯 Componente para cada tarjeta de campaña
-function CampaignCard({ campaign, onSelect, onDelete, onExport }) {
+function CampaignCard({ campaign, onSelect, onDelete, onExport, onEdit }) {
   const campaignIcon = campaign.emoji || getCampaignIcon(campaign.name)
   
   return (
@@ -631,6 +664,20 @@ function CampaignCard({ campaign, onSelect, onDelete, onExport }) {
         </div>
         
         <BaseCard.Actions>
+          <BaseButton
+            variant="compact"
+            onClick={(e) => {
+              e.stopPropagation()
+              onEdit()
+            }}
+            icon={<Edit2 size={16} />}
+            title="Editar campaña"
+            style={{
+              background: 'rgba(16, 185, 129, 0.2)',
+              borderColor: 'rgba(16, 185, 129, 0.3)',
+              color: '#10b981'
+            }}
+          />
           <BaseButton
             variant="compact"
             onClick={(e) => {
