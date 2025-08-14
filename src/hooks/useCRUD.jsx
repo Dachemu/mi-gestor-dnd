@@ -18,9 +18,9 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
   // Hook de notificaciones
   const { showNotification, NotificationComponent } = useNotification()
 
-  // Sincronizar SOLO cuando initialData cambie externamente (ej. cambio de campaña)
+  // Sincronizar SIEMPRE que initialData cambie externamente (incluye arrays vacíos)
   useEffect(() => {
-    if (initialData && initialData.length > 0) {
+    if (Array.isArray(initialData)) {
       setItems(initialData)
     }
   }, [initialData])
@@ -102,7 +102,7 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
       )
       
       setItems(updatedItems)
-      updateCampaign?.(entityType, updatedItems)
+      updateCampaign?.({ [entityType]: updatedItems })
       setShowForm(false)
       markSyncChanges()
       showNotification(`${itemName} "${itemData.name || itemData.title}" actualizado`)
@@ -118,7 +118,9 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
       lastModified: new Date().toISOString()
     })
     
-    setItems(prev => [...prev, newItem])
+    const updatedItems = [...items, newItem]
+    setItems(updatedItems)
+    updateCampaign?.({ [entityType]: updatedItems })
     setShowForm(false)
     markSyncChanges()
     showNotification(`${itemName} "${newItem.name || newItem.title}" creado exitosamente`)
@@ -127,7 +129,9 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
 
   // Eliminar elemento
   const handleDelete = (id, name) => {
-    setItems(prev => prev.filter(item => item.id !== id))
+    const updatedItems = items.filter(item => item.id !== id)
+    setItems(updatedItems)
+    updateCampaign?.({ [entityType]: updatedItems })
     
     // Si el elemento eliminado estaba seleccionado, deseleccionar
     if (selectedItem?.id === id) {

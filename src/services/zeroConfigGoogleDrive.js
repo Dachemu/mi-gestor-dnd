@@ -12,10 +12,8 @@ class ZeroConfigGoogleDrive {
     this.selectedFolder = null
     this.userInfo = null
     
-    // Auto-guardado
-    this.autoSaveEnabled = false
-    this.autoSaveInterval = null
-    this.pendingChanges = new Map()
+    // Auto-guardado basado en eventos (siempre habilitado cuando está conectado)
+    this.autoSaveEnabled = true
     
     // Credenciales desde variables de entorno
     this.config = {
@@ -718,56 +716,79 @@ class ZeroConfigGoogleDrive {
     }
   }
 
-  // ========== AUTO-GUARDADO ==========
+  // ========== GUARDADO AUTOMÁTICO BASADO EN EVENTOS ==========
 
+  /**
+   * Guarda inmediatamente una campaña en Google Drive
+   * Se ejecuta automáticamente cuando ocurren cambios específicos
+   */
+  async saveImmediately(campaignName, campaignData) {
+    if (!this.isConnected || !this.selectedFolder) {
+      debug(`⚠️ No se puede guardar ${campaignName}: Drive no conectado o carpeta no seleccionada`)
+      return false
+    }
+
+    try {
+      debug(`💾 Guardando automáticamente: ${campaignName}`)
+      await this.saveCampaign(campaignName, campaignData)
+      debug(`✅ ${campaignName} guardada automáticamente`)
+      return true
+    } catch (error) {
+      logError(`❌ Error guardando automáticamente ${campaignName}:`, error)
+      return false
+    }
+  }
+
+  /**
+   * Método de transición - mantiene compatibilidad con código existente
+   * @deprecated - Se eliminará en futuras versiones
+   */
+  markForAutoSave(campaignName, campaignData) {
+    debug('⚠️ markForAutoSave está deprecated - usando saveImmediately')
+    return this.saveImmediately(campaignName, campaignData)
+  }
+
+  /**
+   * Funciones preparadas para eventos futuros
+   */
+  
+  // Guardado cuando se duplica un elemento
+  async onElementDuplicated(campaignName, campaignData, elementType, originalElement, duplicatedElement) {
+    debug(`📋 Elemento duplicado: ${elementType} - ${originalElement.name} -> ${duplicatedElement.name}`)
+    return this.saveImmediately(campaignName, campaignData)
+  }
+
+  // Guardado cuando se reordena una lista
+  async onElementsReordered(campaignName, campaignData, elementType, reorderDetails) {
+    debug(`🔀 Elementos reordenados: ${elementType}`, reorderDetails)
+    return this.saveImmediately(campaignName, campaignData)
+  }
+
+  // Guardado cuando se cambian configuraciones de campaña
+  async onCampaignSettingsChanged(campaignName, campaignData, changedSettings) {
+    debug(`⚙️ Configuración de campaña cambiada:`, changedSettings)
+    return this.saveImmediately(campaignName, campaignData)
+  }
+
+  /**
+   * Métodos legacy - mantienen compatibilidad pero ya no hacen nada
+   */
   startAutoSave() {
-    this.autoSaveEnabled = true
-    this.autoSaveInterval = setInterval(() => {
-      this.processAutoSave()
-    }, 30000)
-    debug('🔄 Auto-guardado iniciado')
+    debug('🔄 Auto-guardado basado en eventos activado')
   }
 
   stopAutoSave() {
-    this.autoSaveEnabled = false
-    if (this.autoSaveInterval) {
-      clearInterval(this.autoSaveInterval)
-    }
-    debug('⏹️ Auto-guardado detenido')
-  }
-
-  markForAutoSave(campaignName, campaignData) {
-    if (this.autoSaveEnabled && this.selectedFolder) {
-      this.pendingChanges.set(campaignName, {
-        data: campaignData,
-        timestamp: Date.now()
-      })
-    }
-  }
-
-  async processAutoSave() {
-    if (this.pendingChanges.size === 0) return
-
-    for (const [campaignName, change] of this.pendingChanges) {
-      try {
-        await this.saveCampaign(campaignName, change.data)
-        this.pendingChanges.delete(campaignName)
-      } catch (error) {
-        logError(`Error auto-guardando ${campaignName}:`, error)
-      }
-    }
+    debug('⏹️ Auto-guardado basado en eventos disponible')
   }
 
   /**
    * Desconectar
    */
   disconnect() {
-    this.stopAutoSave()
     this.isConnected = false
     this.accessToken = null
     this.selectedFolder = null
     this.userInfo = null
-    this.pendingChanges.clear()
     debug('👋 Desconectado')
   }
 
@@ -812,8 +833,39 @@ class ZeroConfigGoogleDrive {
       folderSelected: !!this.selectedFolder,
       folderName: this.selectedFolder?.name || null,
       autoSaveEnabled: this.autoSaveEnabled,
-      pendingChanges: this.pendingChanges.size,
       user: this.userInfo?.name || null
+    }
+  }
+
+  /**
+   * Diagnóstico de configuración
+   */
+  getDiagnostics() {
+    const currentUrl = window.location.origin
+    const hasCredentials = !!(this.config.clientId && this.config.appId)
+    
+    return {
+      currentUrl,
+      clientId: this.config.clientId ? `${this.config.clientId.substring(0, 20)}...` : 'NO CONFIGURADO',
+      appId: this.config.appId || 'NO CONFIGURADO',
+      hasCredentials,
+      googleApisLoaded: !!(window.google && window.gapi),
+      status: this.getStatus(),
+      requiredUrls: [
+        `${currentUrl}`,
+        `http://localhost:4000`,
+        `http://localhost:4001`,
+        `http://localhost:4002`,
+        `http://localhost:4003`,
+        `http://localhost:4004`,
+        `http://localhost:4005`,
+        `http://127.0.0.1:4000`,
+        `http://127.0.0.1:4001`,
+        `http://127.0.0.1:4002`,
+        `http://127.0.0.1:4003`,
+        `http://127.0.0.1:4004`,
+        `http://127.0.0.1:4005`
+      ]
     }
   }
 }

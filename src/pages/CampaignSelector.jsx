@@ -9,59 +9,14 @@ import { zeroConfigGoogleDrive } from '../services/zeroConfigGoogleDrive'
 import CreateCampaignForm from './CreateCampaignForm'
 import EditCampaignForm from './EditCampaignForm'
 
-// Datos iniciales mínimos para nuevas campañas
+// Estructura vacía para nuevas campañas - sin contenido por defecto
 const INITIAL_CAMPAIGN_DATA = {
-  locations: [
-    {
-      name: "Taberna del Dragón Dorado",
-      description: "Una acogedora taberna en el centro de la ciudad",
-      importance: "Alta",
-      inhabitants: "Bardo local, comerciantes, aventureros",
-      notes: "Lugar perfecto para conseguir información y rumores",
-      icon: "🏛️",
-      category: "General",
-      linkedItems: { locations: [], players: [], npcs: [], quests: [], objects: [] },
-      createdAt: new Date().toISOString().split('T')[0]
-    }
-  ],
-  npcs: [
-    {
-      name: "Maestro Alaric",
-      role: "Sabio del pueblo",
-      description: "Un anciano mago retirado que vive en una torre",
-      attitude: "Amistoso",
-      notes: "Conoce la historia antigua de la región",
-      icon: "🧙",
-      category: "General",
-      linkedItems: { locations: [], players: [], npcs: [], quests: [], objects: [] },
-      createdAt: new Date().toISOString().split('T')[0]
-    }
-  ],
-  quests: [
-    {
-      name: "Recuperar el Amuleto Perdido",
-      description: "Un artefacto ancestral ha sido robado del templo",
-      status: "Pendiente",
-      priority: "Alta",
-      location: "Templo de la Luna",
-      reward: "500 monedas de oro",
-      notes: "Los ladrones fueron vistos dirigiéndose hacia el bosque",
-      icon: "📜",
-      category: "General",
-      linkedItems: { locations: [], players: [], npcs: [], quests: [], objects: [] },
-      createdAt: new Date().toISOString().split('T')[0]
-    }
-  ],
-  notes: [
-    {
-      title: "Bienvenido a tu nueva campaña",
-      content: "¡Comienza a crear tu mundo fantástico! Usa las diferentes pestañas para añadir lugares, personajes, misiones y más.",
-      category: "General",
-      icon: "📝",
-      linkedItems: { locations: [], players: [], npcs: [], quests: [], objects: [] },
-      createdAt: new Date().toISOString().split('T')[0]
-    }
-  ]
+  locations: [],
+  npcs: [],
+  players: [],
+  quests: [],
+  objects: [],
+  notes: []
 }
 
 // 🎯 FUNCIONES DE PERSISTENCIA - Ahora usando servicio centralizado
@@ -193,34 +148,11 @@ function CampaignSelector({ onSelectCampaign }) {
   const handleCreateCampaign = (newCampaignBasic) => {
     debug('Creando nueva campaña:', newCampaignBasic)
     
-    // Crear campaña con estructura básica
+    // Crear campaña con estructura vacía
     const newCampaign = {
       ...newCampaignBasic,
-      // Copiar estructura básica (no ejemplos extensos)
-      ...JSON.parse(JSON.stringify(INITIAL_CAMPAIGN_DATA)),
-      // Generar IDs únicos
-      locations: INITIAL_CAMPAIGN_DATA.locations.map(loc => ({ 
-        ...loc, 
-        id: generateId(),
-        createdAt: new Date().toISOString().split('T')[0]
-      })),
-      npcs: INITIAL_CAMPAIGN_DATA.npcs.map(npc => ({ 
-        ...npc, 
-        id: generateId(),
-        createdAt: new Date().toISOString().split('T')[0]
-      })),
-      players: [], // Empezar sin jugadores
-      quests: INITIAL_CAMPAIGN_DATA.quests.map(quest => ({ 
-        ...quest, 
-        id: generateId(),
-        createdAt: new Date().toISOString().split('T')[0]
-      })),
-      objects: [], // Empezar sin objetos
-      notes: INITIAL_CAMPAIGN_DATA.notes.map(note => ({ 
-        ...note, 
-        id: generateId(),
-        createdAt: new Date().toISOString().split('T')[0]
-      }))
+      // Usar estructura vacía
+      ...INITIAL_CAMPAIGN_DATA
     }
     
     // Añadir al estado y guardar
@@ -230,6 +162,9 @@ function CampaignSelector({ onSelectCampaign }) {
       return newCampaigns;
     });
     
+    // Guardar automáticamente en Google Drive
+    zeroConfigGoogleDrive.saveImmediately(newCampaign.name, newCampaign)
+    
     // Mostrar notificación en lugar de alert
     showNotification(`¡Campaña "${newCampaign.name}" creada exitosamente! 🎉`)
     setShowNewCampaignForm(false)
@@ -237,12 +172,19 @@ function CampaignSelector({ onSelectCampaign }) {
 
   // 🎯 Función para eliminar campaña
   const handleDeleteCampaign = (campaignId) => {
+    const campaignToDelete = campaigns.find(c => c.id === campaignId)
     if (window.confirm('¿Estás seguro de que quieres eliminar esta campaña?')) {
       setCampaigns(prevCampaigns => {
         const newCampaigns = prevCampaigns.filter(c => c.id !== campaignId);
         saveCampaigns(newCampaigns);
         return newCampaigns;
       });
+      
+      // Eliminar de Google Drive también (implementar después si es necesario)
+      if (campaignToDelete) {
+        debug(`🗑️ Campaña "${campaignToDelete.name}" eliminada`)
+      }
+      
       showNotification('Campaña eliminada exitosamente')
     }
   }
@@ -255,15 +197,22 @@ function CampaignSelector({ onSelectCampaign }) {
 
   // 🎯 Función para actualizar campaña
   const handleUpdateCampaign = (updatedCampaign) => {
+    const campaignWithTimestamp = { 
+      ...updatedCampaign, 
+      lastModified: new Date().toISOString().split('T')[0] 
+    }
+    
     setCampaigns(prevCampaigns => {
       const newCampaigns = prevCampaigns.map(campaign => 
-        campaign.id === updatedCampaign.id 
-          ? { ...updatedCampaign, lastModified: new Date().toISOString().split('T')[0] }
-          : campaign
+        campaign.id === updatedCampaign.id ? campaignWithTimestamp : campaign
       );
       saveCampaigns(newCampaigns);
       return newCampaigns;
     });
+    
+    // Guardar automáticamente en Google Drive
+    zeroConfigGoogleDrive.saveImmediately(campaignWithTimestamp.name, campaignWithTimestamp)
+    
     showNotification(`¡Campaña "${updatedCampaign.name}" actualizada exitosamente! ✨`)
     setEditingCampaign(null)
   }
@@ -292,6 +241,10 @@ function CampaignSelector({ onSelectCampaign }) {
             saveCampaigns(newCampaigns);
             return newCampaigns;
           });
+          
+          // Guardar automáticamente en Google Drive
+          zeroConfigGoogleDrive.saveImmediately(importedCampaign.name, importedCampaign)
+          
           showNotification(`¡Campaña "${importedCampaign.name}" importada exitosamente! 🎉`)
         } catch (error) {
           showNotification(`Error al importar: ${error.message}`, 'error')

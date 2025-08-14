@@ -66,20 +66,26 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
     })
   }, [])
 
-  // Function to save changes to localStorage - memoized to prevent re-renders
+  // Function to save changes to localStorage and Google Drive - memoized to prevent re-renders
   const saveChanges = useCallback((campaignToSave) => {
     if (isSaving) return
     
     setIsSaving(true)
     try {
       const campaigns = loadCampaigns()
+      const campaignWithTimestamp = { 
+        ...campaignToSave, 
+        lastModified: new Date().toISOString().split('T')[0] 
+      }
       const updatedCampaigns = campaigns.map(c => 
-        c.id === campaignToSave.id 
-          ? { ...campaignToSave, lastModified: new Date().toISOString().split('T')[0] }
-          : c
+        c.id === campaignToSave.id ? campaignWithTimestamp : c
       )
       saveCampaigns(updatedCampaigns)
-      debug('Cambios guardados automáticamente')
+      
+      // Guardar automáticamente en Google Drive
+      zeroConfigGoogleDrive.saveImmediately(campaignWithTimestamp.name, campaignWithTimestamp)
+      
+      debug('Cambios guardados automáticamente en local y Drive')
     } catch (error) {
       logError('Error al guardar cambios:', error)
     } finally {
@@ -135,100 +141,19 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
     }
   }, [currentCampaign])
 
-  // ✅ Función para guardar en Google Drive
-  const [isSavingToDrive, setIsSavingToDrive] = useState(false)
-  
-  const handleSaveToGoogleDrive = useCallback(async () => {
-    if (isSavingToDrive) return // Prevenir múltiples clicks
-    
-    try {
-      setIsSavingToDrive(true)
-      const status = zeroConfigGoogleDrive.getStatus()
-      
-      if (!status.connected || !status.folderSelected) {
-        debug('Google Drive no está conectado o configurado')
-        alert('Google Drive no está conectado. Ve al selector de campañas para configurarlo.')
-        return
-      }
-      
-      if (!currentCampaign?.name) {
-        debug('No hay campaña activa para guardar')
-        alert('No hay campaña activa para guardar')
-        return
-      }
-      
-      debug(`💾 Guardando manualmente: ${currentCampaign.name}`)
-      await zeroConfigGoogleDrive.saveCampaign(currentCampaign.name, currentCampaign)
-      debug('✅ Campaña guardada manualmente en Google Drive')
-      
-      // Mostrar confirmación visual temporal
-      const originalText = document.querySelector('.driveText')?.textContent
-      if (originalText) {
-        const driveText = document.querySelector('.driveText')
-        if (driveText) {
-          driveText.textContent = '✅ Guardado'
-          setTimeout(() => {
-            driveText.textContent = originalText
-          }, 2000)
-        }
-      }
-      
-    } catch (error) {
-      logError('❌ Error al guardar en Google Drive:', error)
-      alert(`Error al guardar en Google Drive: ${error.message}`)
-    } finally {
-      setIsSavingToDrive(false)
-    }
-  }, [currentCampaign, isSavingToDrive])
 
   // ✅ Estado de Google Drive
   const [driveStatus, setDriveStatus] = useState({
     connected: false,
     folderSelected: false,
-    autoSaveEnabled: false
+    autoSaveEnabled: true // Siempre habilitado para el guardado basado en eventos
   })
 
-  // ✅ Actualizar estado de Google Drive periódicamente
+  // ✅ Obtener estado inicial de Google Drive
   useEffect(() => {
-    const updateDriveStatus = () => {
-      const status = zeroConfigGoogleDrive.getStatus()
-      setDriveStatus(status)
-      
-      // Debug más detallado
-      if (status.pendingChanges > 0) {
-        debug(`📋 Estado Drive:`, {
-          connected: status.connected,
-          folderSelected: status.folderSelected,
-          autoSaveEnabled: status.autoSaveEnabled,
-          pendingChanges: status.pendingChanges,
-          user: status.user
-        })
-      }
-    }
-    
-    updateDriveStatus()
-    const interval = setInterval(updateDriveStatus, 3000)
-    return () => clearInterval(interval)
+    const status = zeroConfigGoogleDrive.getStatus()
+    setDriveStatus(status)
   }, [])
-
-  // ✅ Auto-marcar campaña para guardado automático cuando cambie
-  useEffect(() => {
-    if (driveStatus.connected && driveStatus.folderSelected && currentCampaign) {
-      debug(`🔄 Marcando para auto-guardado: ${currentCampaign.name}`, {
-        connected: driveStatus.connected,
-        folderSelected: driveStatus.folderSelected,
-        autoSaveEnabled: driveStatus.autoSaveEnabled,
-        pendingChanges: driveStatus.pendingChanges
-      })
-      zeroConfigGoogleDrive.markForAutoSave(currentCampaign.name, currentCampaign)
-    } else {
-      debug('❌ No se puede marcar para auto-guardado:', {
-        connected: driveStatus.connected,
-        folderSelected: driveStatus.folderSelected,
-        hasCampaign: !!currentCampaign
-      })
-    }
-  }, [currentCampaign, driveStatus.connected, driveStatus.folderSelected])
 
   return (
     <div className={styles.campaignManager}>
@@ -276,33 +201,33 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
               navigateToItem={handleSearchItemClick}
               activeTab={activeTab}
             />
-            {/* Botón de Google Drive */}
+            {/* Indicador de estado de Google Drive */}
             {!isMobile && (
-              <BaseButton
-                variant="compact"
-                onClick={handleSaveToGoogleDrive}
-                icon={<Save size={isMobile ? 14 : 16} />}
-                title={driveStatus.connected && driveStatus.folderSelected ? "Guardar campaña manualmente en Google Drive" : "Google Drive no configurado"}
-                aria-label="Guardar en Google Drive"
-                className={styles.driveButton}
-                disabled={!driveStatus.connected || !driveStatus.folderSelected || isSavingToDrive}
+              <div
+                className={styles.driveIndicator}
+                title={driveStatus.connected && driveStatus.folderSelected ? "Google Drive conectado - Guardado automático activo" : "Google Drive no configurado"}
                 style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  fontSize: '0.85rem',
+                  fontWeight: '500',
                   background: driveStatus.connected && driveStatus.folderSelected 
-                    ? (isSavingToDrive ? '#f59e0b' : driveStatus.autoSaveEnabled ? '#10b981' : '#6b7280')
+                    ? (isSaving ? '#f59e0b' : '#10b981')
                     : '#4a5568',
                   color: 'white',
-                  border: 'none',
-                  opacity: driveStatus.connected && driveStatus.folderSelected ? 1 : 0.6,
-                  cursor: isSavingToDrive ? 'wait' : 'pointer'
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  opacity: driveStatus.connected && driveStatus.folderSelected ? 1 : 0.6
                 }}
               >
-                <span className="driveText">
-                  {isSavingToDrive ? '💾 Guardando...' :
+                <span>
+                  {isSaving ? '💾 Guardando...' :
                    driveStatus.connected && driveStatus.folderSelected
-                    ? (driveStatus.autoSaveEnabled ? '☁️ Auto' : '☁️ Drive')
-                    : '☁️ Off'}
+                    ? '☁️ Conectado'
+                    : '☁️ Desconectado'}
                 </span>
-              </BaseButton>
+              </div>
             )}
 
             {/* Botón de exportar */}
