@@ -1,12 +1,14 @@
 import React, { useState } from 'react'
 import { generateId } from '../services/storage'
 import { BaseModal } from '../components/ui/base'
+import EmojiSelector from '../components/ui/EmojiSelector'
 
 function CreateCampaignForm({ onClose, onCreateCampaign }) {
   // Estado del formulario
   const [formData, setFormData] = useState({
     name: '',
-    description: ''
+    description: '',
+    emoji: '🐉'
   })
   
   // Estado para errores
@@ -56,6 +58,7 @@ function CreateCampaignForm({ onClose, onCreateCampaign }) {
       id: generateId(),
       name: formData.name.trim(),
       description: formData.description.trim() || 'Una nueva aventura épica te espera...',
+      emoji: formData.emoji,
       createdAt: new Date().toISOString().split('T')[0], // Solo la fecha
       lastModified: new Date().toISOString().split('T')[0],
       locations: 0,
@@ -83,6 +86,42 @@ function CreateCampaignForm({ onClose, onCreateCampaign }) {
 
         {/* Formulario */}
         <form onSubmit={handleSubmit}>
+          {/* Campo emoji y nombre */}
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '0.9rem',
+              fontWeight: '600',
+              color: 'var(--primary-light)',
+              marginBottom: '0.5rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em'
+            }}>
+              Icono de la campaña
+            </label>
+            <div style={{ 
+              display: 'flex', 
+              gap: '0.75rem', 
+              alignItems: 'flex-start',
+              marginBottom: '1rem'
+            }}>
+              <EmojiSelector
+                value={formData.emoji}
+                onChange={handleChange}
+                name="emoji"
+              />
+              <p style={{
+                fontSize: '0.8rem',
+                color: 'var(--text-muted)',
+                margin: '0.5rem 0 0 0',
+                fontStyle: 'italic',
+                lineHeight: '1.4'
+              }}>
+                Elige un emoticono que represente tu campaña
+              </p>
+            </div>
+          </div>
+
           {/* Campo nombre */}
           <div style={{ marginBottom: '1.5rem' }}>
             <label style={{

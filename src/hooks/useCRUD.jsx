@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { generateId } from '../services/storage'
 import { useNotification } from './useNotification.jsx'
-import syncService from '../services/syncService'
 import changeTracker from '../services/changeTracker'
 
 /**
@@ -49,7 +48,7 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
   // Marcar cambios pendientes cuando hay modificaciones
   const markSyncChanges = (campaignData = null) => {
     try {
-      syncService.markPendingChanges()
+      // Funcionalidad de sync deshabilitada temporalmente
       
       // Si tenemos datos de campaña completos, detectar cambios incrementales
       if (campaignData) {

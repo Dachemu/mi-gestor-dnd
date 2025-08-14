@@ -3,9 +3,10 @@ import { debug, error as logError } from '../utils/logger'
 import { Upload, Download, Trash2 } from 'lucide-react'
 import { loadCampaigns, saveCampaigns, generateId } from '../services/storage'
 import { useNotification } from '../hooks/useNotification.jsx'
-import { BaseButton, BaseInput, BaseCard } from '../components/ui/base'
+import { BaseButton, BaseCard } from '../components/ui/base'
 import { CompactDriveButton } from '../components/sync/CompactDriveButton'
 import { zeroConfigGoogleDrive } from '../services/zeroConfigGoogleDrive'
+import CreateCampaignForm from './CreateCampaignForm'
 
 // Datos iniciales mínimos para nuevas campañas
 const INITIAL_CAMPAIGN_DATA = {
@@ -561,7 +562,7 @@ function CampaignSelector({ onSelectCampaign }) {
 
       {/* Modal para nueva campaña */}
       {showNewCampaignForm && (
-        <NewCampaignForm
+        <CreateCampaignForm
           onClose={() => setShowNewCampaignForm(false)}
           onCreateCampaign={handleCreateCampaign}
         />
@@ -587,7 +588,7 @@ const getCampaignIcon = (campaignName) => {
 
 // 🎯 Componente para cada tarjeta de campaña
 function CampaignCard({ campaign, onSelect, onDelete, onExport }) {
-  const campaignIcon = getCampaignIcon(campaign.name)
+  const campaignIcon = campaign.emoji || getCampaignIcon(campaign.name)
   
   return (
     <BaseCard
@@ -673,105 +674,5 @@ function CampaignCard({ campaign, onSelect, onDelete, onExport }) {
   )
 }
 
-// 🎯 Formulario para crear nueva campaña
-function NewCampaignForm({ onClose, onCreateCampaign }) {
-  const [formData, setFormData] = useState({
-    name: '',
-    description: ''
-  })
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    if (!formData.name.trim()) return
-
-    const newCampaign = {
-      id: generateId(),
-      name: formData.name,
-      description: formData.description,
-      createdAt: new Date().toISOString().split('T')[0],
-      lastModified: new Date().toISOString().split('T')[0]
-    }
-
-    onCreateCampaign(newCampaign)
-  }
-
-  return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      background: 'rgba(0, 0, 0, 0.8)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      backdropFilter: 'blur(10px)'
-    }}>
-      <div style={{
-        background: 'rgba(31, 41, 55, 0.95)',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(79, 70, 229, 0.3)',
-        borderRadius: '20px',
-        padding: '2rem',
-        width: '90%',
-        maxWidth: '500px'
-      }}>
-        <h2 style={{ 
-          color: 'white', 
-          marginBottom: '2rem',
-          textAlign: 'center',
-          fontSize: '1.8rem'
-        }}>
-          🎲 Nueva Campaña
-        </h2>
-
-        <form onSubmit={handleSubmit}>
-          <BaseInput
-            label="Nombre de la campaña"
-            placeholder="Ej: La Sombra del Dragón"
-            value={formData.name}
-            onChange={(e) => setFormData(prev => ({...prev, name: e.target.value}))}
-            required
-            size="md"
-            style={{ marginBottom: '1.5rem' }}
-          />
-
-          <BaseInput
-            variant="textarea"
-            label="Descripción (opcional)"
-            placeholder="Una breve descripción de tu campaña..."
-            value={formData.description}
-            onChange={(e) => setFormData(prev => ({...prev, description: e.target.value}))}
-            rows={4}
-            size="md"
-            style={{ marginBottom: '2rem' }}
-          />
-
-          <div style={{ 
-            display: 'flex', 
-            gap: '1rem', 
-            justifyContent: 'flex-end' 
-          }}>
-            <BaseButton
-              variant="secondary"
-              onClick={onClose}
-              type="button"
-            >
-              Cancelar
-            </BaseButton>
-            <BaseButton
-              variant="primary"
-              type="submit"
-            >
-              🚀 Crear Campaña
-            </BaseButton>
-          </div>
-        </form>
-      </div>
-    </div>
-  )
-}
 
 export default CampaignSelector

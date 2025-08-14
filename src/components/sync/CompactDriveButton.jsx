@@ -33,7 +33,9 @@ export function CompactDriveButton({ onCampaignLoaded }) {
     try {
       const success = await zeroConfigGoogleDrive.connect()
       if (success) {
-        debug('✅ Conectado exitosamente - listo para configurar carpeta')
+        debug('✅ Conectado exitosamente - abriendo selector de carpeta')
+        // Automáticamente abrir selector de carpeta después de conectar
+        await zeroConfigGoogleDrive.selectFolder(true)
       }
     } catch (err) {
       setError(err.message)
@@ -42,29 +44,6 @@ export function CompactDriveButton({ onCampaignLoaded }) {
     }
   }
 
-  const handleSelectAutoFolder = async () => {
-    setIsLoading(true)
-    try {
-      await zeroConfigGoogleDrive.selectFolder(false) // Carpeta automática
-      debug('✅ Carpeta automática configurada')
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleSelectCustomFolder = async () => {
-    setIsLoading(true)
-    try {
-      await zeroConfigGoogleDrive.selectFolder(true) // Selector personalizado
-      debug('✅ Carpeta personalizada seleccionada')
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   const handleDisconnect = () => {
     zeroConfigGoogleDrive.disconnect()
@@ -110,43 +89,9 @@ export function CompactDriveButton({ onCampaignLoaded }) {
   if (!status.folderSelected) {
     return (
       <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-        <BaseButton
-          onClick={handleSelectAutoFolder}
-          disabled={isLoading}
-          variant="ghost" 
-          size="sm"
-          style={{
-            background: 'rgba(59, 130, 246, 0.2)',
-            color: 'white',
-            border: '1px solid rgba(59, 130, 246, 0.3)',
-            borderRadius: '6px',
-            fontSize: '0.75rem',
-            padding: '0.4rem 0.6rem'
-          }}
-        >
-          📁 Automática
-        </BaseButton>
-        <BaseButton
-          onClick={handleSelectCustomFolder}
-          disabled={isLoading}
-          variant="ghost"
-          size="sm"
-          style={{
-            background: 'rgba(16, 185, 129, 0.2)',
-            color: 'white',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
-            borderRadius: '6px',
-            fontSize: '0.75rem',
-            padding: '0.4rem 0.6rem'
-          }}
-        >
-          🔍 Elegir
-        </BaseButton>
-        {isLoading && (
-          <span style={{ color: 'white', fontSize: '0.7rem' }}>
-            Configurando...
-          </span>
-        )}
+        <span style={{ color: 'white', fontSize: '0.8rem' }}>
+          {isLoading ? 'Seleccionando carpeta...' : 'Conectado - Selecciona carpeta'}
+        </span>
       </div>
     )
   }

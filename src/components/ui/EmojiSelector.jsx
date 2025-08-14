@@ -133,7 +133,7 @@ function EmojiSelector({ value, onChange, name, entityType }) {
     setIsOpen(false)
   }
 
-  const currentEmoji = value || '😀'
+  const currentEmoji = value || '🐉'
 
   return (
     <div className="emoji-selector-container" ref={dropdownRef} style={{ position: 'relative' }}>
