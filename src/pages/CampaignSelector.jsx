@@ -7,6 +7,8 @@ import { BaseButton, BaseCard } from '../components/ui/base'
 import { CompactDriveButton } from '../components/sync/CompactDriveButton'
 import { zeroConfigGoogleDrive } from '../services/zeroConfigGoogleDrive'
 import CampaignForm from '../components/forms/CampaignForm'
+import { SortableContainer, DraggableCard } from '../components/drag'
+import { rectSortingStrategy } from '@dnd-kit/sortable'
 
 // Estructura vacía para nuevas campañas - sin contenido por defecto
 const INITIAL_CAMPAIGN_DATA = {
@@ -211,24 +213,31 @@ function CampaignSelector({ onSelectCampaign }) {
 
   // 🎯 Función para actualizar campaña
   const handleUpdateCampaign = (updatedCampaign) => {
-    const campaignWithTimestamp = { 
-      ...updatedCampaign, 
-      lastModified: new Date().toISOString().split('T')[0] 
+    const campaignWithTimestamp = {
+      ...updatedCampaign,
+      lastModified: new Date().toISOString().split('T')[0]
     }
-    
+
     setCampaigns(prevCampaigns => {
-      const newCampaigns = prevCampaigns.map(campaign => 
+      const newCampaigns = prevCampaigns.map(campaign =>
         campaign.id === updatedCampaign.id ? campaignWithTimestamp : campaign
       );
       saveCampaigns(newCampaigns);
       return newCampaigns;
     });
-    
+
     // Guardar automáticamente en Google Drive
     zeroConfigGoogleDrive.saveImmediately(campaignWithTimestamp.name, campaignWithTimestamp)
-    
+
     showNotification(`¡Campaña "${updatedCampaign.name}" actualizada exitosamente! ✨`)
     setEditingCampaign(null)
+  }
+
+  // 🎯 Función para reordenar campañas
+  const handleReorderCampaigns = (newOrder) => {
+    setCampaigns(newOrder)
+    saveCampaigns(newOrder)
+    debug('Campañas reordenadas')
   }
 
   // 🎯 Función para exportar campaña
@@ -403,16 +412,23 @@ function CampaignSelector({ onSelectCampaign }) {
           </div>
         ) : (
           <div className="campaigns-grid-compact">
-            {campaigns.map(campaign => (
-              <CampaignCard
-                key={campaign.id}
-                campaign={campaign}
-                onSelect={() => onSelectCampaign(campaign)}
-                onDelete={() => handleDeleteCampaign(campaign.id)}
-                onExport={() => handleExportCampaign(campaign)}
-                onEdit={() => handleEditCampaign(campaign)}
-              />
-            ))}
+            <SortableContainer
+              items={campaigns}
+              onReorder={handleReorderCampaigns}
+              strategy={rectSortingStrategy}
+            >
+              {campaigns.map(campaign => (
+                <DraggableCard key={campaign.id} id={campaign.id}>
+                  <CampaignCard
+                    campaign={campaign}
+                    onSelect={() => onSelectCampaign(campaign)}
+                    onDelete={() => handleDeleteCampaign(campaign.id)}
+                    onExport={() => handleExportCampaign(campaign)}
+                    onEdit={() => handleEditCampaign(campaign)}
+                  />
+                </DraggableCard>
+              ))}
+            </SortableContainer>
           </div>
         )}
       </div>

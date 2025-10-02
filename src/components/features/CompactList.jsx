@@ -2,6 +2,8 @@ import React from 'react'
 import { Eye, Edit, Trash2, Link2 } from '../ui/LazyIcons'
 import BaseCard from '../ui/base/BaseCard'
 import BaseBadge from '../ui/base/BaseBadge'
+import { SortableContainer, DraggableCard } from '../drag'
+import { rectSortingStrategy } from '@dnd-kit/sortable'
 
 /**
  * Componente para mostrar listas de elementos en formato compacto tipo cards
@@ -43,13 +45,14 @@ const createActionButton = (color, hoverColor, shadowColor) => ({
   overflow: 'hidden'
 })
 
-function CompactList({ 
-  items = [], 
-  itemType, 
-  onSelectItem, 
+function CompactList({
+  items = [],
+  itemType,
+  onSelectItem,
   getConnectionCount,
   emptyMessage = "No hay elementos aún",
-  emptyIcon = "📝"
+  emptyIcon = "📝",
+  onReorder = null
 }) {
   
   if (items.length === 0) {
@@ -73,92 +76,114 @@ function CompactList({
     )
   }
 
-  return (
-    <div className="responsive-grid">
-      {items.map(item => {
-        const connectionCount = getConnectionCount ? getConnectionCount(item) : 0
-        
-        return (
-          <BaseCard
-            key={item.id}
-            variant="compact"
-            clickable
-            onClick={() => onSelectItem(item)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                onSelectItem(item)
+  const renderCard = (item) => {
+    const connectionCount = getConnectionCount ? getConnectionCount(item) : 0
+
+    return (
+      <BaseCard
+        key={item.id}
+        variant="compact"
+        clickable
+        onClick={() => onSelectItem(item)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            onSelectItem(item)
+          }
+        }}
+        tabIndex={0}
+        role="button"
+        aria-label={`Ver detalles de ${item.name || item.title}`}
+        hoverEffect="lift"
+        icon={item.icon || '📝'}
+        badge={connectionCount > 0 ? connectionCount : null}
+        gradient="linear-gradient(90deg, #4f46e5, #3b82f6, #10b981, #f59e0b, #ec4899)"
+        className="compact-card"
+        data-item-id={item.id}
+      >
+        <BaseCard.Title style={{ textAlign: 'center' }}>
+          {item.name || item.title}
+        </BaseCard.Title>
+
+        {/* Información secundaria usando BaseBadge */}
+        <div style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '0.5rem',
+          marginBottom: '1rem'
+        }}>
+          {item.type && (
+            <BaseBadge variant="type" color="blue" size="sm">
+              {item.type}
+            </BaseBadge>
+          )}
+          {item.class && (
+            <BaseBadge variant="category" color="green" size="sm">
+              {item.class}
+            </BaseBadge>
+          )}
+          {item.role && (
+            <BaseBadge variant="category" color="purple" size="sm">
+              {item.role}
+            </BaseBadge>
+          )}
+          {item.status && (
+            <BaseBadge
+              variant="status"
+              color={
+                item.status === 'Completada' ? 'green' :
+                item.status === 'En progreso' ? 'orange' :
+                'gray'
               }
-            }}
-            tabIndex={0}
-            role="button"
-            aria-label={`Ver detalles de ${item.name || item.title}`}
-            hoverEffect="lift"
-            icon={item.icon || '📝'}
-            badge={connectionCount > 0 ? connectionCount : null}
-            gradient="linear-gradient(90deg, #4f46e5, #3b82f6, #10b981, #f59e0b, #ec4899)"
-            className="compact-card"
-            data-item-id={item.id}
-          >
-            <BaseCard.Title style={{ textAlign: 'center' }}>
-              {item.name || item.title}
-            </BaseCard.Title>
+              size="sm"
+            >
+              {item.status}
+            </BaseBadge>
+          )}
+        </div>
 
-            {/* Información secundaria usando BaseBadge */}
-            <div style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '0.5rem',
-              marginBottom: '1rem'
-            }}>
-              {item.type && (
-                <BaseBadge variant="type" color="blue" size="sm">
-                  {item.type}
-                </BaseBadge>
-              )}
-              {item.class && (
-                <BaseBadge variant="category" color="green" size="sm">
-                  {item.class}
-                </BaseBadge>
-              )}
-              {item.role && (
-                <BaseBadge variant="category" color="purple" size="sm">
-                  {item.role}
-                </BaseBadge>
-              )}
-              {item.status && (
-                <BaseBadge 
-                  variant="status" 
-                  color={
-                    item.status === 'Completada' ? 'green' : 
-                    item.status === 'En progreso' ? 'orange' : 
-                    'gray'
-                  }
-                  size="sm"
-                >
-                  {item.status}
-                </BaseBadge>
-              )}
-            </div>
+        {/* Descripción usando BaseCard.Description */}
+        {(item.description || item.content) && (
+          <BaseCard.Description>
+            {item.description || extractTextFromHTML(item.content)}
+          </BaseCard.Description>
+        )}
 
-            {/* Descripción usando BaseCard.Description */}
-            {(item.description || item.content) && (
-              <BaseCard.Description>
-                {item.description || extractTextFromHTML(item.content)}
-              </BaseCard.Description>
-            )}
+        {/* Indicador de conexiones */}
+        {connectionCount > 0 && (
+          <div className="connection-indicator">
+            <Link2 size={14} />
+            <span>{connectionCount} conexión{connectionCount !== 1 ? 'es' : ''}</span>
+          </div>
+        )}
 
-            {/* Indicador de conexiones */}
-            {connectionCount > 0 && (
-              <div className="connection-indicator">
-                <Link2 size={14} />
-                <span>{connectionCount} conexión{connectionCount !== 1 ? 'es' : ''}</span>
-              </div>
-            )}
+      </BaseCard>
+    )
+  }
 
-          </BaseCard>
-        )
-      })}
+  const gridContent = onReorder ? (
+    items.map(item => (
+      <DraggableCard key={item.id} id={item.id}>
+        {renderCard(item)}
+      </DraggableCard>
+    ))
+  ) : (
+    items.map(item => renderCard(item))
+  )
+
+  return (
+    <>
+      {onReorder ? (
+        <SortableContainer items={items} onReorder={onReorder} strategy={rectSortingStrategy}>
+          <div className="responsive-grid">
+            {gridContent}
+          </div>
+        </SortableContainer>
+      ) : (
+        <div className="responsive-grid">
+          {gridContent}
+        </div>
+      )}
 
       <style jsx>{`
         .responsive-grid {
@@ -322,7 +347,7 @@ function CompactList({
           }
         }
       `}</style>
-    </div>
+    </>
   )
 }
 

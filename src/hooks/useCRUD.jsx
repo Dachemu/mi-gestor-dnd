@@ -165,6 +165,13 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
     setSelectedItem(null)
   }
 
+  // Reordenar elementos (para drag & drop)
+  const handleReorder = (newOrder) => {
+    setItems(newOrder)
+    updateCampaign?.({ [entityType]: newOrder })
+    markSyncChanges()
+  }
+
   // Estado vacío
   const isEmpty = items.length === 0
 
@@ -182,6 +189,7 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
     handleSave,
     handleDelete,
     selectItem,
+    handleReorder,
 
     // Acciones de formulario
     openCreateForm,
@@ -191,7 +199,7 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
 
     // Utilidades
     showNotification,
-    
+
     // ✅ Componente de notificación
     NotificationComponent
   }

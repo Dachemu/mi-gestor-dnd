@@ -37,6 +37,7 @@ function UniversalManager({
     handleSave,
     handleDelete,
     selectItem,
+    handleReorder,
     openCreateForm,
     openEditForm,
     closeForm,
@@ -227,6 +228,7 @@ function UniversalManager({
           items={filteredItems}
           itemType={entityType}
           onSelectItem={selectItem}
+          onReorder={handleReorder}
           getConnectionCount={connections?.getConnectionCount}
           emptyMessage={config.emptyMessage}
           emptyIcon={config.emptyIcon}
