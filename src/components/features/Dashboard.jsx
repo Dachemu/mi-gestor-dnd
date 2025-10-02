@@ -1,5 +1,4 @@
 import React from 'react'
-import { COLORS, GRADIENTS } from '../../utils/styleHelpers'
 import { BaseCard, BaseButton, BaseBadge } from '../ui/base'
 
 /**
@@ -62,12 +61,19 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
       <div className="mission-list">
         {quests.length > 0 ? (
           <>
-            {displayQuests.map((quest, index) => (
-              <div
-                key={quest.id || index}
-                className="mission-item-card"
-                onClick={() => onNavigateToItem(quest, 'quests')}
-              >
+            {displayQuests.map((quest, index) => {
+              // Generar key única - advertir si no hay ID
+              if (!quest.id) {
+                console.warn('Quest sin ID encontrado:', quest);
+              }
+              const uniqueKey = quest.id || `quest-${quest.title || 'unnamed'}-${quest.status || 'nostatus'}-${index}`;
+
+              return (
+                <div
+                  key={uniqueKey}
+                  className="mission-item-card"
+                  onClick={() => onNavigateToItem(quest, 'quests')}
+                >
                 <span className="mission-item-icon">{quest.icon || '📜'}</span>
                 <span className="mission-item-title">{quest.title || quest.name}</span>
                 <BaseBadge 
@@ -87,7 +93,8 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
                    'BAJA'}
                 </BaseBadge>
               </div>
-            ))}
+              );
+            })}
             {hasMore && !expanded && (
               <div className="mission-more" onClick={() => setExpanded(true)}>
                 <p>+ {quests.length - maxItems} misiones más...</p>

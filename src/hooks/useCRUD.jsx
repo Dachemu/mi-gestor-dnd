@@ -43,14 +43,9 @@ export function useCRUD(initialData = [], itemName = 'elemento', entityConfig = 
     return item
   }
 
-  // Función de notificaciones ahora viene del hook centralizado
-
   // Marcar cambios pendientes cuando hay modificaciones
   const markSyncChanges = (campaignData = null) => {
     try {
-      // Funcionalidad de sync deshabilitada temporalmente
-      
-      // Si tenemos datos de campaña completos, detectar cambios incrementales
       if (campaignData) {
         changeTracker.detectChanges(campaignData)
       }

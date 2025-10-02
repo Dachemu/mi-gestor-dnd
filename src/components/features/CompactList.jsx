@@ -84,6 +84,15 @@ function CompactList({
             variant="compact"
             clickable
             onClick={() => onSelectItem(item)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                onSelectItem(item)
+              }
+            }}
+            tabIndex={0}
+            role="button"
+            aria-label={`Ver detalles de ${item.name || item.title}`}
             hoverEffect="lift"
             icon={item.icon || '📝'}
             badge={connectionCount > 0 ? connectionCount : null}

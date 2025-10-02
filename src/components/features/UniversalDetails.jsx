@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import DOMPurify from 'dompurify'
 import ConnectionsDisplay from './ConnectionsDisplay'
 import DynamicForm from './DynamicForm'
 // TiptapEditor ya genera HTML, no necesitamos formatear markdown
@@ -47,10 +48,17 @@ function UniversalDetails({
 
     switch (renderType) {
       case 'html':
+        // Sanitizar HTML antes de renderizar para prevenir XSS
+        const sanitizedHTML = DOMPurify.sanitize(value, {
+          ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'code', 'pre', 'a', 'span', 'div'],
+          ALLOWED_ATTR: ['class', 'style', 'href', 'target', 'rel'],
+          ALLOW_DATA_ATTR: false
+        })
+
         return (
-          <div 
-            style={{ 
-              color: 'var(--text-secondary)', 
+          <div
+            style={{
+              color: 'var(--text-secondary)',
               lineHeight: '1.6',
               background: 'rgba(31, 41, 55, 0.3)',
               padding: '1.5rem',
@@ -58,7 +66,7 @@ function UniversalDetails({
               border: '1px solid rgba(79, 70, 229, 0.1)',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
             }}
-            dangerouslySetInnerHTML={{ __html: value }}
+            dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
           />
         )
 
@@ -358,6 +366,8 @@ function UniversalDetails({
     const editButton = document.createElement('button')
     editButton.innerHTML = '✏️'
     editButton.title = 'Editar'
+    editButton.setAttribute('aria-label', `Editar ${item.name || item.title}`)
+    editButton.setAttribute('type', 'button')
     editButton.style.cssText = `
       background: rgba(79, 70, 229, 0.2);
       border: 1px solid rgba(79, 70, 229, 0.3);
@@ -382,12 +392,21 @@ function UniversalDetails({
       editButton.style.borderColor = 'rgba(79, 70, 229, 0.3)'
     })
     editButton.addEventListener('click', handleStartEdit)
+    // Soporte de teclado
+    editButton.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        handleStartEdit()
+      }
+    })
     actionContainer.appendChild(editButton)
 
     // Botón de eliminar compacto
     const deleteButton = document.createElement('button')
     deleteButton.innerHTML = '🗑️'
     deleteButton.title = 'Eliminar'
+    deleteButton.setAttribute('aria-label', `Eliminar ${item.name || item.title}`)
+    deleteButton.setAttribute('type', 'button')
     deleteButton.style.cssText = `
       background: rgba(239, 68, 68, 0.2);
       border: 1px solid rgba(239, 68, 68, 0.3);
@@ -411,9 +430,17 @@ function UniversalDetails({
       deleteButton.style.background = 'rgba(239, 68, 68, 0.2)'
       deleteButton.style.borderColor = 'rgba(239, 68, 68, 0.3)'
     })
-    deleteButton.addEventListener('click', () => {
+    const handleDelete = () => {
       if (window.confirm(`¿Estás seguro de que quieres eliminar "${item.name || item.title}"?`)) {
         onDelete()
+      }
+    }
+    deleteButton.addEventListener('click', handleDelete)
+    // Soporte de teclado
+    deleteButton.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        handleDelete()
       }
     })
     actionContainer.appendChild(deleteButton)

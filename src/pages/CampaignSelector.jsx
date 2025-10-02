@@ -98,33 +98,48 @@ function CampaignSelector({ onSelectCampaign }) {
   useEffect(() => {
     const handleGoogleDriveCampaigns = async (event) => {
       const { campaigns: driveCampaigns, folder } = event.detail
-      
+
       try {
         setIsLoading(true)
         showNotification(`📁 Encontradas ${driveCampaigns.length} campañas en "${folder.name}"`, 'info')
-        
+
         // Cargar las campañas desde Drive y sincronizar con local
         const loadedCampaigns = []
-        
+        const failedCampaigns = []
+
         for (const driveCampaign of driveCampaigns) {
           try {
             const campaignData = await zeroConfigGoogleDrive.loadCampaign(driveCampaign.name)
             loadedCampaigns.push(campaignData)
           } catch (error) {
             logError(`Error cargando campaña ${driveCampaign.name}:`, error)
+            failedCampaigns.push(driveCampaign.name)
           }
         }
-        
+
         if (loadedCampaigns.length > 0) {
           // Actualizar estado local
           setCampaigns(loadedCampaigns)
-          
+
           // Guardar en localStorage también
           saveCampaigns(loadedCampaigns)
-          
+
           showNotification(`✅ ${loadedCampaigns.length} campañas cargadas desde Google Drive`, 'success')
         }
-        
+
+        // Notificar campañas que fallaron
+        if (failedCampaigns.length > 0) {
+          showNotification(
+            `⚠️ ${failedCampaigns.length} campaña${failedCampaigns.length > 1 ? 's' : ''} no pudo cargarse: ${failedCampaigns.join(', ')}`,
+            'warning'
+          )
+        }
+
+        // Caso donde todas las campañas fallaron
+        if (loadedCampaigns.length === 0 && failedCampaigns.length > 0) {
+          showNotification('❌ No se pudo cargar ninguna campaña desde Drive', 'error')
+        }
+
       } catch (error) {
         logError('Error procesando campañas de Drive:', error)
         showNotification('❌ Error cargando campañas desde Drive', 'error')

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, Suspense } from 'react'
+import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react'
 import { SearchIcon, BackIcon, MenuIcon, CloseIcon } from '../components/ui/LazyIcons'
 import { debug, error as logError } from '../utils/logger'
 import { ImprovedSearchBox } from '../components/features/ImprovedSearchBox'
@@ -34,7 +34,10 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  
+
+  // Ref para evitar dependencias circulares en useCallback
+  const isSavingRef = useRef(false)
+
   // Detect if mobile
   useEffect(() => {
     const checkMobile = () => {
@@ -53,45 +56,50 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
     setIsMobileMenuOpen(false)
   }, [activeTab])
 
+  // Function to save changes to localStorage and Google Drive - memoized to prevent re-renders
+  const saveChanges = useCallback((campaignToSave) => {
+    if (isSavingRef.current) return
+
+    isSavingRef.current = true
+    setIsSaving(true)
+
+    try {
+      const campaigns = loadCampaigns()
+      const campaignWithTimestamp = {
+        ...campaignToSave,
+        lastModified: new Date().toISOString().split('T')[0]
+      }
+      const updatedCampaigns = campaigns.map(c =>
+        c.id === campaignToSave.id ? campaignWithTimestamp : c
+      )
+      saveCampaigns(updatedCampaigns)
+
+      // Guardar automáticamente en Google Drive
+      zeroConfigGoogleDrive.saveImmediately(campaignWithTimestamp.name, campaignWithTimestamp)
+
+      debug('Cambios guardados automáticamente en local y Drive')
+    } catch (error) {
+      logError('Error al guardar cambios:', error)
+    } finally {
+      isSavingRef.current = false
+      setIsSaving(false)
+    }
+  }, [])
+
   // Enhanced function to update campaign with auto-save
   const updateCampaign = useCallback((updates) => {
     debug('Actualizando campaña:', updates)
     setCurrentCampaign(prev => {
       const newCampaign = { ...prev, ...updates }
-      
-      // Auto-save changes
-      saveChanges(newCampaign)
-      
+
+      // Auto-save changes using setTimeout to avoid blocking
+      setTimeout(() => {
+        saveChanges(newCampaign)
+      }, 0)
+
       return newCampaign
     })
-  }, [])
-
-  // Function to save changes to localStorage and Google Drive - memoized to prevent re-renders
-  const saveChanges = useCallback((campaignToSave) => {
-    if (isSaving) return
-    
-    setIsSaving(true)
-    try {
-      const campaigns = loadCampaigns()
-      const campaignWithTimestamp = { 
-        ...campaignToSave, 
-        lastModified: new Date().toISOString().split('T')[0] 
-      }
-      const updatedCampaigns = campaigns.map(c => 
-        c.id === campaignToSave.id ? campaignWithTimestamp : c
-      )
-      saveCampaigns(updatedCampaigns)
-      
-      // Guardar automáticamente en Google Drive
-      zeroConfigGoogleDrive.saveImmediately(campaignWithTimestamp.name, campaignWithTimestamp)
-      
-      debug('Cambios guardados automáticamente en local y Drive')
-    } catch (error) {
-      logError('Error al guardar cambios:', error)
-    } finally {
-      setIsSaving(false)
-    }
-  }, [])
+  }, [saveChanges])
 
   // Hooks
   const connections = useConnections(currentCampaign, updateCampaign)

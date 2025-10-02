@@ -169,14 +169,20 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showCompactBut
       root.render(<CompactButtons />)
     }
     
-    // Cleanup function
+    // Cleanup function mejorado con manejo de errores
     return () => {
       if (root) {
-        root.unmount()
+        try {
+          root.unmount()
+        } catch (error) {
+          // Silenciar error si el componente ya fue unmounted
+          console.warn('Error al desmontar root de botones compactos:', error)
+        }
       }
-      // Limpiar el container completamente
-      if (actionContainer) {
-        actionContainer.innerHTML = ''
+      // Limpiar el container solo si todavía existe en el DOM
+      const container = document.getElementById('modal-compact-actions')
+      if (container) {
+        container.innerHTML = ''
       }
     }
   }, [showCompactButtons, onClose, handleCompactSave, isSaving])
@@ -499,4 +505,16 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showCompactBut
   )
 }
 
-export default React.memo(DynamicForm)
+// Memoización con comparación personalizada para optimizar re-renders
+export default React.memo(DynamicForm, (prevProps, nextProps) => {
+  // Solo re-renderizar si cambian props críticas
+  return (
+    prevProps.item?.id === nextProps.item?.id &&
+    prevProps.entityType === nextProps.entityType &&
+    prevProps.showCompactButtons === nextProps.showCompactButtons &&
+    prevProps.config === nextProps.config &&
+    // Comparar referencia de funciones - si cambian, re-renderizar
+    prevProps.onSave === nextProps.onSave &&
+    prevProps.onClose === nextProps.onClose
+  )
+})
