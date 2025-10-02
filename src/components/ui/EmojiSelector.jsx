@@ -1,74 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
-
-// Categorías de emojis SIN duplicados - cada emoji aparece solo en UNA categoría
-const EMOJI_CATEGORIES = {
-  personas: {
-    name: 'Personas',
-    emojis: [
-      '🧙', '🧙‍♀️', '🧙‍♂️', '🤴', '👸', '🧝', '🧝‍♀️', '🧝‍♂️', 
-      '🧛', '🧛‍♀️', '🧛‍♂️', '🧚', '🧚‍♀️', '🧚‍♂️', '🧞', '🧞‍♀️', '🧞‍♂️',
-      '🧟', '🧟‍♀️', '🧟‍♂️', '🦸', '🦸‍♀️', '🦸‍♂️', '🦹', '🦹‍♀️', '🦹‍♂️',
-      '🤺', '🥷', '💂', '💂‍♀️', '💂‍♂️', '👷', '👷‍♀️', '👷‍♂️',
-      '🕵️', '🕵️‍♀️', '🕵️‍♂️', '👨‍⚕️', '👩‍⚕️', '🧑‍⚕️', '👨‍🌾', '👩‍🌾', '🧑‍🌾',
-      '👨‍🍳', '👩‍🍳', '🧑‍🍳', '👨‍🏫', '👩‍🏫', '🧑‍🏫', '👨‍⚖️', '👩‍⚖️', '🧑‍⚖️',
-      '🧔', '🧔‍♀️', '🧔‍♂️', '👲', '👳', '👳‍♀️', '👳‍♂️', '🧕',
-      '👮', '👮‍♀️', '👮‍♂️', '👴', '👵', '🧓', '👶', '👧', '🧒', '👦',
-      '👱', '👱‍♀️', '👱‍♂️'
-    ]
-  },
-  lugares: {
-    name: 'Lugares',
-    emojis: [
-      '🏰', '🏯', '🗼', '⛪', '🕌', '🛕', '🕍', '⛩️', '🏛️', '🗿',
-      '🏚️', '🏘️', '🏙️', '🌋', '⛰️', '🏔️', '🗻', '🏞️', '🏜️', '🏖️',
-      '🏝️', '🌊', '🌅', '🌄', '🌃', '🌌', '🌉', '🏟️',
-      '🏗️', '🧱', '🪨', '🪵', '🏕️', '🛖', '⛺', '🌁', '🌆', '🌇',
-      '💒', '🏩', '🏨', '🏦', '🏪', '🏬', '🏣', '🏤', '🏥', '🏢',
-      '🏭', '🏡', '🏠', '⛲', '🌳', '🌲', '🌴', '🌵', '🌾', '🌿',
-      '☘️', '🍀', '🍄', '🌰', '🌍', '🌎', '🌏', '🌐', '🗺️', '🧭'
-    ]
-  },
-  magia: {
-    name: 'Magia',
-    emojis: [
-      '🔮', '🎱', '🧿', '🪬', '💫', '⭐', '🌟',
-      '✨', '⚡', '💥', '☄️', '🌠', '🌈', '🎆', '🎇',
-      '🎃', '👻', '💀', '☠️', '👹', '👺', '😈', '👿', '🦄',
-      '🐉', '🐲', '🪔', '🪄', '🔱', '💎', '💍', '👑',
-      '♟️', '🃏', '🀄', '🎴', '🧩', '🪅', '🪆'
-    ]
-  },
-  naturaleza: {
-    name: 'Naturaleza',
-    emojis: [
-      '🐺', '🦅', '🦉', '🦇', '🐗', '🦌', '🦏', '🦛', '🐘', '🦒',
-      '🦘', '🦬', '🐃', '🐂', '🐄', '🐎', '🦓', '🦍', '🦧', '🐆',
-      '🐅', '🦁', '🐯', '🐈', '🐈‍⬛', '🦝', '🦨', '🦡', '🦫', '🦦',
-      '🦥', '🐁', '🐀', '🐿️', '🦔', '🐇', '🐰', '🦎', '🐍', '🐢',
-      '🐊', '🦕', '🦖', '🦂', '🕷️', '🕸️', '🐝', '🪲', '🐞', '🦗',
-      '🪰', '🪱', '🦟', '🦠', '🐙', '🦑', '🦀', '🦞', '🦐', '🦪',
-      '🐚', '🐠', '🐟', '🐡', '🐋', '🦈', '🦭', '🦢', '🦚', '🦜',
-      '🦩', '🕊️', '🦃', '🦆'
-    ]
-  },
-  objetos: {
-    name: 'Objetos',
-    emojis: [
-      '⚔️', '🗡️', '🛡️', '🏹', '🪓', '🔨', '⛏️', '🪝', 
-      '💣', '🧨', '🔥', '💰', '💵', '🪙', '🎩',
-      '🎓', '⛑️', '🪖', '📿', '🔔', '🎺', '🥁', '🪘', '🪕', '🎻',
-      '🪈', '🎸', '🎹', '🎵', '🎶', '🎼', '🎤', '🎧', '📻', '🎮',
-      '🕹️', '🎰', '🎲', '🎯', '🎳', '🪀', '🪁', '🏆', '🏅',
-      '🥇', '🥈', '🥉', '🎖️', '🏵️', '🎗️', '🎫', '🎟️', '🗝️', '🔑',
-      '🔐', '🔒', '🔓', '🔏', '🧰', '🪛', '🔧', '🔩', '⚙️', '🧲',
-      '🔫', '🏺', '🕯️', '💡', '🔦', '🏮', '🪟', '🪜', '🧯',
-      '🛢️', '⚱️', '🪦', '⚰️', '🚬', '🔬', '🔭', '📡', '💉', '🩸',
-      '💊', '🩹', '🩺', '🧬', '🧪', '🧫', '⚗️', '📜', '📋', '📊',
-      '📈', '📉', '📚', '📖', '📕', '📗', '📘', '📙', '📓', '📔',
-      '📒', '📝', '✏️', '✒️', '🖋️', '🖊️', '🖌️', '🖍️', '🎪', '🎭', '🎨', '🖼️'
-    ]
-  }
-}
+import { EMOJI_CATEGORIES } from '../../constants/emojiLibrary'
+import { COMMON_STYLES } from '../../utils/cssHelpers'
+import { useHoverStyle } from '../../hooks/useHoverStyle'
 
 /**
  * Selector de emojis compacto que se puede integrar al lado de campos
@@ -77,6 +10,26 @@ function EmojiSelector({ value, onChange, name, entityType }) {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('personas')
   const modalRef = useRef(null)
+
+  // Estilos con hover para el botón principal
+  const { style: buttonStyle, handlers: buttonHandlers } = useHoverStyle(
+    {
+      ...COMMON_STYLES.darkBackground,
+      ...COMMON_STYLES.transition,
+      padding: '0.5rem',
+      fontSize: '1.25rem',
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minWidth: '40px',
+      height: '40px'
+    },
+    {
+      background: 'rgba(31, 41, 55, 0.9)',
+      borderColor: 'rgba(107, 114, 128, 0.5)'
+    }
+  )
 
   // Cerrar modal con tecla Escape
   useEffect(() => {
@@ -118,28 +71,8 @@ function EmojiSelector({ value, onChange, name, entityType }) {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        style={{
-          background: 'rgba(31, 41, 55, 0.8)',
-          border: '1px solid rgba(107, 114, 128, 0.3)',
-          borderRadius: '8px',
-          padding: '0.5rem',
-          fontSize: '1.25rem',
-          cursor: 'pointer',
-          transition: 'all 0.2s ease',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          minWidth: '40px',
-          height: '40px'
-        }}
-        onMouseEnter={(e) => {
-          e.target.style.background = 'rgba(31, 41, 55, 0.9)'
-          e.target.style.borderColor = 'rgba(107, 114, 128, 0.5)'
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.background = 'rgba(31, 41, 55, 0.8)'
-          e.target.style.borderColor = 'rgba(107, 114, 128, 0.3)'
-        }}
+        style={buttonStyle}
+        {...buttonHandlers}
       >
         {currentEmoji}
       </button>

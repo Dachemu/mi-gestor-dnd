@@ -1,6 +1,7 @@
 import React from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import useDropdown from '../../hooks/useDropdown.jsx'
+import { COMMON_STYLES } from '../../utils/cssHelpers'
 
 /**
  * Base component for dropdown selectors (emojis, icons, etc.)
@@ -55,11 +56,11 @@ function BaseSelector({
           style={{
             background: value === option ? 'rgba(79, 70, 229, 0.3)' : 'rgba(31, 41, 55, 0.6)',
             border: value === option ? '2px solid rgba(79, 70, 229, 0.6)' : '1px solid rgba(79, 70, 229, 0.2)',
-            borderRadius: '8px',
+            ...COMMON_STYLES.borderRadiusSmall,
             padding: '0.5rem',
             cursor: 'pointer',
             fontSize: '1.2rem',
-            transition: 'all 0.2s ease',
+            ...COMMON_STYLES.transition,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

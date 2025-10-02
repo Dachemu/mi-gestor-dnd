@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { generateId } from '../../services/storage'
 import { BaseModal } from '../ui/base'
 import EmojiSelector from '../ui/EmojiSelector'
+import { getDefaultEmoji } from '../../constants/emojiLibrary'
+import { COMMON_STYLES } from '../../utils/cssHelpers'
 
 /**
  * Formulario unificado para crear y editar campañas
@@ -16,7 +18,7 @@ function CampaignForm({ campaign = null, onClose, onSave }) {
   const [formData, setFormData] = useState({
     name: campaign?.name || '',
     description: campaign?.description || '',
-    emoji: campaign?.emoji || '🐉'
+    emoji: campaign?.emoji || getDefaultEmoji('campaign')
   })
 
   // Estado para errores
@@ -95,18 +97,7 @@ function CampaignForm({ campaign = null, onClose, onSave }) {
       <form onSubmit={handleSubmit}>
         {/* Campo Emoji */}
         <div style={{ marginBottom: '1.5rem' }}>
-          <label
-            htmlFor="emoji"
-            style={{
-              display: 'block',
-              fontSize: '0.9rem',
-              fontWeight: '600',
-              color: 'var(--primary-light)',
-              marginBottom: '0.5rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em'
-            }}
-          >
+          <label htmlFor="emoji" style={COMMON_STYLES.formLabel}>
             Icono
           </label>
           <EmojiSelector
@@ -117,18 +108,7 @@ function CampaignForm({ campaign = null, onClose, onSave }) {
 
         {/* Campo Nombre */}
         <div style={{ marginBottom: '1.5rem' }}>
-          <label
-            htmlFor="name"
-            style={{
-              display: 'block',
-              fontSize: '0.9rem',
-              fontWeight: '600',
-              color: 'var(--primary-light)',
-              marginBottom: '0.5rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em'
-            }}
-          >
+          <label htmlFor="name" style={COMMON_STYLES.formLabel}>
             Nombre de la Campaña *
           </label>
           <input
@@ -140,17 +120,9 @@ function CampaignForm({ campaign = null, onClose, onSave }) {
             placeholder="Ej: La Torre del Mago Oscuro"
             autoFocus
             style={{
-              width: '100%',
-              padding: '0.75rem',
-              fontSize: '1rem',
-              background: 'rgba(31, 41, 55, 0.5)',
-              border: errors.name
-                ? '2px solid #ef4444'
-                : '1px solid rgba(79, 70, 229, 0.3)',
-              borderRadius: '8px',
-              color: 'white',
-              outline: 'none',
-              transition: 'all 0.2s ease'
+              ...COMMON_STYLES.input,
+              ...(errors.name ? COMMON_STYLES.borderError : {}),
+              ...COMMON_STYLES.transition
             }}
           />
           {errors.name && (
@@ -162,18 +134,7 @@ function CampaignForm({ campaign = null, onClose, onSave }) {
 
         {/* Campo Descripción */}
         <div style={{ marginBottom: '2rem' }}>
-          <label
-            htmlFor="description"
-            style={{
-              display: 'block',
-              fontSize: '0.9rem',
-              fontWeight: '600',
-              color: 'var(--primary-light)',
-              marginBottom: '0.5rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em'
-            }}
-          >
+          <label htmlFor="description" style={COMMON_STYLES.formLabel}>
             Descripción
           </label>
           <textarea
@@ -184,17 +145,10 @@ function CampaignForm({ campaign = null, onClose, onSave }) {
             placeholder="Describe brevemente tu campaña..."
             rows={4}
             style={{
-              width: '100%',
-              padding: '0.75rem',
-              fontSize: '1rem',
-              background: 'rgba(31, 41, 55, 0.5)',
-              border: '1px solid rgba(79, 70, 229, 0.3)',
-              borderRadius: '8px',
-              color: 'white',
-              outline: 'none',
+              ...COMMON_STYLES.input,
+              ...COMMON_STYLES.transition,
               resize: 'vertical',
-              minHeight: '100px',
-              transition: 'all 0.2s ease'
+              minHeight: '100px'
             }}
           />
         </div>
