@@ -237,3 +237,106 @@ export const getConnectionStyles = (isConnected = false, colorVar = 'primary') =
     gap: '1rem'
   }
 }
+
+/**
+ * Estilos comunes reutilizables para evitar duplicación
+ * Estos estilos se repiten frecuentemente en múltiples componentes
+ */
+export const COMMON_STYLES = {
+  // Fondo semi-transparente usado en cards y modales
+  cardBackground: {
+    background: 'rgba(31, 41, 55, 0.5)',
+    border: '1px solid rgba(79, 70, 229, 0.2)',
+    borderRadius: '10px'
+  },
+
+  // Fondo más oscuro para elementos nested
+  darkBackground: {
+    background: 'rgba(31, 41, 55, 0.8)',
+    border: '1px solid rgba(79, 70, 229, 0.3)',
+    borderRadius: '8px'
+  },
+
+  // Transición estándar
+  transition: {
+    transition: 'all 0.2s ease'
+  },
+
+  // Transición lenta para animaciones más suaves
+  transitionSlow: {
+    transition: 'all 0.3s ease'
+  },
+
+  // Padding responsivo
+  responsivePadding: {
+    padding: 'clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 2vw, 1rem)'
+  },
+
+  // Padding responsivo más generoso
+  responsivePaddingLarge: {
+    padding: 'clamp(0.75rem, 3vw, 1.5rem) clamp(1rem, 3vw, 2rem)'
+  },
+
+  // Border radius estándar
+  borderRadius: {
+    borderRadius: '10px'
+  },
+
+  // Border radius pequeño
+  borderRadiusSmall: {
+    borderRadius: '6px'
+  },
+
+  // Border radius grande
+  borderRadiusLarge: {
+    borderRadius: '12px'
+  },
+
+  // Sombra sutil
+  shadowSmall: {
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+  },
+
+  // Sombra media
+  shadowMedium: {
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+  },
+
+  // Sombra grande
+  shadowLarge: {
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)'
+  },
+
+  // Border primario
+  borderPrimary: {
+    border: '1px solid rgba(79, 70, 229, 0.3)'
+  },
+
+  // Border de error
+  borderError: {
+    border: '2px solid #ef4444'
+  },
+
+  // Label estándar para formularios
+  formLabel: {
+    display: 'block',
+    fontSize: '0.9rem',
+    fontWeight: '600',
+    color: 'var(--primary-light)',
+    marginBottom: '0.5rem',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em'
+  },
+
+  // Input estándar
+  input: {
+    width: '100%',
+    padding: '0.75rem',
+    fontSize: '1rem',
+    background: 'rgba(31, 41, 55, 0.5)',
+    border: '1px solid rgba(79, 70, 229, 0.3)',
+    borderRadius: '8px',
+    color: 'white',
+    outline: 'none'
+  }
+}

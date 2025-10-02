@@ -6,8 +6,7 @@ import { useNotification } from '../hooks/useNotification.jsx'
 import { BaseButton, BaseCard } from '../components/ui/base'
 import { CompactDriveButton } from '../components/sync/CompactDriveButton'
 import { zeroConfigGoogleDrive } from '../services/zeroConfigGoogleDrive'
-import CreateCampaignForm from './CreateCampaignForm'
-import EditCampaignForm from './EditCampaignForm'
+import CampaignForm from '../components/forms/CampaignForm'
 
 // Estructura vacía para nuevas campañas - sin contenido por defecto
 const INITIAL_CAMPAIGN_DATA = {
@@ -554,18 +553,18 @@ function CampaignSelector({ onSelectCampaign }) {
 
       {/* Modal para editar campaña */}
       {editingCampaign && (
-        <EditCampaignForm
+        <CampaignForm
           campaign={editingCampaign}
           onClose={() => setEditingCampaign(null)}
-          onUpdateCampaign={handleUpdateCampaign}
+          onSave={handleUpdateCampaign}
         />
       )}
 
       {/* Modal para nueva campaña */}
       {showNewCampaignForm && (
-        <CreateCampaignForm
+        <CampaignForm
           onClose={() => setShowNewCampaignForm(false)}
-          onCreateCampaign={handleCreateCampaign}
+          onSave={handleCreateCampaign}
         />
       )}
     </div>
