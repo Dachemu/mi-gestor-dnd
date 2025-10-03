@@ -13,6 +13,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
+import { restrictToWindowEdges } from '@dnd-kit/modifiers'
 
 /**
  * Contenedor sortable que gestiona el drag & drop de items
@@ -30,18 +31,27 @@ export function SortableContainer({
 }) {
   const [activeId, setActiveId] = React.useState(null)
 
-  // Configurar sensores para detectar drag
-  // activationConstraint previene conflictos con clicks
+  // Configurar sensores para detectar drag con auto-scroll optimizado
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 5, // 5px de movimiento antes de iniciar drag (reducido para mejor respuesta)
+        distance: 5,
       },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   )
+
+  // Configuración de auto-scroll personalizado y optimizado
+  const autoScrollConfig = React.useMemo(() => ({
+    interval: 5, // Actualización ultra rápida (cada 5ms)
+    acceleration: 10, // Aceleración muy alta
+    threshold: {
+      x: 0.2, // 20% del ancho (no necesario para vertical)
+      y: 0.15, // 15% de la altura para activar scroll
+    },
+  }), [])
 
   const handleDragStart = (event) => {
     setActiveId(event.active.id)
@@ -76,6 +86,8 @@ export function SortableContainer({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
+      modifiers={[restrictToWindowEdges]}
+      autoScroll={autoScrollConfig}
     >
       <SortableContext items={items.map(item => item.id)} strategy={strategy}>
         {children}
