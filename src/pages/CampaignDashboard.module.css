@@ -59,7 +59,7 @@
   gap: clamp(0.25rem, 1.5vw, 0.75rem);
   min-width: 0;
   max-width: clamp(200px, 45vw, 500px);
-  overflow: hidden;
+  overflow: visible; /* Cambiado de hidden a visible para permitir dropdown de búsqueda */
 }
 
 /* ====================================
@@ -179,6 +179,8 @@
   flex: 1 1 auto;
   max-width: clamp(160px, 30vw, 280px);
   min-width: clamp(120px, 20vw, 160px);
+  /* Asegurar que el dropdown pueda salirse del contenedor */
+  overflow: visible;
 }
 
 .searchInput {

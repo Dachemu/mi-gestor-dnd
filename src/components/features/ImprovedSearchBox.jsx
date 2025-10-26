@@ -55,22 +55,21 @@ export function ImprovedSearchBox({ search, navigateToItem, activeTab = 'dashboa
   }
 
   // Determinar si debemos mostrar el dropdown
-  // En Dashboard siempre mostramos el dropdown
-  // En otras pestañas también mostramos el dropdown para búsqueda global
-  const shouldShowDropdown = search.showSearchDropdown && search.searchResults.length > 0
+  // Simplificado: mostrar si hay término de búsqueda de 2+ caracteres
+  const shouldShowDropdown = search.searchTerm && search.searchTerm.length >= 2
 
   // Placeholder dinámico según la pestaña
   const getPlaceholder = () => {
     if (activeTab === 'dashboard') {
-      return 'Buscar en campaña...'
+      return 'Buscar en toda la campaña...'
     }
     const tabNames = {
-      'locations': 'Buscar lugares...',
-      'players': 'Buscar jugadores...',
-      'npcs': 'Buscar NPCs...',
-      'objects': 'Buscar objetos...',
-      'quests': 'Buscar misiones...',
-      'notes': 'Buscar notas...'
+      'locations': 'Buscar en lugares...',
+      'players': 'Buscar en jugadores...',
+      'npcs': 'Buscar en NPCs...',
+      'objects': 'Buscar en objetos...',
+      'quests': 'Buscar en misiones...',
+      'notes': 'Buscar en notas...'
     }
     return tabNames[activeTab] || 'Buscar...'
   }

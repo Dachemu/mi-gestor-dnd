@@ -105,6 +105,11 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
   const connections = useConnections(currentCampaign, updateCampaign)
   const search = useSearch(currentCampaign)
 
+  // Inicializar el filtro de búsqueda según la pestaña activa
+  useEffect(() => {
+    search.setFilter(activeTab)
+  }, [activeTab, search.setFilter])
+
   // Enhanced function to navigate to connected element
   const navigateToItem = useCallback((item, itemType) => {
     debug('Navegando a:', itemType, item.name || item.title)
@@ -134,7 +139,9 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
   const handleTabChange = useCallback((tabId) => {
     setActiveTab(tabId)
     setSelectedItemForNavigation(null)
-  }, [])
+    // Actualizar el filtro de búsqueda según la pestaña activa
+    search.setFilter(tabId)
+  }, [search.setFilter])
 
   // ✅ Función para exportar campaña actual
   const handleExportCampaign = useCallback(() => {

@@ -3,10 +3,13 @@ import React from 'react'
 /**
  * Componente que muestra los resultados de búsqueda en un dropdown
  * 🔍 Migrado desde el archivo HTML original
+ * Muestra mensaje cuando no hay resultados
  */
 function SearchDropdown({ searchTerm, results, onItemClick, onClose }) {
-  // Si no hay término de búsqueda o resultados, no mostrar nada
-  if (!searchTerm || results.length === 0) return null
+  // Si no hay término de búsqueda, no mostrar nada
+  if (!searchTerm || searchTerm.length < 2) {
+    return null
+  }
 
   // Función para obtener el icono apropiado según el tipo
   const getTypeIcon = (type) => {
@@ -34,6 +37,24 @@ function SearchDropdown({ searchTerm, results, onItemClick, onClose }) {
     return names[type] || 'ELEMENTO'
   }
 
+  // Si no hay resultados, mostrar mensaje
+  if (results.length === 0) {
+    return (
+      <div className="search-dropdown">
+        <div style={{
+          padding: '1.5rem',
+          textAlign: 'center',
+          color: '#a1a1aa'
+        }}>
+          <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🔍</div>
+          <p style={{ margin: 0, fontSize: '0.9rem' }}>
+            No se encontraron resultados para "{searchTerm}"
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="search-dropdown">
       {results.map(result => (
@@ -49,11 +70,11 @@ function SearchDropdown({ searchTerm, results, onItemClick, onClose }) {
           <span style={{ fontSize: '1.5rem' }}>
             {result.icon || result.avatar || getTypeIcon(result.type)}
           </span>
-          
+
           {/* Información del elemento */}
           <div style={{ flex: 1 }}>
-            <p style={{ 
-              color: 'white', 
+            <p style={{
+              color: 'white',
               fontWeight: '600',
               margin: 0,
               fontSize: '0.95rem',
@@ -63,8 +84,8 @@ function SearchDropdown({ searchTerm, results, onItemClick, onClose }) {
             }}>
               {result.name || result.title}
             </p>
-            <p style={{ 
-              color: '#a1a1aa', 
+            <p style={{
+              color: '#a1a1aa',
               fontSize: '0.8rem',
               margin: 0,
               lineHeight: '1.3',
@@ -74,7 +95,7 @@ function SearchDropdown({ searchTerm, results, onItemClick, onClose }) {
               {result.role || result.class || result.status || result.type}
             </p>
           </div>
-          
+
           {/* Etiqueta del tipo */}
           <span className="search-result-type">
             {getTypeName(result.type)}
