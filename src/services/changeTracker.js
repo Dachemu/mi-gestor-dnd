@@ -300,7 +300,7 @@ class ChangeTracker {
     // Generar operaciones para entidades
     Object.entries(changes.details.entities || {}).forEach(([entityType, entityChanges]) => {
       entityChanges.forEach(entityChange => {
-        let operation = {
+        const operation = {
           type: `${entityChange.type}_entity`,
           entityType,
           entityId: entityChange.id
@@ -340,7 +340,7 @@ class ChangeTracker {
       return campaign
     }
 
-    let updatedCampaign = { ...campaign }
+    const updatedCampaign = { ...campaign }
 
     delta.operations.forEach(operation => {
       switch (operation.type) {

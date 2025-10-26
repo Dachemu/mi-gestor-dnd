@@ -70,10 +70,6 @@ function UniversalDetails({
         )
       }
 
-      case 'stats':
-        // Renderizado especial para estadísticas (específico de players)
-        return renderStatsSection(item)
-
       case 'badge':
         return (
           <span style={{
@@ -134,42 +130,6 @@ function UniversalDetails({
     return iconMaps[fieldName]?.[value] || ''
   }
 
-  // Renderizado especial para estadísticas de jugadores
-  const renderStatsSection = (player) => {
-    const stats = [
-      { key: 'hitPoints', label: 'HP', icon: '❤️', color: '#ef4444' },
-      { key: 'armorClass', label: 'CA', icon: '🛡️', color: '#3b82f6' },
-      { key: 'speed', label: 'pies', icon: '💨', color: '#10b981' }
-    ]
-
-    const availableStats = stats.filter(stat => player[stat.key])
-    
-    if (availableStats.length === 0) return null
-
-    return (
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))',
-        gap: '0.5rem'
-      }}>
-        {availableStats.map(stat => (
-          <div key={stat.key} style={{
-            background: `rgba(${stat.color.slice(1).match(/.{2}/g).map(x => parseInt(x, 16)).join(', ')}, 0.2)`,
-            color: stat.color,
-            padding: '0.5rem',
-            borderRadius: '8px',
-            textAlign: 'center',
-            fontSize: '0.8rem',
-            fontWeight: '600'
-          }}>
-            <div style={{ fontSize: '1.2rem' }}>{stat.icon}</div>
-            <div>{player[stat.key]} {stat.label}</div>
-          </div>
-        ))}
-      </div>
-    )
-  }
-
   // Renderizar información básica en el header
   const renderHeader = () => {
     const primaryField = config.displayFields.primary
@@ -179,7 +139,7 @@ function UniversalDetails({
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
           <div style={{ fontSize: '3rem' }}>
-            {item.icon || item.avatar || config.icon}
+            {item.icon || config.icon}
           </div>
           <div>
             <h3 style={{ color: 'white', margin: 0, fontSize: '1.5rem' }}>
@@ -243,28 +203,24 @@ function UniversalDetails({
       return (
         <div key={index} style={{ marginBottom: '2rem' }}>
           <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>{section.title}</h4>
-          
-          {section.render === 'stats' ? (
-            renderStatsSection(item)
-          ) : (
-            sectionFields.map(fieldName => {
-              const fieldConfig = config.schema[fieldName]
-              const value = item[fieldName]
-              
-              if (!value) return null
 
-              return (
-                <div key={fieldName} style={{ marginBottom: '1rem' }}>
-                  {section.render !== 'html' && fieldConfig && (
-                    <h5 style={{ color: 'white', marginBottom: '0.5rem', fontSize: '0.9rem' }}>
-                      {fieldConfig.label}
-                    </h5>
-                  )}
-                  {renderFieldValue(fieldName, value, section.render)}
-                </div>
-              )
-            })
-          )}
+          {sectionFields.map(fieldName => {
+            const fieldConfig = config.schema[fieldName]
+            const value = item[fieldName]
+
+            if (!value) return null
+
+            return (
+              <div key={fieldName} style={{ marginBottom: '1rem' }}>
+                {section.render !== 'html' && fieldConfig && (
+                  <h5 style={{ color: 'white', marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                    {fieldConfig.label}
+                  </h5>
+                )}
+                {renderFieldValue(fieldName, value, section.render)}
+              </div>
+            )
+          })}
         </div>
       )
     })

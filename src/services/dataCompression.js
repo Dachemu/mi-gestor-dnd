@@ -234,7 +234,7 @@ class DataCompression {
     // Implementación simplificada - en producción usar LZString.compress()
     const dictionary = new Map()
     let dictSize = 256
-    let result = []
+    const result = []
     
     // Inicializar diccionario con caracteres ASCII
     for (let i = 0; i < 256; i++) {

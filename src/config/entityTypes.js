@@ -26,56 +26,29 @@ export const ENTITY_SCHEMAS = {
       required: true,
       options: ['Bárbaro', 'Bardo', 'Brujo', 'Clérigo', 'Druida', 'Explorador', 'Guerrero', 'Hechicero', 'Mago', 'Monje', 'Paladín', 'Pícaro', 'Artificiero']
     },
-    race: { 
-      type: 'select', 
+    race: {
+      type: 'select',
       label: 'Raza',
       options: ['Humano', 'Elfo', 'Enano', 'Mediano', 'Dracoborn', 'Gnomo', 'Semielfo', 'Semiorco', 'Tiefling', 'Aasimar', 'Genasi', 'Tabaxi', 'Otro']
     },
-    level: {
-      type: 'number',
-      label: 'Nivel',
-      defaultValue: 1,
-      min: 1,
-      max: 20
-    },
-    background: { 
-      type: 'text', 
-      label: 'Trasfondo', 
+    background: {
+      type: 'text',
+      label: 'Trasfondo',
       placeholder: 'Ej: Noble, Forajido, Ermitaño...',
       maxLength: 100
     },
-    description: { 
-      type: 'textarea', 
-      label: 'Descripción del personaje', 
+    description: {
+      type: 'textarea',
+      label: 'Descripción del personaje',
       placeholder: 'Apariencia, personalidad, historia personal...',
       maxLength: 500
     },
-    backstory: { 
-      type: 'richtext', 
-      label: 'Historia del personaje', 
-      placeholder: 'Historia completa del personaje, conexiones con la trama, motivaciones...' 
+    backstory: {
+      type: 'richtext',
+      label: 'Historia del personaje',
+      placeholder: 'Historia completa del personaje, conexiones con la trama, motivaciones...'
     },
-    hitPoints: {
-      type: 'number',
-      label: 'Puntos de vida',
-      min: 1,
-      max: 1000
-    },
-    armorClass: {
-      type: 'number',
-      label: 'Clase de armadura',
-      min: 1,
-      max: 30
-    },
-    speed: {
-      type: 'number',
-      label: 'Velocidad (pies)',
-      defaultValue: 30,
-      min: 0,
-      max: 120
-    },
-    avatar: { type: 'text', label: 'Avatar', defaultValue: '⚔️' },
-    icon: { type: 'text', label: 'Icono', defaultValue: '⚔️' }
+    icon: { type: 'emoji', label: 'Icono', defaultValue: '⚔️' }
   },
 
   quests: {

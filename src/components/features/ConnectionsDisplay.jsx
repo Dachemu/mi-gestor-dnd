@@ -328,7 +328,7 @@ function ConnectionItem({ item, config, onRemove, onNavigate, _compact = false }
     >
       {/* Icono del elemento */}
       <span className="connection-item-icon">
-        {item.icon || item.avatar || config.icon}
+        {item.icon || config.icon}
       </span>
 
       {/* Información del elemento */}

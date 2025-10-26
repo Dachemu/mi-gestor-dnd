@@ -307,8 +307,8 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showCompactBut
         )
 
       default:
-        // Campos especiales de icono/avatar usan IconSelector
-        if (fieldName === 'icon' || fieldName === 'avatar') {
+        // Campo especial de icono usa IconSelector
+        if (fieldName === 'icon') {
           return (
             <IconSelector
               name={fieldName}
@@ -348,38 +348,38 @@ function DynamicForm({ entityType, config, item, onSave, onClose, showCompactBut
 
           // Campos de nombre/título con selector de emoji integrado
           const isNameField = ['name', 'title'].includes(fieldName)
-          const hasIconField = config.schema.icon || config.schema.avatar
+          const hasIconField = config.schema.icon
 
           return (
             <div key={fieldName}>
-              {/* No mostrar label para campos de icono/avatar ya que IconSelector lo incluye */}
-              {(fieldName !== 'icon' && fieldName !== 'avatar') && (
-                <label style={{ 
-                  color: 'white', 
-                  fontWeight: '600', 
-                  marginBottom: '0.5rem', 
-                  display: 'block' 
+              {/* No mostrar label para campo de icono ya que EmojiSelector lo incluye */}
+              {(fieldName !== 'icon') && (
+                <label style={{
+                  color: 'white',
+                  fontWeight: '600',
+                  marginBottom: '0.5rem',
+                  display: 'block'
                 }}>
                   {fieldConfig.label} {fieldConfig.required && '*'}
                 </label>
               )}
-              
-              {/* Si es campo de nombre/título y hay campo icon/avatar, mostrar juntos */}
+
+              {/* Si es campo de nombre/título y hay campo icon, mostrar juntos */}
               {isNameField && hasIconField ? (
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end' }}>
                   <div style={{ flex: 1 }}>
                     {renderField(fieldName, fieldConfig)}
                   </div>
                   <EmojiSelector
-                    value={formData.icon || formData.avatar || ''}
+                    value={formData.icon || ''}
                     onChange={handleChange}
-                    name={config.schema.icon ? 'icon' : 'avatar'}
+                    name='icon'
                     entityType={entityType}
                   />
                 </div>
               ) : (
-                // Renderizar campo normal (pero omitir icon/avatar si ya se renderizó con el nombre)
-                fieldName !== 'icon' && fieldName !== 'avatar' && renderField(fieldName, fieldConfig)
+                // Renderizar campo normal (pero omitir icon si ya se renderizó con el nombre)
+                fieldName !== 'icon' && renderField(fieldName, fieldConfig)
               )}
               
               {errors[fieldName] && (

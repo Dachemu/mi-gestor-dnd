@@ -68,7 +68,7 @@ function SearchDropdown({ searchTerm, results, onItemClick, onClose }) {
         >
           {/* Icono del elemento */}
           <span style={{ fontSize: '1.5rem' }}>
-            {result.icon || result.avatar || getTypeIcon(result.type)}
+            {result.icon || getTypeIcon(result.type)}
           </span>
 
           {/* Información del elemento */}

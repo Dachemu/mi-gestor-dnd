@@ -19,7 +19,7 @@ function BaseSelector({
   showGroups = false,
   label = null,
   className = ''
-  // eslint-disable-next-line no-unused-vars
+   
   ,..._props
 }) {
   const { isOpen, toggleDropdown, closeDropdown, dropdownRef, buttonRef } = useDropdown()
