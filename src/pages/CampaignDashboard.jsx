@@ -313,14 +313,15 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
 
       {/* Contenido principal */}
       <main className={styles.campaignContent}>
-        <TabContent 
-          activeTab={activeTab} 
-          campaign={currentCampaign} 
-          onTabChange={handleTabChange} 
+        <TabContent
+          activeTab={activeTab}
+          campaign={currentCampaign}
+          onTabChange={handleTabChange}
           connections={connections}
           onNavigateToItem={navigateToItem}
           selectedItemForNavigation={selectedItemForNavigation}
           updateCampaign={updateCampaign}
+          searchTerm={search.searchTerm}
         />
       </main>
 
@@ -344,14 +345,15 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
 })
 
 // ✅ Componente mejorado para renderizar el contenido de cada pestaña
-function TabContent({ 
-  activeTab, 
-  campaign, 
-  onTabChange, 
-  connections, 
-  onNavigateToItem, 
+function TabContent({
+  activeTab,
+  campaign,
+  onTabChange,
+  connections,
+  onNavigateToItem,
   selectedItemForNavigation,
-  updateCampaign 
+  updateCampaign,
+  searchTerm
 }) {
   // Props comunes para todos los gestores
   const commonProps = {
@@ -362,6 +364,7 @@ function TabContent({
     },
     selectedItemForNavigation,
     updateCampaign,
+    searchTerm: activeTab !== 'dashboard' ? searchTerm : '' // Solo pasar searchTerm si NO estamos en dashboard
   }
 
   // Dynamic entity managers using UniversalManager con Suspense

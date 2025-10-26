@@ -16,7 +16,8 @@ function UniversalManager({
   campaign,
   connections,
   selectedItemForNavigation,
-  updateCampaign
+  updateCampaign,
+  searchTerm = ''                // Término de búsqueda para filtrado en tiempo real
 }) {
   // Obtener configuración del tipo de entidad
   const config = getEntityConfig(entityType)
@@ -73,17 +74,60 @@ function UniversalManager({
 
   // Función para aplicar filtros
   const getFilteredItems = () => {
-    // Aplicar filtros de categoría si existen
-    if (!config.filters || Object.keys(filters).length === 0) {
-      return items
+    let filteredItems = items
+
+    // Primero aplicar filtro de búsqueda si existe
+    if (searchTerm && searchTerm.length >= 2) {
+      const searchLower = searchTerm.toLowerCase()
+
+      filteredItems = filteredItems.filter(item => {
+        // Buscar en campos comunes
+        const nameMatch = item.name?.toLowerCase().includes(searchLower)
+        const titleMatch = item.title?.toLowerCase().includes(searchLower)
+        const descriptionMatch = item.description?.toLowerCase().includes(searchLower)
+
+        // Campos específicos según el tipo de entidad
+        let specificFieldsMatch = false
+
+        switch (entityType) {
+          case 'players':
+            specificFieldsMatch =
+              item.class?.toLowerCase().includes(searchLower) ||
+              item.race?.toLowerCase().includes(searchLower)
+            break
+          case 'npcs':
+            specificFieldsMatch =
+              item.role?.toLowerCase().includes(searchLower) ||
+              item.location?.toLowerCase().includes(searchLower)
+            break
+          case 'objects':
+            specificFieldsMatch = item.type?.toLowerCase().includes(searchLower)
+            break
+          case 'quests':
+            specificFieldsMatch = item.status?.toLowerCase().includes(searchLower)
+            break
+          case 'notes':
+            specificFieldsMatch = item.content?.toLowerCase().includes(searchLower)
+            break
+          default:
+            specificFieldsMatch = false
+        }
+
+        return nameMatch || titleMatch || descriptionMatch || specificFieldsMatch
+      })
     }
 
-    return items.filter(item => {
-      return Object.entries(filters).every(([filterKey, filterValue]) => {
-        if (!filterValue || filterValue === 'Todas') return true
-        return item[filterKey] === filterValue
+    // Luego aplicar filtros de categoría si existen
+    if (config.filters && Object.keys(filters).length > 0) {
+      filteredItems = filteredItems.filter(item => {
+        return Object.entries(filters).every(([filterKey, filterValue]) => {
+          if (!filterValue || filterValue === 'Todas') return true
+          return item[filterKey] === filterValue
+        })
       })
-    })
+    }
+
+    return filteredItems
   }
 
   // Renderizar filtros si la entidad los soporta
@@ -205,18 +249,24 @@ function UniversalManager({
             🔍
           </div>
           <h3 style={{ color: 'white', marginBottom: '1rem' }}>
-            No se encontraron elementos con los filtros aplicados
+            {searchTerm && searchTerm.length >= 2
+              ? `No se encontraron resultados para "${searchTerm}"`
+              : 'No se encontraron elementos con los filtros aplicados'}
           </h3>
           <p style={{ marginBottom: '2rem' }}>
-            Intenta ajustar los filtros o añadir nuevos elementos.
+            {searchTerm && searchTerm.length >= 2
+              ? 'Intenta con otros términos de búsqueda o añade nuevos elementos.'
+              : 'Intenta ajustar los filtros o añadir nuevos elementos.'}
           </p>
-          <button 
-            onClick={() => setFilters({})} 
-            className="btn-secondary"
-            style={{ marginRight: '1rem' }}
-          >
-            Limpiar filtros
-          </button>
+          {Object.keys(filters).length > 0 && (
+            <button
+              onClick={() => setFilters({})}
+              className="btn-secondary"
+              style={{ marginRight: '1rem' }}
+            >
+              Limpiar filtros
+            </button>
+          )}
           <button onClick={openCreateForm} className="btn-primary">
             ➕ Añadir {config.name}
           </button>
