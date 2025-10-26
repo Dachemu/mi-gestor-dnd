@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useCRUD } from '../../hooks/useCRUD.jsx'
 import { getEntityConfig } from '../../config/entityTypes.js'
-import ConnectionsDisplay from './ConnectionsDisplay'
 import BaseModal from '../ui/base/BaseModal'
 import CompactList from './CompactList'
 import DynamicForm from './DynamicForm'
@@ -12,22 +11,17 @@ import UniversalDetails from './UniversalDetails'
  * Utiliza configuración centralizada para manejar cualquier tipo de entidad
  * Elimina ~80% del código duplicado del proyecto
  */
-function UniversalManager({ 
+function UniversalManager({
   entityType,                    // 'players', 'quests', 'objects', etc.
-  campaign, 
-  connections, 
-  selectedItemForNavigation, 
+  campaign,
+  connections,
+  selectedItemForNavigation,
   updateCampaign
 }) {
   // Obtener configuración del tipo de entidad
   const config = getEntityConfig(entityType)
-  
-  if (!config) {
-    console.error(`Configuración no encontrada para tipo de entidad: ${entityType}`)
-    return <div>Error: Tipo de entidad no válido</div>
-  }
 
-  // Hook CRUD usando datos de la campaña
+  // Hook CRUD usando datos de la campaña (SIEMPRE llamar hooks antes de cualquier return)
   const {
     items,
     showForm,
@@ -43,12 +37,10 @@ function UniversalManager({
     closeForm,
     closeDetails,
     NotificationComponent
-  } = useCRUD(campaign[entityType] || [], config.name, config, entityType, updateCampaign)
-
+  } = useCRUD(campaign[entityType] || [], config?.name || 'elemento', config, entityType, updateCampaign)
 
   // Estado para filtros (solo si la entidad los soporta)
   const [filters, setFilters] = useState({})
-
 
   // Efecto para seleccionar automáticamente un elemento cuando se navega desde conexiones
   useEffect(() => {
@@ -72,6 +64,12 @@ function UniversalManager({
       }
     }
   }, [selectedItemForNavigation, items, selectItem, entityType])
+
+  // Validación de config después de todos los hooks
+  if (!config) {
+    console.error(`Configuración no encontrada para tipo de entidad: ${entityType}`)
+    return <div>Error: Tipo de entidad no válido</div>
+  }
 
   // Función para aplicar filtros
   const getFilteredItems = () => {

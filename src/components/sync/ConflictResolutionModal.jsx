@@ -141,7 +141,7 @@ export function ConflictResolutionModal({
         </div>
 
         <div className={styles.conflictsList}>
-          {conflicts.map((conflict, index) => {
+          {conflicts.map((conflict, _index) => {
             const isExpanded = expandedConflicts.has(conflict.name || conflict.campaignName)
             const conflictName = conflict.name || conflict.campaignName
             const localModified = conflict.localModified || conflict.details?.localModified

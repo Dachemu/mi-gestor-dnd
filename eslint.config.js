@@ -5,6 +5,7 @@ import prettier from 'eslint-config-prettier'
 
 export default [
   js.configs.recommended,
+  // Configuración general para todos los archivos
   {
     files: ['**/*.{js,jsx}'],
     plugins: {
@@ -27,7 +28,23 @@ export default [
         localStorage: 'readonly',
         setTimeout: 'readonly',
         clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        requestAnimationFrame: 'readonly',
+        cancelAnimationFrame: 'readonly',
         process: 'readonly',
+        Blob: 'readonly',
+        URL: 'readonly',
+        FileReader: 'readonly',
+        FormData: 'readonly',
+        fetch: 'readonly',
+        CustomEvent: 'readonly',
+        btoa: 'readonly',
+        atob: 'readonly',
+        indexedDB: 'readonly',
+        performance: 'readonly',
+        getComputedStyle: 'readonly',
+        global: 'readonly',
       },
     },
     settings: {
@@ -50,6 +67,23 @@ export default [
       'no-console': ['warn', { allow: ['warn', 'error', 'debug'] }],
       'prefer-const': 'warn',
       'no-var': 'error',
+    },
+  },
+  // Configuración específica para archivos de test
+  {
+    files: ['**/__tests__/**/*.{js,jsx}', '**/*.test.{js,jsx}', '**/*.spec.{js,jsx}'],
+    languageOptions: {
+      globals: {
+        jest: 'readonly',
+        describe: 'readonly',
+        it: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+      },
     },
   },
   prettier, // Debe ir al final para desactivar reglas que entren en conflicto

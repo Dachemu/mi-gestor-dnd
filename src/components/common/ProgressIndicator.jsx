@@ -21,9 +21,9 @@ const ProgressIndicator = ({
   useEffect(() => {
     if (!operationId) return
 
-    let unsubscribe = progressTracker.subscribe(operationId, (event, operationData) => {
+    const unsubscribe = progressTracker.subscribe(operationId, (event, operationData) => {
       setOperation(operationData)
-      
+
       if (event === 'started') {
         setVisible(true)
       } else if (event === 'completed' && autoHide) {

@@ -7,19 +7,20 @@ import { COMMON_STYLES } from '../../utils/cssHelpers'
  * Base component for dropdown selectors (emojis, icons, etc.)
  * Unifies common functionality between EmojiSelector and IconSelector
  */
-function BaseSelector({ 
-  value, 
-  onChange, 
-  name, 
-  options = [], 
+function BaseSelector({
+  value,
+  onChange,
+  name,
+  options = [],
   groups = null,
   placeholder = 'Seleccionar...',
   selectedText = null,
   renderOption = null,
   showGroups = false,
   label = null,
-  className = '',
-  ...props 
+  className = ''
+  // eslint-disable-next-line no-unused-vars
+  ,..._props
 }) {
   const { isOpen, toggleDropdown, closeDropdown, dropdownRef, buttonRef } = useDropdown()
 

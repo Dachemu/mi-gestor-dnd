@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { debug, error as logError } from '../utils/logger'
-import { Upload, Download, Trash2, Edit2 } from 'lucide-react'
+import { Download, Trash2, Edit2 } from 'lucide-react'
 import { loadCampaigns, saveCampaigns, generateId } from '../services/storage'
 import { useNotification } from '../hooks/useNotification.jsx'
 import { BaseButton, BaseCard } from '../components/ui/base'

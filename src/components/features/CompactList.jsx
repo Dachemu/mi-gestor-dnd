@@ -1,5 +1,5 @@
 import React from 'react'
-import { Eye, Edit, Trash2, Link2 } from '../ui/LazyIcons'
+import { Link2 } from '../ui/LazyIcons'
 import BaseCard from '../ui/base/BaseCard'
 import BaseBadge from '../ui/base/BaseBadge'
 import { SortableContainer, DraggableCard } from '../drag'
@@ -13,41 +13,23 @@ import { rectSortingStrategy } from '@dnd-kit/sortable'
 // Helper para extraer texto plano de HTML y limitarlo
 const extractTextFromHTML = (html, maxLength = 120) => {
   if (!html) return ''
-  
+
   // Crear un elemento temporal para extraer texto
   const tempDiv = document.createElement('div')
   tempDiv.innerHTML = html
   const textContent = tempDiv.textContent || tempDiv.innerText || ''
-  
+
   // Limitar longitud y añadir ellipsis si es necesario
   if (textContent.length > maxLength) {
     return textContent.substring(0, maxLength).trim() + '...'
   }
-  
+
   return textContent
 }
 
-// Helper para crear botones con estilo consistente
-const createActionButton = (color, hoverColor, shadowColor) => ({
-  background: `linear-gradient(135deg, var(--accent-${color}), ${hoverColor})`,
-  border: 'none',
-  color: 'white',
-  padding: '0.75rem',
-  borderRadius: '10px',
-  cursor: 'pointer',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  flex: 1,
-  boxShadow: `0 4px 12px rgba(${shadowColor}, 0.3)`,
-  position: 'relative',
-  overflow: 'hidden'
-})
-
 function CompactList({
   items = [],
-  itemType,
+  _itemType,
   onSelectItem,
   getConnectionCount,
   emptyMessage = "No hay elementos aún",

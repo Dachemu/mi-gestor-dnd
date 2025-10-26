@@ -1,22 +1,11 @@
 import React from 'react'
-import { BaseCard, BaseButton, BaseBadge } from '../ui/base'
+import { BaseCard, BaseBadge } from '../ui/base'
 
 /**
  * Dashboard Component - Réplica exacta del archivo de referencia
  * Incluye navegación por categorías, estadísticas y misiones activas
  */
 const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavigateToItem }) {
-  // Función para obtener el color de prioridad
-  const getPriorityColor = (priority) => {
-    const colors = {
-      'Crítica': 'bg-red-500',
-      'Alta': 'bg-orange-500',
-      'Media': 'bg-yellow-500',
-      'Baja': 'bg-green-500'
-    }
-    return colors[priority] || 'bg-gray-500'
-  }
-
   // Configuración de categorías con colores específicos
   const categoryConfig = {
     locations: { name: 'Lugares', icon: '📍', color: '#3b82f6', colorEnd: '#2563eb' },
@@ -27,15 +16,8 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
     notes: { name: 'Notas', icon: '📝', color: '#ec4899', colorEnd: '#db2777' }
   }
 
-  // Estadísticas de misiones
-  const stats = {
-    activeQuests: (campaign.quests || []).filter(q => q.status === 'En progreso').length,
-    completedQuests: (campaign.quests || []).filter(q => q.status === 'Completada').length,
-    pendingQuests: (campaign.quests || []).filter(q => q.status === 'Pendiente').length
-  }
-
   // Componente reutilizable para las secciones de misiones
-  const MissionSection = ({ title, icon, quests, emptyMessage, colorScheme, onNavigateToItem, getPriorityColor }) => {
+  const MissionSection = ({ title, icon, quests, emptyMessage, colorScheme, onNavigateToItem, _getPriorityColor }) => {
     const [expanded, setExpanded] = React.useState(false)
     const maxItems = 5
     const displayQuests = expanded ? quests : quests.slice(0, maxItems)
@@ -161,7 +143,6 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
           emptyMessage="No hay misiones activas"
           colorScheme="active"
           onNavigateToItem={onNavigateToItem}
-          getPriorityColor={getPriorityColor}
         />
         <MissionSection
           title="Misiones Pendientes"
@@ -170,7 +151,6 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
           emptyMessage="No hay misiones pendientes"
           colorScheme="pending"
           onNavigateToItem={onNavigateToItem}
-          getPriorityColor={getPriorityColor}
         />
         <MissionSection
           title="Misiones Completadas"
@@ -179,7 +159,6 @@ const Dashboard = React.memo(function Dashboard({ campaign, onTabChange, onNavig
           emptyMessage="No hay misiones completadas"
           colorScheme="completed"
           onNavigateToItem={onNavigateToItem}
-          getPriorityColor={getPriorityColor}
         />
       </div>
 

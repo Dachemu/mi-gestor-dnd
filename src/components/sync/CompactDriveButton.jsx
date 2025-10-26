@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { Cloud, CloudOff, Settings } from 'lucide-react'
+import { Cloud, CloudOff } from 'lucide-react'
 import BaseButton from '../ui/base/BaseButton'
 import { zeroConfigGoogleDrive } from '../../services/zeroConfigGoogleDrive'
 import { debug } from '../../utils/logger'
 
-export function CompactDriveButton({ onCampaignLoaded }) {
+export function CompactDriveButton({ _onCampaignLoaded }) {
   const [status, setStatus] = useState({
     connected: false,
     folderSelected: false,

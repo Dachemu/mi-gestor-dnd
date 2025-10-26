@@ -11,10 +11,10 @@ const CONNECTION_TYPES = {
   notes: { name: 'Notas', icon: '📝', color: '#ef4444' }
 }
 
-function ConnectionModal({ 
-  sourceItem, 
-  sourceType, 
-  campaign,
+function ConnectionModal({
+  sourceItem,
+  sourceType,
+  _campaign,
   onConnect,
   onRemove,
   onClose,
@@ -190,8 +190,8 @@ function ConnectionModal({
 // Componente para mostrar elementos de un tipo específico
 function ConnectionTypeContent({
   type,
-  sourceItem,
-  sourceType,
+  _sourceItem,
+  _sourceType,
   availableItems,
   selectedItems,
   onToggleSelection,

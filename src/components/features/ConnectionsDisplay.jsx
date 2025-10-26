@@ -172,7 +172,7 @@ function ConnectionsDisplay({
 }
 
 // Sección para mostrar conexiones de un tipo específico - VERSION COMPACTA
-function ConnectionTypeSection({ type, config, items, onRemove, onNavigate }) {
+function ConnectionTypeSection({ _type, config, items, onRemove, onNavigate }) {
   // Estado para controlar la expansión de conexiones
   const [isExpanded, setIsExpanded] = React.useState(false);
   
@@ -303,7 +303,7 @@ function ConnectionTypeSection({ type, config, items, onRemove, onNavigate }) {
 }
 
 // Item individual de conexión - VERSION COMPACTA
-function ConnectionItem({ item, config, onRemove, onNavigate, compact = false }) {
+function ConnectionItem({ item, config, onRemove, onNavigate, _compact = false }) {
   const displayName = item.name || item.title || 'Sin nombre';
   const displayDetail = item.role || item.class || item.status || item.type;
   

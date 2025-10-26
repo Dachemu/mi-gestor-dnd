@@ -4,22 +4,21 @@ import ConnectionsDisplay from './ConnectionsDisplay'
 import DynamicForm from './DynamicForm'
 // TiptapEditor ya genera HTML, no necesitamos formatear markdown
 import BaseBadge from '../ui/base/BaseBadge'
-import { validateEntity } from '../../config/entityTypes.js'
 
 /**
  * Componente de detalles universal que reemplaza todos los *Details específicos
  * Renderiza información de cualquier tipo de entidad basado en configuración
  * Maneja secciones personalizadas y diferentes tipos de renderizado
  */
-function UniversalDetails({ 
-  item, 
-  entityType, 
-  config, 
-  onClose, 
-  onEdit, 
-  onDelete, 
-  connections, 
-  campaign 
+function UniversalDetails({
+  item,
+  entityType,
+  config,
+  _onClose,
+  onEdit,
+  onDelete,
+  connections,
+  _campaign
 }) {
   const [isEditing, setIsEditing] = useState(false)
   // Obtener elementos conectados
@@ -47,7 +46,7 @@ function UniversalDetails({
     if (!value) return null
 
     switch (renderType) {
-      case 'html':
+      case 'html': {
         // Sanitizar HTML antes de renderizar para prevenir XSS
         const sanitizedHTML = DOMPurify.sanitize(value, {
           ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'code', 'pre', 'a', 'span', 'div'],
@@ -69,6 +68,7 @@ function UniversalDetails({
             dangerouslySetInnerHTML={{ __html: sanitizedHTML }}
           />
         )
+      }
 
       case 'stats':
         // Renderizado especial para estadísticas (específico de players)

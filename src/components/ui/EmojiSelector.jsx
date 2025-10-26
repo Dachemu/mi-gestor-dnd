@@ -6,10 +6,10 @@ import { useHoverStyle } from '../../hooks/useHoverStyle'
 /**
  * Selector de emojis compacto que se puede integrar al lado de campos
  */
-function EmojiSelector({ value, onChange, name, entityType }) {
+function EmojiSelector({ value, onChange, name, _entityType }) {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('personas')
-  const modalRef = useRef(null)
+  const _modalRef = useRef(null)
 
   // Estilos con hover para el botón principal
   const { style: buttonStyle, handlers: buttonHandlers } = useHoverStyle(

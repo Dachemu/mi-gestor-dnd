@@ -3,15 +3,15 @@ import { useEditor, EditorContent } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { TextStyle } from '@tiptap/extension-text-style'
 import { Color } from '@tiptap/extension-color'
-import { Bold, Italic, Underline, List, ListOrdered, Quote, Palette } from './LazyIcons'
+import { Bold, Italic, List, ListOrdered, Quote, Palette } from './LazyIcons'
 
-const TiptapEditor = React.memo(function TiptapEditor({ 
-  value = '', 
-  onChange, 
-  placeholder = 'Escribe aquí...', 
+const TiptapEditor = React.memo(function TiptapEditor({
+  value = '',
+  onChange,
+  _placeholder = 'Escribe aquí...',
   minHeight = '200px',
   maxHeight = '400px',
-  name 
+  name
 }) {
   const editor = useEditor({
     extensions: [

@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react'
-import { SearchIcon, BackIcon, MenuIcon, CloseIcon } from '../components/ui/LazyIcons'
+import { BackIcon, MenuIcon, CloseIcon } from '../components/ui/LazyIcons'
 import { debug, error as logError } from '../utils/logger'
 import { ImprovedSearchBox } from '../components/features/ImprovedSearchBox'
 import { useConnections } from '../hooks/useConnections.jsx'
 import { useSearch } from '../hooks/useSearch.jsx'
 import { saveCampaigns, loadCampaigns, exportCampaign } from '../services'
-import { Download, Save } from '../components/ui/LazyIcons'
+import { Download } from '../components/ui/LazyIcons'
 import { zeroConfigGoogleDrive } from '../services/zeroConfigGoogleDrive'
 import styles from './CampaignDashboard.module.css'
-import { BaseButton, BaseInput, BaseBadge, BaseLoader } from '../components/ui/base'
+import { BaseButton, BaseBadge, BaseLoader } from '../components/ui/base'
 
 // Lazy loading para componentes pesados que se usan condicionalmente
 const UniversalManager = React.lazy(() => import('../components/features/EntityManager'))

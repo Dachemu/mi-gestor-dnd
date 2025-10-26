@@ -33,10 +33,17 @@ Un gestor de campañas moderno y completo para Dungeons & Dragons, construido co
 - Resultados en tiempo real con destacado
 - Filtros por tipo de entidad
 
+### ☁️ Sincronización con Google Drive
+- Sincronización automática con tu Google Drive personal
+- Tus campañas se guardan de forma segura en la nube
+- Accede a tus datos desde cualquier dispositivo
+- Sistema de resolución de conflictos inteligente
+- [Ver guía de configuración](GOOGLE_DRIVE_SETUP.md)
+
 ### 💾 Persistencia Local
-- Guarda automáticamente todos los cambios
-- Datos almacenados localmente en el navegador
-- Exportación e importación de campañas
+- Guarda automáticamente todos los cambios en localStorage
+- Funciona completamente offline
+- Exportación e importación de campañas en formato JSON
 
 ### 🎨 Interfaz Moderna
 - Diseño responsivo y atractivo
@@ -60,11 +67,18 @@ cd mi-gestor-dnd
 # Instalar dependencias
 npm install
 
+# Configurar Google Drive (OPCIONAL - ver GOOGLE_DRIVE_SETUP.md)
+# Copia .env.example a .env y agrega tus credenciales
+cp .env.example .env
+# Edita .env con tus credenciales de Google Cloud Console
+
 # Iniciar servidor de desarrollo
 npm run dev
 ```
 
 El servidor se iniciará en `http://127.0.0.1:4000`
+
+**Nota:** La aplicación funciona perfectamente sin Google Drive. La sincronización en la nube es completamente opcional.
 
 ### Scripts Disponibles
 
