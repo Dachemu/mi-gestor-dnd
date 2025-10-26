@@ -21,8 +21,16 @@ function UniversalDetails({
   _campaign
 }) {
   const [isEditing, setIsEditing] = useState(false)
-  // Obtener elementos conectados
-  const linkedItems = connections?.getLinkedItems(item) || {}
+  // Estado local del item para actualización inmediata
+  const [localItem, setLocalItem] = useState(item)
+
+  // Sincronizar item local con prop cuando cambia
+  useEffect(() => {
+    setLocalItem(item)
+  }, [item])
+
+  // Obtener elementos conectados usando el item local
+  const linkedItems = connections?.getLinkedItems(localItem) || {}
 
   // Función para obtener color basado en configuración
   const getFieldColor = (fieldName, value) => {
@@ -134,22 +142,22 @@ function UniversalDetails({
   const renderHeader = () => {
     const primaryField = config.displayFields.primary
     const secondaryFields = config.displayFields.secondary || []
-    
+
     return (
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
           <div style={{ fontSize: '3rem' }}>
-            {item.icon || config.icon}
+            {localItem.icon || config.icon}
           </div>
           <div>
             <h3 style={{ color: 'white', margin: 0, fontSize: '1.5rem' }}>
-              {item[primaryField]}
+              {localItem[primaryField]}
             </h3>
-            
+
             {/* Información secundaria con badges */}
             <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
               {secondaryFields.map(fieldName => {
-                const value = item[fieldName]
+                const value = localItem[fieldName]
                 if (!value) return null
                 
                 return (
@@ -171,19 +179,19 @@ function UniversalDetails({
               })}
               
               {/* Campo especial de nivel para jugadores */}
-              {entityType === 'players' && item.level && (
-                <BaseBadge 
+              {entityType === 'players' && localItem.level && (
+                <BaseBadge
                   variant="category"
                   color="purple"
                   size="md"
                   icon="⭐"
                   style={{
-                    background: `${getFieldColor('level', item.level)}20`,
-                    color: getFieldColor('level', item.level),
-                    border: `1px solid ${getFieldColor('level', item.level)}40`
+                    background: `${getFieldColor('level', localItem.level)}20`,
+                    color: getFieldColor('level', localItem.level),
+                    border: `1px solid ${getFieldColor('level', localItem.level)}40`
                   }}
                 >
-                  Nivel {item.level}
+                  Nivel {localItem.level}
                 </BaseBadge>
               )}
             </div>
@@ -196,8 +204,8 @@ function UniversalDetails({
   // Renderizar secciones de detalles
   const renderDetailSections = () => {
     return config.detailSections.map((section, index) => {
-      const sectionFields = section.fields.filter(fieldName => item[fieldName])
-      
+      const sectionFields = section.fields.filter(fieldName => localItem[fieldName])
+
       if (sectionFields.length === 0) return null
 
       return (
@@ -206,7 +214,7 @@ function UniversalDetails({
 
           {sectionFields.map(fieldName => {
             const fieldConfig = config.schema[fieldName]
-            const value = item[fieldName]
+            const value = localItem[fieldName]
 
             if (!value) return null
 
@@ -231,36 +239,36 @@ function UniversalDetails({
     const sections = []
 
     // Información específica de jugadores
-    if (entityType === 'players' && item.playerName) {
+    if (entityType === 'players' && localItem.playerName) {
       sections.push(
         <div key="playerName" style={{ marginBottom: '1rem' }}>
           <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Jugador real</h4>
           <p style={{ color: 'var(--text-secondary)' }}>
-            🎮 {item.playerName}
+            🎮 {localItem.playerName}
           </p>
         </div>
       )
     }
 
     // Información de ubicación para misiones y objetos
-    if ((entityType === 'quests' || entityType === 'objects') && item.location) {
+    if ((entityType === 'quests' || entityType === 'objects') && localItem.location) {
       sections.push(
         <div key="location" style={{ marginBottom: '1rem' }}>
           <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Ubicación</h4>
           <p style={{ color: 'var(--text-secondary)' }}>
-            📍 {item.location}
+            📍 {localItem.location}
           </p>
         </div>
       )
     }
 
     // Recompensa para misiones
-    if (entityType === 'quests' && item.reward) {
+    if (entityType === 'quests' && localItem.reward) {
       sections.push(
         <div key="reward" style={{ marginBottom: '1rem' }}>
           <h4 style={{ color: 'white', marginBottom: '0.5rem' }}>Recompensa</h4>
           <p style={{ color: 'var(--text-secondary)' }}>
-            💰 {item.reward}
+            💰 {localItem.reward}
           </p>
         </div>
       )
@@ -271,11 +279,11 @@ function UniversalDetails({
       sections.push(
         <div key="timestamps" style={{ marginBottom: '2rem' }}>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            📅 Creada el {new Date(item.createdAt).toLocaleDateString()} a las {new Date(item.createdAt).toLocaleTimeString()}
+            📅 Creada el {new Date(localItem.createdAt).toLocaleDateString()} a las {new Date(localItem.createdAt).toLocaleTimeString()}
           </p>
-          {item.modifiedAt && item.modifiedAt !== item.createdAt && (
+          {localItem.modifiedAt && localItem.modifiedAt !== localItem.createdAt && (
             <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-              ✏️ Última modificación: {new Date(item.modifiedAt).toLocaleDateString()} a las {new Date(item.modifiedAt).toLocaleTimeString()}
+              ✏️ Última modificación: {new Date(localItem.modifiedAt).toLocaleDateString()} a las {new Date(localItem.modifiedAt).toLocaleTimeString()}
             </p>
           )}
         </div>
@@ -287,7 +295,8 @@ function UniversalDetails({
 
   // Función para manejar guardado desde el formulario interno
   const handleSave = (formData) => {
-    const updatedItem = { ...item, ...formData, id: item.id }
+    const updatedItem = { ...localItem, ...formData, id: localItem.id }
+    setLocalItem(updatedItem) // Actualizar item local inmediatamente
     onEdit(updatedItem) // Llamar a la función de guardado del padre
     setIsEditing(false) // Volver al modo vista
   }
@@ -322,7 +331,7 @@ function UniversalDetails({
     const editButton = document.createElement('button')
     editButton.innerHTML = '✏️'
     editButton.title = 'Editar'
-    editButton.setAttribute('aria-label', `Editar ${item.name || item.title}`)
+    editButton.setAttribute('aria-label', `Editar ${localItem.name || localItem.title}`)
     editButton.setAttribute('type', 'button')
     editButton.style.cssText = `
       background: rgba(79, 70, 229, 0.2);
@@ -361,7 +370,7 @@ function UniversalDetails({
     const deleteButton = document.createElement('button')
     deleteButton.innerHTML = '🗑️'
     deleteButton.title = 'Eliminar'
-    deleteButton.setAttribute('aria-label', `Eliminar ${item.name || item.title}`)
+    deleteButton.setAttribute('aria-label', `Eliminar ${localItem.name || localItem.title}`)
     deleteButton.setAttribute('type', 'button')
     deleteButton.style.cssText = `
       background: rgba(239, 68, 68, 0.2);
@@ -387,7 +396,7 @@ function UniversalDetails({
       deleteButton.style.borderColor = 'rgba(239, 68, 68, 0.3)'
     })
     const handleDelete = () => {
-      if (window.confirm(`¿Estás seguro de que quieres eliminar "${item.name || item.title}"?`)) {
+      if (window.confirm(`¿Estás seguro de que quieres eliminar "${localItem.name || localItem.title}"?`)) {
         onDelete()
       }
     }
@@ -427,7 +436,7 @@ function UniversalDetails({
         <DynamicForm
           entityType={entityType}
           config={config}
-          item={item}
+          item={localItem}
           onSave={handleSave}
           onClose={handleCancelEdit}
           showCompactButtons={true}
@@ -480,7 +489,7 @@ function UniversalDetails({
         </button>
         <button
           onClick={() => {
-            if (window.confirm(`¿Estás seguro de que quieres eliminar "${item.name || item.title}"?`)) {
+            if (window.confirm(`¿Estás seguro de que quieres eliminar "${localItem.name || localItem.title}"?`)) {
               onDelete()
             }
           }}

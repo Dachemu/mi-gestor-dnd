@@ -47,6 +47,7 @@ const BaseModal = ({
 }) => {
   const modalRef = useRef(null)
   const overlayRef = useRef(null)
+  const mouseDownPos = useRef(null)
 
   // Efecto para manejar el escape key
   useEffect(() => {
@@ -100,9 +101,34 @@ const BaseModal = ({
     }
   }, [isOpen])
 
-  // Handler para click en overlay
+  // Handler para mousedown en overlay - guardar posición inicial
+  const handleOverlayMouseDown = (e) => {
+    if (e.target === overlayRef.current) {
+      mouseDownPos.current = { x: e.clientX, y: e.clientY }
+    }
+  }
+
+  // Handler para click en overlay - solo cerrar si no hubo drag
   const handleOverlayClick = (e) => {
-    if (closeOnOverlay && e.target === overlayRef.current) {
+    if (!closeOnOverlay || e.target !== overlayRef.current) {
+      return
+    }
+
+    // Si hubo mousedown, verificar que no fue un drag
+    if (mouseDownPos.current) {
+      const deltaX = Math.abs(e.clientX - mouseDownPos.current.x)
+      const deltaY = Math.abs(e.clientY - mouseDownPos.current.y)
+      const threshold = 5 // Píxeles de tolerancia para considerar que es un click
+
+      // Solo cerrar si el movimiento fue menor al threshold
+      if (deltaX < threshold && deltaY < threshold) {
+        onClose()
+      }
+
+      // Limpiar posición guardada
+      mouseDownPos.current = null
+    } else {
+      // Si no hay mousedown guardado, es un click directo (edge case)
       onClose()
     }
   }
@@ -131,6 +157,7 @@ const BaseModal = ({
     <div
       ref={overlayRef}
       className={styles.modalOverlay}
+      onMouseDown={handleOverlayMouseDown}
       onClick={handleOverlayClick}
       onAnimationEnd={handleAnimationEnd}
       style={{ zIndex }}
