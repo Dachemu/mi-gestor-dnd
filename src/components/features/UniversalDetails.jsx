@@ -23,6 +23,8 @@ function UniversalDetails({
   const [isEditing, setIsEditing] = useState(false)
   // Estado local del item para actualización inmediata
   const [localItem, setLocalItem] = useState(item)
+  // Estado para controlar el dropdown de campos editables
+  const [openDropdown, setOpenDropdown] = useState(null)
 
   // Sincronizar item local con prop cuando cambia
   useEffect(() => {
@@ -31,6 +33,25 @@ function UniversalDetails({
 
   // Obtener elementos conectados usando el item local
   const linkedItems = connections?.getLinkedItems(localItem) || {}
+
+  // Función para manejar cambio de campo editable (como status o priority)
+  const handleFieldChange = (fieldName, newValue) => {
+    const updatedItem = { ...localItem, [fieldName]: newValue }
+    setLocalItem(updatedItem) // Actualizar item local inmediatamente
+    onEdit(updatedItem) // Llamar a la función de guardado del padre
+    setOpenDropdown(null) // Cerrar el dropdown
+  }
+
+  // Cerrar dropdown al hacer click fuera
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (openDropdown !== null) {
+        setOpenDropdown(null)
+      }
+    }
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [openDropdown])
 
   // Función para obtener color basado en configuración
   const getFieldColor = (fieldName, value) => {
@@ -159,25 +180,106 @@ function UniversalDetails({
               {secondaryFields.map(fieldName => {
                 const value = localItem[fieldName]
                 if (!value) return null
-                
+
+                const fieldConfig = config.schema[fieldName]
+                const isEditable = fieldConfig?.type === 'select' && fieldConfig?.options
+                const isDropdownOpen = openDropdown === fieldName
+
                 return (
-                  <BaseBadge 
-                    key={fieldName}
-                    variant="info"
-                    color="blue"
-                    size="md"
-                    icon={getFieldIcon(fieldName, value)}
-                    style={{
-                      background: `${getFieldColor(fieldName, value)}20`,
-                      color: getFieldColor(fieldName, value),
-                      border: `1px solid ${getFieldColor(fieldName, value)}40`
-                    }}
-                  >
-                    {value}
-                  </BaseBadge>
+                  <div key={fieldName} style={{ position: 'relative' }}>
+                    <BaseBadge
+                      variant="info"
+                      color="blue"
+                      size="md"
+                      icon={getFieldIcon(fieldName, value)}
+                      style={{
+                        background: `${getFieldColor(fieldName, value)}20`,
+                        color: getFieldColor(fieldName, value),
+                        border: `1px solid ${getFieldColor(fieldName, value)}40`,
+                        cursor: isEditable ? 'pointer' : 'default',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onClick={(e) => {
+                        if (isEditable) {
+                          e.stopPropagation()
+                          setOpenDropdown(isDropdownOpen ? null : fieldName)
+                        }
+                      }}
+                      onMouseEnter={(e) => {
+                        if (isEditable) {
+                          e.currentTarget.style.transform = 'scale(1.05)'
+                          e.currentTarget.style.boxShadow = `0 0 12px ${getFieldColor(fieldName, value)}60`
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (isEditable) {
+                          e.currentTarget.style.transform = 'scale(1)'
+                          e.currentTarget.style.boxShadow = 'none'
+                        }
+                      }}
+                    >
+                      {value} {isEditable && <span style={{ marginLeft: '0.25rem' }}>▼</span>}
+                    </BaseBadge>
+
+                    {/* Dropdown de opciones */}
+                    {isEditable && isDropdownOpen && (
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                          position: 'absolute',
+                          top: 'calc(100% + 0.5rem)',
+                          left: 0,
+                          background: 'rgba(31, 41, 55, 0.98)',
+                          border: `1px solid ${getFieldColor(fieldName, value)}40`,
+                          borderRadius: '8px',
+                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                          zIndex: 1000,
+                          minWidth: '150px',
+                          overflow: 'hidden'
+                        }}
+                      >
+                        {fieldConfig.options.map((option) => (
+                          <div
+                            key={option}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleFieldChange(fieldName, option)
+                            }}
+                            style={{
+                              padding: '0.75rem 1rem',
+                              cursor: 'pointer',
+                              background: option === value ? `${getFieldColor(fieldName, option)}20` : 'transparent',
+                              color: option === value ? getFieldColor(fieldName, option) : '#d1d5db',
+                              borderBottom: '1px solid rgba(79, 70, 229, 0.1)',
+                              transition: 'all 0.15s ease',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (option !== value) {
+                                e.currentTarget.style.background = `${getFieldColor(fieldName, option)}15`
+                                e.currentTarget.style.color = getFieldColor(fieldName, option)
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (option !== value) {
+                                e.currentTarget.style.background = 'transparent'
+                                e.currentTarget.style.color = '#d1d5db'
+                              }
+                            }}
+                          >
+                            <span>{getFieldIcon(fieldName, option)}</span>
+                            <span>{option}</span>
+                            {option === value && <span style={{ marginLeft: 'auto' }}>✓</span>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 )
               })}
-              
+
               {/* Campo especial de nivel para jugadores */}
               {entityType === 'players' && localItem.level && (
                 <BaseBadge

@@ -78,8 +78,8 @@ function ConnectionModal({
     }
   }, [sourceItem, sourceType, selectedItems, getAvailableItems, onConnect, onRemove])
 
-  // Filtrar tipos disponibles (no mostrar el mismo tipo del elemento fuente)
-  const availableTypes = Object.keys(CONNECTION_TYPES).filter(type => type !== sourceType)
+  // Mostrar todos los tipos disponibles, incluyendo el mismo tipo del elemento fuente
+  const availableTypes = Object.keys(CONNECTION_TYPES)
 
   if (!sourceItem) return null
 
@@ -91,95 +91,268 @@ function ConnectionModal({
       size="lg"
     >
       <div style={{
-        maxHeight: '70vh',
-        overflow: 'auto'
+        display: 'grid',
+        gridTemplateColumns: '1fr 400px',
+        gap: '1.5rem',
+        height: '70vh',
+        overflow: 'hidden'
       }}>
-        {/* Descripción */}
-        <div style={{
-          marginBottom: '2rem',
-          borderBottom: '1px solid var(--glass-border)',
-          paddingBottom: '1rem'
-        }}>
-          <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '1rem' }}>
-            Selecciona elementos para conectar con este {CONNECTION_TYPES[sourceType]?.name.toLowerCase().slice(0, -1)}
-          </p>
-        </div>
-
-        {/* Tabs de categorías */}
+        {/* Panel izquierdo - Selección */}
         <div style={{
           display: 'flex',
-          gap: 'clamp(0.25rem, 1vw, 0.5rem)',
-          marginBottom: '1.5rem',
-          flexWrap: 'wrap'
+          flexDirection: 'column',
+          overflow: 'hidden'
         }}>
-          {availableTypes.map(type => {
-            const config = CONNECTION_TYPES[type]
-            const available = getAvailableItems(sourceItem, sourceType, type)
-            const selected = selectedItems[type] || []
-            
-            return (
-              <button
-                key={type}
-                onClick={() => setActiveTab(type)}
-                style={{
-                  padding: 'clamp(0.5rem, 2vw, 0.75rem) clamp(0.75rem, 2vw, 1rem)',
-                  borderRadius: '10px',
-                  border: 'none',
-                  background: activeTab === type 
-                    ? `${config.color}40` 
-                    : 'rgba(31, 41, 55, 0.5)',
-                  color: activeTab === type 
-                    ? config.color 
-                    : 'var(--text-muted)',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  fontSize: 'clamp(0.8rem, 2vw, 0.9rem)',
-                  fontWeight: '500'
-                }}
-              >
-                <span>{config.icon}</span>
-                <span>{config.name}</span>
-                <span style={{
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  borderRadius: '12px',
-                  padding: '0.125rem 0.375rem',
-                  fontSize: '0.75rem',
-                  fontWeight: '600'
-                }}>
-                  {selected.length}/{available.length}
-                </span>
-              </button>
-            )
-          })}
+          {/* Descripción */}
+          <div style={{
+            marginBottom: '1rem',
+            paddingBottom: '1rem',
+            borderBottom: '1px solid var(--glass-border)'
+          }}>
+            <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.9rem' }}>
+              Selecciona elementos para conectar
+            </p>
+          </div>
+
+          {/* Tabs de categorías */}
+          <div style={{
+            display: 'flex',
+            gap: '0.5rem',
+            marginBottom: '1rem',
+            flexWrap: 'wrap',
+            flexShrink: 0
+          }}>
+            {availableTypes.map(type => {
+              const config = CONNECTION_TYPES[type]
+              const available = getAvailableItems(sourceItem, sourceType, type)
+              const selected = selectedItems[type] || []
+
+              return (
+                <button
+                  key={type}
+                  onClick={() => setActiveTab(type)}
+                  style={{
+                    padding: '0.6rem 0.9rem',
+                    borderRadius: '10px',
+                    border: 'none',
+                    background: activeTab === type
+                      ? `${config.color}40`
+                      : 'rgba(31, 41, 55, 0.5)',
+                    color: activeTab === type
+                      ? config.color
+                      : 'var(--text-muted)',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    fontSize: '0.85rem',
+                    fontWeight: '500'
+                  }}
+                >
+                  <span>{config.icon}</span>
+                  <span>{config.name}</span>
+                  <span style={{
+                    background: 'rgba(255, 255, 255, 0.2)',
+                    borderRadius: '12px',
+                    padding: '0.125rem 0.375rem',
+                    fontSize: '0.7rem',
+                    fontWeight: '600'
+                  }}>
+                    {selected.length}/{available.length}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Contenido de la pestaña activa */}
+          <div style={{
+            flex: 1,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <ConnectionTypeContent
+              type={activeTab}
+              sourceItem={sourceItem}
+              sourceType={sourceType}
+              availableItems={getAvailableItems(sourceItem, sourceType, activeTab)}
+              selectedItems={selectedItems[activeTab] || []}
+              onToggleSelection={(item) => toggleSelection(item, activeTab)}
+              onSelectAll={() => selectAllInType(activeTab)}
+            />
+          </div>
         </div>
 
-        {/* Contenido de la pestaña activa */}
-        <div style={{ minHeight: '300px' }}>
-          <ConnectionTypeContent
-            type={activeTab}
-            sourceItem={sourceItem}
-            sourceType={sourceType}
-            availableItems={getAvailableItems(sourceItem, sourceType, activeTab)}
-            selectedItems={selectedItems[activeTab] || []}
-            onToggleSelection={(item) => toggleSelection(item, activeTab)}
-            onSelectAll={() => selectAllInType(activeTab)}
-          />
-        </div>
-
-        {/* Footer con estadísticas */}
+        {/* Panel derecho - Conexiones actuales */}
         <div style={{
-          borderTop: '1px solid var(--glass-border)',
-          paddingTop: '1rem',
-          marginTop: '2rem',
+          borderLeft: '1px solid var(--glass-border)',
+          paddingLeft: '1.5rem',
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
+          flexDirection: 'column',
+          overflow: 'hidden'
         }}>
-          <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            Total de conexiones: {Object.values(selectedItems).reduce((total, items) => total + items.length, 0)}
+          <h4 style={{
+            color: 'white',
+            fontSize: '1.1rem',
+            marginBottom: '1rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            flexShrink: 0
+          }}>
+            🔗 Conexiones actuales
+            <span style={{
+              background: 'rgba(79, 70, 229, 0.2)',
+              borderRadius: '12px',
+              padding: '0.25rem 0.5rem',
+              fontSize: '0.75rem',
+              fontWeight: '600',
+              color: '#6366f1'
+            }}>
+              {Object.values(selectedItems).reduce((total, items) => total + items.length, 0)}
+            </span>
+          </h4>
+
+          {/* Lista de conexiones con scroll */}
+          <div style={{
+            flex: 1,
+            overflowY: 'auto',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem'
+          }}>
+            {Object.values(selectedItems).every(items => items.length === 0) ? (
+              <div style={{
+                textAlign: 'center',
+                padding: '3rem 1rem',
+                color: 'var(--text-muted)'
+              }}>
+                <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>
+                  🔗
+                </div>
+                <p style={{ fontSize: '0.9rem' }}>
+                  No hay conexiones aún
+                </p>
+                <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>
+                  Selecciona elementos de la izquierda
+                </p>
+              </div>
+            ) : (
+              Object.entries(CONNECTION_TYPES).map(([type, config]) => {
+                const connections = selectedItems[type] || []
+                if (connections.length === 0) return null
+
+                return (
+                  <div key={type} style={{
+                    background: `${config.color}08`,
+                    border: `1px solid ${config.color}30`,
+                    borderRadius: '12px',
+                    padding: '1rem'
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      marginBottom: '0.75rem'
+                    }}>
+                      <span style={{ fontSize: '1.2rem' }}>{config.icon}</span>
+                      <span style={{
+                        color: config.color,
+                        fontWeight: '600',
+                        fontSize: '0.95rem'
+                      }}>
+                        {config.name}
+                      </span>
+                      <span style={{
+                        background: `${config.color}25`,
+                        borderRadius: '12px',
+                        padding: '0.125rem 0.4rem',
+                        fontSize: '0.7rem',
+                        fontWeight: '600',
+                        color: config.color
+                      }}>
+                        {connections.length}
+                      </span>
+                    </div>
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.5rem'
+                    }}>
+                      {connections.map(item => (
+                        <div
+                          key={item.id}
+                          style={{
+                            background: `${config.color}15`,
+                            border: `1px solid ${config.color}30`,
+                            borderRadius: '8px',
+                            padding: '0.5rem 0.75rem',
+                            color: 'white',
+                            fontSize: '0.85rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            transition: 'all 0.2s ease',
+                            position: 'relative',
+                            paddingRight: '2rem'
+                          }}
+                        >
+                          <span>{item.icon || config.icon}</span>
+                          <span style={{
+                            flex: 1,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                          }}>
+                            {item.name || item.title}
+                          </span>
+                          {/* Botón de eliminar */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              toggleSelection(item, type)
+                            }}
+                            style={{
+                              position: 'absolute',
+                              right: '0.5rem',
+                              top: '50%',
+                              transform: 'translateY(-50%)',
+                              background: 'rgba(239, 68, 68, 0.2)',
+                              border: '1px solid rgba(239, 68, 68, 0.3)',
+                              borderRadius: '4px',
+                              color: '#ef4444',
+                              width: '20px',
+                              height: '20px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              fontSize: '0.7rem',
+                              padding: 0,
+                              transition: 'all 0.15s ease',
+                              opacity: 0.7
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.opacity = '1'
+                              e.currentTarget.style.background = 'rgba(239, 68, 68, 0.3)'
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.opacity = '0.7'
+                              e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'
+                            }}
+                            title="Eliminar conexión"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })
+            )}
           </div>
         </div>
       </div>
@@ -216,74 +389,110 @@ function ConnectionTypeContent({
   const allSelected = selectedItems.length === availableItems.length
 
   return (
-    <div>
+    <div style={{
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden'
+    }}>
       {/* Header con botón "Seleccionar todos" */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: '1rem'
+        marginBottom: '1rem',
+        flexShrink: 0
       }}>
-        <h4 style={{ 
-          color: 'white', 
-          fontSize: '1.1rem', 
+        <h4 style={{
+          color: 'white',
+          fontSize: '1rem',
           margin: 0,
           display: 'flex',
           alignItems: 'center',
           gap: '0.5rem'
         }}>
-          {config.icon} {config.name} disponibles ({availableItems.length})
+          {config.icon} {config.name}
+          <span style={{
+            background: `${config.color}20`,
+            borderRadius: '12px',
+            padding: '0.125rem 0.4rem',
+            fontSize: '0.7rem',
+            fontWeight: '600',
+            color: config.color
+          }}>
+            {availableItems.length}
+          </span>
         </h4>
-        
+
         <button
           onClick={onSelectAll}
           style={{
-            background: allSelected 
-              ? 'rgba(239, 68, 68, 0.2)' 
+            background: allSelected
+              ? 'rgba(239, 68, 68, 0.2)'
               : 'rgba(79, 70, 229, 0.2)',
-            border: `1px solid ${allSelected 
-              ? 'rgba(239, 68, 68, 0.3)' 
+            border: `1px solid ${allSelected
+              ? 'rgba(239, 68, 68, 0.3)'
               : 'rgba(79, 70, 229, 0.3)'}`,
             borderRadius: '8px',
             color: allSelected ? '#ef4444' : '#4f46e5',
             padding: '0.5rem 0.75rem',
             cursor: 'pointer',
-            fontSize: '0.8rem',
-            fontWeight: '600'
+            fontSize: '0.75rem',
+            fontWeight: '600',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.opacity = '0.8'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.opacity = '1'
           }}
         >
-          {allSelected ? '❌ Deseleccionar todos' : '✅ Seleccionar todos'}
+          {allSelected ? '❌ Deseleccionar' : '✅ Seleccionar todos'}
         </button>
       </div>
 
       {/* Lista de elementos */}
       <div style={{
+        flex: 1,
+        overflow: 'auto',
         display: 'grid',
         gap: '0.75rem',
-        maxHeight: '300px',
-        overflowY: 'auto'
+        alignContent: 'start'
       }}>
         {availableItems.map(item => {
           const isSelected = selectedItems.some(selected => selected.id === item.id)
-          
+
           return (
             <div
               key={item.id}
               onClick={() => onToggleSelection(item)}
               style={{
-                background: isSelected 
-                  ? `${config.color}20` 
+                background: isSelected
+                  ? `${config.color}20`
                   : 'rgba(31, 41, 55, 0.3)',
-                border: `1px solid ${isSelected 
-                  ? config.color 
+                border: `1px solid ${isSelected
+                  ? config.color
                   : 'rgba(79, 70, 229, 0.2)'}`,
                 borderRadius: '12px',
-                padding: '1rem',
+                padding: '0.9rem',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '1rem'
+                gap: '0.9rem'
+              }}
+              onMouseEnter={(e) => {
+                if (!isSelected) {
+                  e.currentTarget.style.background = 'rgba(31, 41, 55, 0.5)'
+                  e.currentTarget.style.borderColor = 'rgba(79, 70, 229, 0.3)'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isSelected) {
+                  e.currentTarget.style.background = 'rgba(31, 41, 55, 0.3)'
+                  e.currentTarget.style.borderColor = 'rgba(79, 70, 229, 0.2)'
+                }
               }}
             >
               {/* Checkbox visual */}
@@ -296,21 +505,22 @@ function ConnectionTypeContent({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                flexShrink: 0
+                flexShrink: 0,
+                transition: 'all 0.2s ease'
               }}>
-                {isSelected && <span style={{ color: 'white', fontSize: '0.8rem' }}>✓</span>}
+                {isSelected && <span style={{ color: 'white', fontSize: '0.8rem', fontWeight: 'bold' }}>✓</span>}
               </div>
 
               {/* Icono del elemento */}
-              <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>
+              <span style={{ fontSize: '1.4rem', flexShrink: 0 }}>
                 {item.icon || config.icon}
               </span>
 
               {/* Información del elemento */}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <h5 style={{ 
-                  color: 'white', 
-                  fontSize: '1rem', 
+                <h5 style={{
+                  color: 'white',
+                  fontSize: '0.95rem',
                   fontWeight: '600',
                   margin: 0,
                   overflow: 'hidden',
@@ -320,9 +530,9 @@ function ConnectionTypeContent({
                   {item.name || item.title}
                 </h5>
                 {item.description && (
-                  <p style={{ 
-                    color: 'var(--text-muted)', 
-                    fontSize: '0.8rem',
+                  <p style={{
+                    color: 'var(--text-muted)',
+                    fontSize: '0.75rem',
                     margin: '0.25rem 0 0 0',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -335,13 +545,13 @@ function ConnectionTypeContent({
 
               {/* Estado de selección */}
               <span style={{
-                background: isSelected 
-                  ? `${config.color}40` 
+                background: isSelected
+                  ? `${config.color}40`
                   : 'rgba(107, 114, 128, 0.2)',
                 color: isSelected ? config.color : '#9ca3af',
-                padding: '0.25rem 0.5rem',
-                borderRadius: '8px',
-                fontSize: '0.75rem',
+                padding: '0.3rem 0.6rem',
+                borderRadius: '6px',
+                fontSize: '0.7rem',
                 fontWeight: '600',
                 flexShrink: 0
               }}>
