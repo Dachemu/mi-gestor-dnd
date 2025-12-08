@@ -1,0 +1,36 @@
+/* Estilos para las partículas de fondo */
+#particles .particle {
+  width: var(--size);
+  height: var(--size);
+  position: absolute;
+  left: var(--x-pos);
+  background: rgba(139, 92, 246, 0.4);
+  border-radius: 50%;
+  animation: floatOptimized var(--duration) var(--delay) infinite;
+  will-change: transform;
+}
+
+@keyframes floatOptimized {
+  from {
+    transform: translateY(100vh) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-100px) translateX(calc(var(--x-pos) * 0.2));
+    opacity: 0;
+  }
+}
+
+/* Desactivar animaciones si el usuario prefiere motion reducido */
+@media (prefers-reduced-motion: reduce) {
+  #particles .particle {
+    animation: none;
+    opacity: 0.3;
+  }
+}

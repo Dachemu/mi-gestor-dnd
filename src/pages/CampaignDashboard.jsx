@@ -86,16 +86,25 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
     }
   }, [])
 
-  // Enhanced function to update campaign with auto-save
+  // Debounced save function - solo guarda después de 2 segundos de inactividad
+  const debouncedSaveRef = useRef(null)
+
+  // Enhanced function to update campaign with debounced auto-save
   const updateCampaign = useCallback((updates) => {
     debug('Actualizando campaña:', updates)
     setCurrentCampaign(prev => {
       const newCampaign = { ...prev, ...updates }
 
-      // Auto-save changes using setTimeout to avoid blocking
-      setTimeout(() => {
+      // Cancelar guardado pendiente
+      if (debouncedSaveRef.current) {
+        clearTimeout(debouncedSaveRef.current)
+      }
+
+      // Programar nuevo guardado después de 2 segundos de inactividad
+      debouncedSaveRef.current = setTimeout(() => {
         saveChanges(newCampaign)
-      }, 0)
+        debouncedSaveRef.current = null
+      }, 2000)
 
       return newCampaign
     })
@@ -108,7 +117,7 @@ const CampaignDashboard = React.memo(function CampaignDashboard({ campaign, onBa
   // Inicializar el filtro de búsqueda según la pestaña activa
   useEffect(() => {
     search.setFilter(activeTab)
-  }, [activeTab, search.setFilter])
+  }, [activeTab]) // Removido search.setFilter para evitar loops
 
   // Enhanced function to navigate to connected element
   const navigateToItem = useCallback((item, itemType) => {

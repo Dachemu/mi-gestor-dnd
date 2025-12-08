@@ -5,6 +5,7 @@ import { BaseLoader } from './components/ui/base'
 import GlobalProgressManager from './components/common/GlobalProgressManager'
 import ErrorBoundary from './utils/errorBoundary'
 import './App.css'
+import './styles/animations.css'
 
 // Lazy loading de páginas principales para code splitting
 const CampaignSelector = React.lazy(() => import('./pages/CampaignSelector'))
@@ -30,7 +31,7 @@ function App() {
   return (
     <ErrorBoundary>
       <BackgroundParticles />
-      
+
       {/* Suspense wrapper para lazy loading con loader consistente */}
       <Suspense fallback={<BaseLoader />}>
         {/* Mostrar componente según la vista actual */}
